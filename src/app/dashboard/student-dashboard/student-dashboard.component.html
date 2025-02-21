@@ -1,0 +1,67 @@
+
+
+<div class="container mt-3">
+  <!-- Welcome Section -->
+  <div class="card mb-4 p-4">
+    <h2>Welcome, {{ studentInfo.name }}</h2>
+    <p>Disability ID: {{ studentInfo.disabilityId }}</p>
+    <p>Course: {{ studentInfo.course }}</p>
+    <p>Current Semester: {{ studentInfo.semester }}</p>
+    <p><strong>Pending Dues: {{ studentInfo.dues }}</strong></p>
+  </div>
+
+  <!-- Notifications Section -->
+<div class="card mb-4">
+  <div class="card-header">
+    <h3>Notifications</h3>
+  </div>
+  <ul class="list-group list-group-flush">
+    <li *ngFor="let notification of notifications" class="list-group-item d-flex align-items-center">
+      <i class="bi bi-bell-fill text-primary me-2"></i>
+      {{ notification }}
+    </li>
+  </ul>
+</div>
+
+<!-- Recent Activities Section -->
+<div class="card mb-4">
+  <div class="card-header">
+    <h3>Recent Activities</h3>
+  </div>
+  <ul class="list-group list-group-flush">
+    <li *ngFor="let activity of recentActivities" class="list-group-item d-flex align-items-center">
+      <i class="bi bi-check-circle-fill text-success me-2"></i>
+      <strong>{{ activity.date }}</strong>: {{ activity.activity }}
+    </li>
+  </ul>
+</div>
+
+
+  <!-- Quick Links Section -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h3>Quick Links</h3>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div *ngFor="let link of quickLinks" class="col-md-3 mb-3">
+          <button class="btn btn-primary w-100">{{ link }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Study Resources Section -->
+  <div class="card">
+    <div class="card-header">
+      <h3>Study Resources</h3>
+    </div>
+    <div class="card-body">
+      <ul>
+        <li *ngFor="let resource of studyResources">
+          <a href="{{ resource.link }}" target="_blank">{{ resource.title }}</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

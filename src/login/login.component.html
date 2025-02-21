@@ -1,0 +1,27 @@
+
+
+<div class="left-section">
+    <img src="IMG-20250201-WA0005.jpg" class="img-fluid" alt="Future of Children" style="max-width: 100%; height: auto; border-radius: 10px;">
+
+  <div class="right-section">
+    <div class="form-container">
+      <h2>LOGIN PAGE</h2>
+      <form>
+        <label for="user">User Name</label>
+        <input class="form-control" type="text" [(ngModel)]="user" name="user">
+
+        <label for="pass">Password</label>
+        <input class="form-control" type="password" [(ngModel)]="pass" name="pass">
+
+        <label for="disabilityId">Unique ID</label>
+        <input class="form-control" type="text" [(ngModel)]="disabilityId" name="disabilityId" placeholder="(Enter government unique disability id)">
+
+        <div class="buttons">
+          <button type="submit" class="btn btn-primary" (click)="onsubmit()">Submit</button>
+          <button type="reset" class="btn btn-danger" (click)="onreset()">Reset</button>
+        </div>
+        <hr style="color: black;">
+      </form>
+    </div>
+  </div>
+</div>

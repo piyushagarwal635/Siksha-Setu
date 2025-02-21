@@ -1,0 +1,55 @@
+/* Footer Styles */
+.footer {
+  background-color: #343a40;
+  color: white;
+  padding: 20px 0;
+  border-top: 2px solid #007bff;
+}
+
+.footer a {
+  color: #ffffff;
+  text-decoration: none;
+  transition: color 0.3s ease-in-out;
+}
+
+.footer a:hover {
+  color: #17a2b8;
+}
+
+.cta-section {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  border-radius: 12px;
+}
+
+button {
+  font-weight: bold;
+}
+
+.hero-section {
+  background: linear-gradient(135deg, #007bff, #6610f2);
+  border-radius: 1rem;
+  margin-bottom: 40px;
+}
+
+.image-container {
+  display: inline-block;
+  vertical-align: middle;
+  margin-top: 15px;
+}
+
+.hero-image {
+  width: 350px;
+  height: auto;
+  animation: floatImage 3s ease-in-out infinite alternate;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes floatImage {
+  0% {
+    transform: translateY(0px);
+  }
+  100% {
+    transform: translateY(-10px);
+  }
+
+}

@@ -1,0 +1,29 @@
+<div class="form-container">
+    <h2>Student Registration Form</h2>
+    <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+      
+      <label for="id">Disability ID:</label>
+      <input type="text" id="id" formControlName="id" [disabled]="true" />
+  
+      <label for="name">Name:</label>
+      <input type="text" id="name" formControlName="name" [disabled]="true" />
+  
+      <label for="course">Select Course:</label>
+      <select id="course" formControlName="course">
+        <option value="" disabled>Select Course</option>
+        <option *ngFor="let course of courses" [value]="course">{{ course }}</option>
+      </select>
+  
+      <label for="phone">Phone Number:</label>
+      <input type="tel" id="phone" formControlName="phone" placeholder="Enter phone number" />
+  
+      <label for="email">Email ID:</label>
+      <input type="email" id="email" formControlName="email" placeholder="Enter email address" />
+  
+      <label for="incomeCertificate">Income Certificate:</label>
+      <input type="file" id="incomeCertificate" formControlName="incomeCertificate" />
+  
+      <button type="submit" [disabled]="!userForm.valid">Submit</button>
+    </form>
+  </div>
+  

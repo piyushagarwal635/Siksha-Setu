@@ -1,0 +1,76 @@
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Inclusive Educational Dashboard</h2>
+  
+    <div class="row">
+      <!-- Text Resources -->
+      <div class="col-md-6 mb-4">
+        <div class="card">
+          <div class="card-header">
+            <h3>
+              <i class="bi bi-file-earmark-text-fill me-2"></i> Text Resources
+            </h3>
+          </div>
+          <div class="card-body">
+            <p>Read detailed study notes and downloadable PDFs.</p>
+            <button class="btn btn-primary" (click)="viewTextResources()">
+              <i class="bi bi-file-earmark-arrow-down-fill me-1"></i> View Resources
+            </button>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Video Lectures -->
+      <div class="col-md-6 mb-4">
+        <div class="card">
+          <div class="card-header">
+            <h3>
+              <i class="bi bi-camera-reels-fill me-2"></i> Video Lectures
+            </h3>
+          </div>
+          <div class="card-body">
+            <p>Watch lectures with subtitles for easy understanding.</p>
+            <video width="100%" controls>
+              <source src="assets/lecture.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Audio Resources -->
+      <div class="col-md-6 mb-4">
+        <div class="card">
+          <div class="card-header">
+            <h3>
+              <i class="bi bi-headphones me-2"></i> Audio Resources
+            </h3>
+          </div>
+          <div class="card-body">
+            <p>Listen to educational podcasts and lectures.</p>
+            <audio controls>
+              <source src="assets/podcast.mp3" type="audio/mp3" />
+              Your browser does not support the audio element.
+            </audio>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Visualization Tools -->
+      <div class="col-md-6 mb-4">
+        <div class="card">
+          <div class="card-header">
+            <h3>
+              <i class="bi bi-bar-chart-fill me-2"></i> Data Visualization Tools
+            </h3>
+          </div>
+          <div class="card-body">
+            <p>Explore charts and visual aids for better learning.</p>
+            <div>
+              <canvas id="dataChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  

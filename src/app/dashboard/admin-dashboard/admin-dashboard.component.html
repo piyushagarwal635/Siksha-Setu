@@ -1,0 +1,37 @@
+<div class="container mt-4">
+    <div class="row">
+      <!-- User Management Section -->
+      <div class="col-md-6 mb-4">
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="bi bi-people-fill me-2"></i>User Management</h3>
+          </div>
+          <div class="card-body">
+            <p>Manage users by viewing, updating, or deleting their profiles.</p>
+            <button class="btn btn-primary me-2" (click)="viewUsers()">
+              <i class="bi bi-eye-fill me-1"></i> View Users
+            </button>
+            <button class="btn btn-success" (click)="addUser()">
+              <i class="bi bi-person-plus-fill me-1"></i> Add User
+            </button>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Reports Section -->
+      <div class="col-md-6 mb-4">
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="bi bi-graph-up-arrow me-2"></i>Reports</h3>
+          </div>
+          <div class="card-body">
+            <p>View and analyze reports related to system activities and user engagement.</p>
+            <button class="btn btn-info" (click)="generateReport()">
+              <i class="bi bi-bar-chart-fill me-1"></i> Generate Reports
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
