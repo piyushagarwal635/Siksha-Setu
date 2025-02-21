@@ -6,12 +6,12 @@
   align-items: center;
   padding: 10px 20px;
   flex-wrap: wrap;
+  flex-direction: row;
 }
 
 .container-fluid {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  
   width: 100%;
   flex-wrap: wrap;
 }
@@ -25,9 +25,11 @@
 .nav-links {
   list-style: none;
   display: flex;
+  justify-items: center;
   gap: 15px;
   padding: 0;
   margin: 0;
+  flex-direction: row;
 }
 
 .nav-links li a {
@@ -186,32 +188,31 @@
 /* Responsive Navbar (Fixed for Vertical Alignment) */
 @media (max-width: 992px) {
   .nav {
-    flex-direction: column;
-    align-items: center;
+    flex-direction: row;
+    justify-content: space-between;
     padding: 10px;
   }
 
   .container-fluid {
-    flex-direction: column;
-    align-items: center;
+    flex-direction: row;
+   
   }
 
   .nav-links {
-    flex-direction: column;
-    align-items: center;
+    flex-direction: row;
+  
     gap: 10px;
     margin-top: 10px;
   }
 
   .d-flex {
-    flex-direction: column;
+    flex-direction: row;
     width: 100%;
-    align-items: center;
     margin-top: 10px;
   }
 
   .d-flex input {
-    width: 90%;
+    width: auto;
   }
 
   .avatar-button {

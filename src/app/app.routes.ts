@@ -18,6 +18,6 @@ export const routes: Routes = [
             { path: 'admindashboard', component: AdminDashboardComponent},
         ]
     },
-    { path: '**', redirectTo: '/login'},
+    
 
 ];
