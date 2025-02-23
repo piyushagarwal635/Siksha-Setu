@@ -13,15 +13,19 @@ export class StudentDashboardComponent {
   studentInfo = {
     name: '',
     disabilityId: '',
-    course: 'B.Sc Computer Science',
-    semester: '5th Semester',
-    dues: '₹ 5,000',
+    course: '',
+    semester: '',
+    dues: '',
   };
-
+  
   ngOnInit(): void {
-    this.studentInfo.name = localStorage.getItem('username') || 'Unknown';
-    this.studentInfo.disabilityId =
-      localStorage.getItem('disabilityId') || 'Not Provided';
+    const usersData = JSON.parse(localStorage.getItem('usersData') || '[]');
+    const loggedInUser = usersData.find((user: any) => user.username === localStorage.getItem('loggedInUser'));
+    
+    if (loggedInUser) {
+      this.studentInfo.name = loggedInUser.username;
+      this.studentInfo.disabilityId = loggedInUser.disabilityId;
+    }
   }
 
   notifications = [

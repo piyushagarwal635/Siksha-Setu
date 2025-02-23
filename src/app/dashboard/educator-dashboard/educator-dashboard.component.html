@@ -71,6 +71,55 @@
           </div>
         </div>
       </div>
+    </div>    
+  </div>
+
+  <div class="container">
+    <h2>Education Dashboard</h2>
+  
+    <!-- Course Selection -->
+    <label>Select Course:</label>
+    <select title="Select Course" [(ngModel)]="selectedCourse" (change)="filterResources()">
+      <option value="" disabled selected>Choose a Course</option>
+      <option *ngFor="let course of courses" [value]="course">{{ course }}</option>
+    </select>
+  
+    <!-- Resource Type Selection -->
+    <label>Select Resource Type:</label>
+    <select title="type select" [(ngModel)]="selectedResource" (change)="filterResources()">
+      <option value="" disabled selected>Choose Resource Type</option>
+      <option value="text">Text Resource</option>
+      <option value="video">Video Resource</option>
+      <option value="audio">Audio Resource</option>
+      <option value="all">All Resources</option>
+    </select>
+  
+    <!-- Show Resources -->
+    <div *ngIf="filteredResources.length > 0">
+      <h3>Available Resources</h3>
+      <ul>
+        <li *ngFor="let resource of filteredResources">
+          <span *ngIf="resource.type === 'text'">
+            📄 <a [href]="resource.path" target="_blank">{{ resource.name }}</a>
+          </span>
+  
+          <span *ngIf="resource.type === 'video'">
+            🎥 {{ resource.name }}
+            <video width="300" controls>
+              <source [src]="resource.path" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          </span>
+  
+          <span *ngIf="resource.type === 'audio'">
+            🎵 {{ resource.name }}
+            <audio controls>
+              <source [src]="resource.path" type="audio/mpeg">
+              Your browser does not support the audio tag.
+            </audio>
+          </span>
+        </li>
+      </ul>
     </div>
   </div>
   

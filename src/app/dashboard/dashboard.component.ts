@@ -24,17 +24,37 @@ export class DashboardComponent {
   profileImage: string | null = null;
   
   ngOnInit() {
-    const usersData = JSON.parse(localStorage.getItem('usersData') || '[]');
-    const loggedInUser = usersData.find((user: any) => user.username === localStorage.getItem('loggedInUser'));
-    
-    if (loggedInUser) {
-      this.userName = loggedInUser.username;
-      this.disabilityId = loggedInUser.disabilityId;
-      this.profileImage = loggedInUser.profileImage || this.defaultAvatar;
+    try {
+      const usersData = JSON.parse(localStorage.getItem('usersData') || '[]');
+      const loggedInUser = usersData.find((user: any) => user.username === localStorage.getItem('loggedInUser'));
+  
+      if (loggedInUser) {
+        this.userName = loggedInUser.username;
+        this.disabilityId = loggedInUser.disabilityId;
+        this.profileImage = loggedInUser.profileImage || this.defaultAvatar;
+      }
+    } catch (e) {
+      console.error('LocalStorage is not available:', e);
     }
   }
   
-  constructor(private router: Router) {}
+  
+  constructor(private router: Router) {
+    this.checkScreenSize();
+  }
+  showWarning: boolean = false;
+  @HostListener('window:resize', [])
+  onResize() {
+    this.checkScreenSize();
+  }
+
+  checkScreenSize() {
+    if (window.innerWidth < 1000) {
+      this.showWarning = true;
+    } else {
+      this.showWarning = false;
+    }
+  }
   
   toggleMenu() {
     this.menuOpen = !this.menuOpen;

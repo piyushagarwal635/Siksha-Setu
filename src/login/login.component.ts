@@ -1,11 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit,HostListener } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  imports: [FormsModule],
+  imports: [FormsModule,CommonModule],
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
@@ -14,7 +15,9 @@ export class LoginComponent implements OnInit {
   disabilityId = '';
   isSignUpActive = false;
 
-  constructor(private rl: Router) {}
+  constructor(private rl: Router) {
+    this.checkScreenSize();
+  }
 
   ngOnInit(): void {}
 
@@ -80,5 +83,18 @@ export class LoginComponent implements OnInit {
     this.pass = '';
     this.disabilityId = '';
     this.isSignUpActive = false;
+  }
+  showWarning: boolean = false;
+  @HostListener('window:resize', [])
+  onResize() {
+    this.checkScreenSize();
+  }
+
+  checkScreenSize() {
+    if (window.innerWidth < 768) {
+      this.showWarning = true;
+    } else {
+      this.showWarning = false;
+    }
   }
 }
