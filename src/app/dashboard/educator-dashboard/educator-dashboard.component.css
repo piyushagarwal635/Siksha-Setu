@@ -12,6 +12,7 @@
   .card-body {
     padding: 15px;
     text-align: center;
+    min-height: 50px;
   }
   
   video,

@@ -91,7 +91,7 @@ export class LoginComponent implements OnInit {
   }
 
   checkScreenSize() {
-    if (window.innerWidth < 768) {
+    if (window.innerWidth < 700) {
       this.showWarning = true;
     } else {
       this.showWarning = false;

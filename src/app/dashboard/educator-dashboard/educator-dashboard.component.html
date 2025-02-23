@@ -3,18 +3,21 @@
   
     <div class="row">
       <!-- Text Resources -->
-      <div class="col-md-6 mb-4">
+      <div class="col-md-6 mb-4" >
         <div class="card">
           <div class="card-header">
             <h3>
               <i class="bi bi-file-earmark-text-fill me-2"></i> Text Resources
             </h3>
           </div>
-          <div class="card-body">
-            <p>Read detailed study notes and downloadable PDFs.</p>
-            <button class="btn btn-primary" (click)="viewTextResources()">
-              <i class="bi bi-file-earmark-arrow-down-fill me-1"></i> View Resources
-            </button>
+          <div class="card-body" *ngIf="filteredResources.length > 0">
+            <ul>
+              <li *ngFor="let resource of filteredResources">
+                <span *ngIf="resource.type === 'text'">
+                  📄 <a [href]="resource.path" target="_blank">{{ resource.name }}</a>
+                </span>
+              </li>
+            </ul>
           </div>
         </div>
       </div>
