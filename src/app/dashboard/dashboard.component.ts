@@ -49,7 +49,7 @@ export class DashboardComponent {
   }
 
   checkScreenSize() {
-    if (window.innerWidth < 700) {
+    if (window.innerWidth < 800) {
       this.showWarning = true;
     } else {
       this.showWarning = false;
