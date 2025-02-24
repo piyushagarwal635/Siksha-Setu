@@ -1,53 +1,54 @@
-<nav class="navbar nav">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="/">
-      <img src="WhatsApp Image 2025-02-01 at 13.33.00_14d0087d.jpg" alt="logo" style="border-radius: 50%; transition: transform 1.2s ease; width: 70px;">
-      <span class="fw-bold fst-italic fs-4">&nbsp;&nbsp;Shiksha Setu</span>
-    </a>
-    <ul class="nav-links">
-      <li><a routerLink="/about">About Us</a></li>
-      <li><a routerLink="/courses">Courses</a></li>
-      <li><a routerLink="/resources">Resources</a></li>
-      <li><a routerLink="/contact">Contact</a></li>
-    </ul>
-    <form class="d-flex" role="search">
-      <input class="form-control me-1 shadow-lg bg-body-tertiary rounded" type="search" placeholder="Search" aria-label="Search">
-      <button class="btn btn-outline-primary me-4" type="submit">Search</button>
-    </form>
-    <div class="position-relative d-inline-block">
-      <div class="avatar-button" (click)="toggleMenu()">
-        <img
-          [src]="profileImage || defaultAvatar"
-          alt="User Avatar"
-          class="rounded-circle"
-          style="width: 40px; height: 40px; cursor: pointer;"
-        />
-      </div>
-    
-      <!-- Dropdown menu -->
-      <div *ngIf="menuOpen" class="dropdown-menu show mt-2 position-absolute shadow p-3 bg-white rounded" style="min-width: 14rem; right: 0;">
-        <p class="fw-bold mb-1">User Name: {{ userName }}</p>
-        <p class="text-muted small mb-2">Disability Id: {{ disabilityId }}</p>
-        
-        <!-- Profile Picture Change Section -->
-        <hr/>
-        <label class="text-primary d-block mb-2 cursor-pointer">
-          <i class="bi bi-camera"></i> Change Profile Picture
-          <input type="file" (change)="onFileSelected($event)" hidden />
-        </label>
-        
-        <div *ngIf="profileImage" class="mb-2 text-center">
-          <img [src]="profileImage" alt="Profile Preview" class="rounded-circle border" width="80" height="80" />
-          <button class="btn btn-outline-danger btn-sm mt-2" (click)="removeProfileImage()">Remove</button>
-        </div>
-        
-        <hr/>
-        <button class="btn btn-danger w-100" (click)="logout()">
-          <i class="bi bi-box-arrow-right"></i> Logout
-        </button>
-      </div>
+<nav class="navbar">
+    <div class="nav-left">
+        <img src="WhatsApp Image 2025-02-01 at 13.33.00_14d0087d.jpg" alt="Profile Picture">
+        <span class=" fst-italic">&nbsp;&nbsp;Siksha Setu</span>
     </div>
-    
+    <div class="nav-center">
+        <a href="#">About</a>
+        <a href="#">Resource</a>
+        <a href="#">Course</a>
+        <a href="#">Contact</a>
+    </div>
+    <div class="nav-right">
+      <div class="search">
+        <input type="text" placeholder="Search...">
+        <button><i class="bi bi-search"></i></button>
+      </div>
+      <div>
+        <div class="position-relative d-inline-block">
+          <div class="avatar-button" (click)="toggleMenu()">
+            <img
+              [src]="profileImage || defaultAvatar"
+              alt="User Avatar"
+              class="rounded-circle"
+              style="width: 40px; height: 40px; cursor: pointer;"
+            />
+          </div>
+        
+          
+          <div *ngIf="menuOpen" class="dropdown-menu show mt-2 position-absolute shadow p-3 bg-white rounded" style="min-width: 14rem; right: 0;">
+            <p class="fw-bold mb-1">User Name: {{ userName }}</p>
+            <p class="text-muted small mb-2">Disability Id: {{ disabilityId }}</p>
+            
+            
+            <hr/>
+            <label class="text-primary d-block mb-2 cursor-pointer">
+              <i class="bi bi-camera"></i> Change Profile Picture
+              <input type="file" (change)="onFileSelected($event)" hidden />
+            </label>
+            
+            <div *ngIf="profileImage" class="mb-2 text-center">
+              <img [src]="profileImage" alt="Profile Preview" class="rounded-circle border" width="80" height="80" />
+              <button class="btn btn-outline-danger btn-sm mt-2" (click)="removeProfileImage()">Remove</button>
+            </div>
+            
+            <hr/>
+            <button class="btn btn-danger w-100" (click)="logout()">
+              <i class="bi bi-box-arrow-right"></i> Logout
+            </button>
+          </div>
+        </div>
+      </div>
     </div> 
 </nav>
 
@@ -84,9 +85,9 @@
   </div>
   <div class="chatbot-icon" (click)="toggleChatbot()" title="Open Chatbot">
     💬
-</div>
-<div class="chatbot-text">Ai Chat</div>
-<div class="chatbot-popup" *ngIf="showChatbot">
+  </div>
+  <div class="chatbot-text">Ai Chat</div>
+  <div class="chatbot-popup" *ngIf="showChatbot">
     <iframe 
       src="https://cdn.botpress.cloud/webchat/v2.2/shareable.html?configUrl=https://files.bpcontent.cloud/2025/02/02/07/20250202073519-TKZMWKTW.json" 
       width="350px" 
@@ -95,7 +96,7 @@
       style="border: none; overflow: hidden;"
       title="chatbot">
     </iframe>
-</div>
+  </div>
 
 </div>
 <div *ngIf="showWarning" class="warning-overlay">
