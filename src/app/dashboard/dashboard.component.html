@@ -4,10 +4,10 @@
         <span class=" fst-italic">&nbsp;&nbsp;Siksha Setu</span>
     </div>
     <div class="nav-center">
-        <a href="#">About</a>
-        <a href="#">Resource</a>
-        <a href="#">Course</a>
-        <a href="#">Contact</a>
+      <a (click)="about()">About</a>
+      <a (click)="resources()">Resources</a>
+      <a (click)="cources()">Courses</a>
+      <a (click)="contact()">Contact</a>
     </div>
     <div class="nav-right">
       <div class="search">
@@ -100,5 +100,5 @@
 
 </div>
 <div *ngIf="showWarning" class="warning-overlay">
-  <p>Please rotate your device to landscape mode or open in desktop site.</p>
+  <p>Please open as a desktop site.</p>
 </div>

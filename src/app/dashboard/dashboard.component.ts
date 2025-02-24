@@ -100,5 +100,18 @@ export class DashboardComponent {
       this.menuOpen = false;
     }
   }
+  about(){
+    alert('There is not compelete data yet');
+  }
+  resources(){
+    alert('There is not compelete data yet');
+  }
+  cources(){
+    alert('There is not compelete data yet');
+  }
+  contact(){
+    alert('There is not compelete data yet');
+  }
+
   }
 
