@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 import { SecureStorageService } from './secure-storage.service';
+import { environment } from '../../environments/environment';
 
 export interface AuthUser {
   user: string;
@@ -19,7 +20,7 @@ export interface AuthUser {
 })
 export class UserService {
 
-  private apiUrl = 'http://localhost:8080/api/users';
+  private apiUrl = `${environment.apiUrl}/api/users`;
 
   private currentUser = new BehaviorSubject<AuthUser | null>(null);
   public currentUser$ = this.currentUser.asObservable();
@@ -56,7 +57,7 @@ export class UserService {
   }
 
   submitContactForm(contactData: any): Observable<any> {
-    return this.http.post('http://localhost:8080/api/contact', contactData, { responseType: 'text' });
+    return this.http.post(`${environment.apiUrl}/api/contact`, contactData, { responseType: 'text' });
   }
 
   login(user: AuthUser, rememberMe: boolean = false): void {
@@ -142,36 +143,36 @@ export class UserService {
 
   // Student Edit Requests
   submitEditRequest(requestData: any): Observable<any> {
-    return this.http.post('http://localhost:8080/api/edit-requests', requestData);
+    return this.http.post(`${environment.apiUrl}/api/edit-requests`, requestData);
   }
 
   getStudentEditRequests(userId: string): Observable<any[]> {
-    return this.http.get<any[]>(`http://localhost:8080/api/edit-requests/student/${userId}`);
+    return this.http.get<any[]>(`${environment.apiUrl}/api/edit-requests/student/${userId}`);
   }
 
   // Security Question Recovery Workflow
   getForgotPasswordQuestion(userId: string): Observable<any> {
-    return this.http.get<any>(`http://localhost:8080/api/auth/forgot-password/question/${userId}`);
+    return this.http.get<any>(`${environment.apiUrl}/api/auth/forgot-password/question/${userId}`);
   }
 
   resetPasswordWithSecurityQuestion(resetData: { userId: string; securityAnswer: string; newPassword: string }): Observable<any> {
-    return this.http.post('http://localhost:8080/api/auth/forgot-password/answer', resetData, { responseType: 'text' });
+    return this.http.post(`${environment.apiUrl}/api/auth/forgot-password/answer`, resetData, { responseType: 'text' });
   }
 
   updateLoginStreak(userId: string): Observable<any> {
-    return this.http.post(`http://localhost:8080/api/student/${userId}/login-streak`, null);
+    return this.http.post(`${environment.apiUrl}/api/student/${userId}/login-streak`, null);
   }
 
   restoreStreak(userId: string): Observable<any> {
-    return this.http.post(`http://localhost:8080/api/student/${userId}/restore-streak`, null);
+    return this.http.post(`${environment.apiUrl}/api/student/${userId}/restore-streak`, null);
   }
 
   getStudentAnalytics(userId: string): Observable<any> {
-    return this.http.get<any>(`http://localhost:8080/api/student/${userId}/analytics`);
+    return this.http.get<any>(`${environment.apiUrl}/api/student/${userId}/analytics`);
   }
 
   getSchemes(): Observable<any[]> {
-    return this.http.get<any[]>('http://localhost:8080/api/schemes');
+    return this.http.get<any[]>(`${environment.apiUrl}/api/schemes`);
   }
 
   isTokenExpired(): boolean {
@@ -189,36 +190,36 @@ export class UserService {
 
   // Course and Resource Endpoints
   getAllCourses(): Observable<any[]> {
-    return this.http.get<any[]>('http://localhost:8080/api/courses');
+    return this.http.get<any[]>(`${environment.apiUrl}/api/courses`);
   }
 
   getAllResources(): Observable<any[]> {
-    return this.http.get<any[]>('http://localhost:8080/api/resources');
+    return this.http.get<any[]>(`${environment.apiUrl}/api/resources`);
   }
 
   enrollInCourse(userId: string, courseId: string, preference: string): Observable<any> {
     const params = new HttpParams().set('preference', preference);
-    return this.http.post(`http://localhost:8080/api/student/${userId}/enroll/${courseId}`, null, { params });
+    return this.http.post(`${environment.apiUrl}/api/student/${userId}/enroll/${courseId}`, null, { params });
   }
 
   getResourcesByCourse(courseId: string): Observable<any[]> {
-    return this.http.get<any[]>(`http://localhost:8080/api/resources/course/${courseId}`);
+    return this.http.get<any[]>(`${environment.apiUrl}/api/resources/course/${courseId}`);
   }
 
   getEnrollment(userId: string, courseId: string): Observable<any> {
-    return this.http.get<any>(`http://localhost:8080/api/student/${userId}/course/${courseId}/enrollment`);
+    return this.http.get<any>(`${environment.apiUrl}/api/student/${userId}/course/${courseId}/enrollment`);
   }
 
   completeResource(userId: string, courseId: string, resourceId: number): Observable<any> {
-    return this.http.post<any>(`http://localhost:8080/api/student/${userId}/course/${courseId}/complete-resource/${resourceId}`, null);
+    return this.http.post<any>(`${environment.apiUrl}/api/student/${userId}/course/${courseId}/complete-resource/${resourceId}`, null);
   }
 
   submitTest(userId: string, courseId: string, payload: any): Observable<any> {
-    return this.http.post<any>(`http://localhost:8080/api/student/${userId}/course/${courseId}/submit-test`, payload);
+    return this.http.post<any>(`${environment.apiUrl}/api/student/${userId}/course/${courseId}/submit-test`, payload);
   }
 
   generateCertificate(userId: string, courseId: string): Observable<any> {
-    return this.http.post<any>(`http://localhost:8080/api/student/${userId}/enroll/${courseId}/certificate`, {});
+    return this.http.post<any>(`${environment.apiUrl}/api/student/${userId}/enroll/${courseId}/certificate`, {});
   }
 
   unenrollFromCourse(userId: string, courseId: string, review?: string): Observable<any> {
@@ -226,23 +227,23 @@ export class UserService {
     if (review) {
       params = params.set('review', review);
     }
-    return this.http.delete(`http://localhost:8080/api/student/${userId}/unenroll/${courseId}`, { params, responseType: 'text' });
+    return this.http.delete(`${environment.apiUrl}/api/student/${userId}/unenroll/${courseId}`, { params, responseType: 'text' });
   }
 
   submitChatHistory(payload: any): Observable<any> {
-    return this.http.post('http://localhost:8080/api/contact/chat', payload);
+    return this.http.post(`${environment.apiUrl}/api/contact/chat`, payload);
   }
 
   getFileContent(url: string): Observable<string> {
     let targetUrl = url;
     if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
-      targetUrl = `http://localhost:8080${url.startsWith('/') ? '' : '/'}${url}`;
+      targetUrl = `${environment.apiUrl}${url.startsWith('/') ? '' : '/'}${url}`;
     }
     return this.http.get(targetUrl, { responseType: 'text' });
   }
 
   // Test Questions
   getTestQuestions(courseId: string): Observable<any[]> {
-    return this.http.get<any[]>(`http://localhost:8080/api/courses/${courseId}/test-questions`);
+    return this.http.get<any[]>(`${environment.apiUrl}/api/courses/${courseId}/test-questions`);
   }
 }

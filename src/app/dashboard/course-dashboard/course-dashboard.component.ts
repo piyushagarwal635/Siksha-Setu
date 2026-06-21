@@ -12,6 +12,7 @@ import { BrailleContentViewerComponent } from '../../braille/braille-content-vie
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { SearchTelemetryService } from '../../services/search-telemetry.service';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-course-dashboard',
@@ -491,7 +492,7 @@ export class CourseDashboardComponent implements OnInit, OnDestroy {
     if (url.startsWith('http://') || url.startsWith('https://')) {
       return url;
     }
-    return `http://localhost:8080${url.startsWith('/') ? '' : '/'}${url}`;
+    return `${environment.apiUrl}${url.startsWith('/') ? '' : '/'}${url}`;
   }
 
   selectResource(res: any, format: string) {

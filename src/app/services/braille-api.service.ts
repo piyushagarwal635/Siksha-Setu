@@ -6,10 +6,11 @@ import {
   BrailleTranslation,
   BrailleTranslationRequest
 } from '../braille/braille.models';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class BrailleApiService {
-  private readonly apiUrl = 'http://localhost:8080/api/braille';
+  private readonly apiUrl = `${environment.apiUrl}/api/braille`;
 
   constructor(private readonly http: HttpClient) {}
 
