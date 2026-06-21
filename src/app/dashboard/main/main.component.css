@@ -1,55 +1,187 @@
-/* Footer Styles */
-.footer {
-  background-color: #343a40;
-  color: white;
-  padding: 20px 0;
-  border-top: 2px solid #007bff;
+/* Premium Layout & Typography */
+.main-container {
+  background: rgba(255, 255, 255, 0.3); /* Not pure white, slightly transparent */
+  backdrop-filter: blur(12px);
+  border-radius: 2rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); /* Slight shadow initially */
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  margin-top: 1rem;
+  overflow: hidden;
+  transition: all 0.4s ease;
 }
 
-.footer a {
-  color: #ffffff;
-  text-decoration: none;
-  transition: color 0.3s ease-in-out;
+.main-container:hover {
+  background: rgba(255, 255, 255, 0.5); /* Slightly darker/more solid on hover */
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08); /* Deeper shadow on hover */
 }
 
-.footer a:hover {
-  color: #17a2b8;
+.animate-fade-up {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.cta-section {
-  background: linear-gradient(135deg, #007bff, #0056b3);
-  border-radius: 12px;
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-button {
-  font-weight: bold;
-}
-
+/* Hero Section */
 .hero-section {
-  background: linear-gradient(135deg, #007bff, #6610f2);
-  border-radius: 1rem;
-  margin-bottom: 40px;
+  background: radial-gradient(circle at 50% -20%, rgba(99, 102, 241, 0.08) 0%, transparent 60%),
+              radial-gradient(circle at 80% 50%, rgba(6, 182, 212, 0.05) 0%, transparent 40%);
+  padding: 8rem 1rem 6rem;
+  border-bottom: 1px solid rgba(0,0,0,0.03);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
 }
 
-.image-container {
+.hero-badge {
+  background: rgba(99, 102, 241, 0.08);
+  color: var(--primary-color);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  padding: 0.5rem 1.2rem;
+  border-radius: 100px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
   display: inline-block;
-  vertical-align: middle;
-  margin-top: 15px;
+  margin-bottom: 1.5rem;
 }
 
-.hero-image {
-  width: 350px;
-  height: auto;
-  animation: floatImage 3s ease-in-out infinite alternate;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+.hero-title {
+  font-size: 4.5rem;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+  margin-bottom: 1.5rem;
+  color: #0f172a;
+  background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-@keyframes floatImage {
-  0% {
-    transform: translateY(0px);
-  }
-  100% {
-    transform: translateY(-10px);
-  }
+.hero-subtitle {
+  font-size: 1.25rem;
+  color: var(--text-muted);
+  max-width: 650px;
+  margin: 0 auto 2.5rem;
+  line-height: 1.6;
+}
 
+/* Bento Box Grid */
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1.5rem;
+  padding: 2rem 0;
+}
+
+.bento-card {
+  background: #ffffff;
+  border-radius: 24px;
+  border: 1px solid rgba(0,0,0,0.06);
+  padding: 2.5rem;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.bento-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.bento-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.bento-card-large { grid-column: span 8; }
+.bento-card-small { grid-column: span 4; }
+.bento-card-medium { grid-column: span 6; }
+
+.bento-card h3 {
+  font-weight: 800;
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.bento-card p {
+  color: var(--text-muted);
+  margin-bottom: 0;
+  line-height: 1.6;
+}
+
+/* Journey Timeline */
+.journey-line {
+  border-left: 2px dashed rgba(99, 102, 241, 0.3);
+  padding-left: 2rem;
+  margin-left: 1rem;
+  position: relative;
+}
+
+.journey-item {
+  position: relative;
+  margin-bottom: 3rem;
+}
+
+.journey-dot {
+  position: absolute;
+  left: -2.6rem;
+  top: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  border: 4px solid #fff;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+/* Stats / Streak Preview */
+.streak-preview-box {
+  background: #f8fafc;
+  border: 1px solid rgba(0,0,0,0.04);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-top: auto;
+}
+
+/* Footer */
+.modern-footer {
+  background: #0f172a;
+  color: #f8fafc;
+  padding: 4rem 2rem 2rem;
+  border-radius: 24px 24px 0 0;
+  margin-top: 6rem;
+}
+
+.footer-link {
+  color: #94a3b8;
+  text-decoration: none;
+  transition: color 0.2s;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.footer-link:hover { color: #fff; }
+
+@media (max-width: 992px) {
+  .hero-title { font-size: 3rem; }
+  .bento-card-large, .bento-card-small, .bento-card-medium { grid-column: span 12; }
 }

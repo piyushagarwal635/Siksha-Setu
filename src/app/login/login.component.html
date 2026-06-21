@@ -1,0 +1,210 @@
+<div class="container shadow-3d" [class.right-panel-active]="isRightPanelActive">
+  <!-- Sign In Form / Forgot Password Container -->
+  <div class="form-container sign-in-container">
+    
+    <!-- Sign In Form -->
+    <form [formGroup]="signInForm" (ngSubmit)="onSignIn()" *ngIf="!isForgotPasswordActive">
+      <h2 class="fw-extrabold mb-1">Sign In</h2>
+      <p class="text-muted small mb-4">Access your lessons and tracker</p>
+
+      <!-- Bootstrap Alert Banner for Sign In Errors -->
+      <div *ngIf="showSignInError" class="alert alert-danger alert-dismissible fade show w-100 p-3 text-start rounded-4 mb-3 small d-flex align-items-center justify-content-between" role="alert" style="background-color: #fff1f2; border: 1px solid rgba(239, 68, 68, 0.2); color: #9f1239;">
+        <span><i class="bi bi-exclamation-triangle-fill me-2 fs-6 text-danger"></i><strong>Error:</strong> {{ signInErrorMessage }}</span>
+        <button type="button" (click)="showSignInError = false" style="background: transparent; border: none; font-size: 1.4rem; font-weight: bold; cursor: pointer; color: #9f1239; line-height: 1;">&times;</button>
+      </div>
+
+      <div class="input-group-custom w-100">
+        <label class="form-input-label" for="signin-id"><i class="bi bi-person-fill"></i> Disability ID / Username</label>
+        <input type="text" id="signin-id" placeholder="Enter ID or Username" formControlName="disabilityId" required />
+        <div *ngIf="signInForm.get('disabilityId')?.touched && signInForm.get('disabilityId')?.invalid" class="validation-message text-danger small text-start ps-1">
+          Disability ID or Username is required.
+        </div>
+      </div>
+
+      <div class="input-group-custom w-100">
+        <label class="form-input-label" for="signin-pass"><i class="bi bi-lock-fill"></i> Password</label>
+        <input type="password" id="signin-pass" placeholder="Enter Password" formControlName="pass" required />
+        <div *ngIf="signInForm.get('pass')?.touched && signInForm.get('pass')?.invalid" class="validation-message text-danger small text-start ps-1">
+          Password is required.
+        </div>
+      </div>
+      
+      <!-- Remember Me & Forgot Password Link row -->
+      <div class="d-flex justify-content-between align-items-center w-100 mb-3 px-1">
+        <div class="form-check text-start">
+          <input class="form-check-input" type="checkbox" id="remember-me" formControlName="rememberMe" />
+          <label class="form-check-label text-muted small ms-1" for="remember-me" style="cursor: pointer; user-select: none;">
+            Remember Me
+          </label>
+        </div>
+        <a (click)="toggleForgotPassword(true)" class="forgot-password text-primary small fw-bold" style="cursor: pointer; font-size: 0.85rem;">Forgot password?</a>
+      </div>
+      
+      <div class="form-actions-row">
+        <button type="submit" class="btn btn-submit-3d" [disabled]="isLoading">
+          <span *ngIf="!isLoading"><i class="bi bi-box-arrow-in-right me-1"></i> Sign In</span>
+          <span *ngIf="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          <span *ngIf="isLoading"> Loading...</span>
+        </button>
+        <button type="reset" class="btn btn-reset-3d" (click)="onreset()" [disabled]="isLoading">Reset</button>
+      </div>
+
+      <!-- Mobile-only Switcher -->
+      <div class="mobile-toggle-footer">
+        <span>Don't have an account?</span>
+        <button type="button" class="btn-toggle-link" (click)="togglePanel(true)">Sign Up Now</button>
+      </div>
+    </form>
+
+    <!-- Forgot Password Step-by-Step Forms -->
+    <div *ngIf="isForgotPasswordActive" class="forgot-password-wrapper">
+      <h2 class="fw-extrabold mb-1 text-center">Reset Password</h2>
+      <p class="text-muted small mb-4 text-center">Recover your account credentials</p>
+
+      <!-- STEP 1: Enter ID -->
+      <div *ngIf="recoveryStep === 1" class="w-100">
+        <div class="input-group-custom w-100 mb-3">
+          <label class="form-input-label" for="recovery-id"><i class="bi bi-person-fill"></i> Disability ID, Admin ID, or Username</label>
+          <input type="text" id="recovery-id" placeholder="Enter ID or Username" [(ngModel)]="recoveryUserId" required />
+        </div>
+        
+        <div class="form-actions-row mt-4">
+          <button type="button" class="btn btn-submit-3d" (click)="fetchSecurityQuestion()" [disabled]="isLoading || !recoveryUserId">
+            <span *ngIf="!isLoading">Next <i class="bi bi-arrow-right-short"></i></span>
+            <span *ngIf="isLoading" class="spinner-border spinner-border-sm" role="status"></span>
+          </button>
+          <button type="button" class="btn btn-cancel-3d" (click)="toggleForgotPassword(false)">Cancel</button>
+        </div>
+      </div>
+
+      <!-- STEP 2: Security Question Form -->
+      <div *ngIf="recoveryStep === 2" class="w-100">
+        <div class="input-group-custom w-100 mb-3">
+          <label class="form-input-label" for="recovery-question"><i class="bi bi-shield-lock-fill"></i> Select Your Security Question</label>
+          <select id="recovery-question" [(ngModel)]="recoveryQuestion" required>
+            <option value="" disabled>Choose a Question</option>
+            <option *ngFor="let q of recoveryQuestions" [value]="q">{{ q }}</option>
+          </select>
+        </div>
+
+        <div class="input-group-custom w-100 mb-3">
+          <label class="form-input-label" for="recovery-answer"><i class="bi bi-chat-left-dots-fill"></i> Your Answer</label>
+          <input type="text" id="recovery-answer" placeholder="Enter your answer" [(ngModel)]="recoveryAnswer" required />
+        </div>
+
+        <div class="input-group-custom w-100 mb-3">
+          <label class="form-input-label" for="recovery-new-pass"><i class="bi bi-lock-fill"></i> New Password</label>
+          <input type="password" id="recovery-new-pass" placeholder="Enter new password (min 8 chars)" [(ngModel)]="recoveryNewPassword" required />
+        </div>
+
+        <div class="input-group-custom w-100 mb-4">
+          <label class="form-input-label" for="recovery-confirm-pass"><i class="bi bi-shield-lock-fill"></i> Confirm Password</label>
+          <input type="password" id="recovery-confirm-pass" placeholder="Confirm new password" [(ngModel)]="recoveryConfirmPassword" required />
+        </div>
+
+        <div class="form-actions-row">
+          <button type="button" class="btn btn-submit-3d" (click)="resetWithQuestion()" 
+                  [disabled]="isLoading || !recoveryQuestion || !recoveryAnswer || !recoveryNewPassword || !recoveryConfirmPassword">
+            <span *ngIf="!isLoading">Reset Password</span>
+            <span *ngIf="isLoading" class="spinner-border spinner-border-sm" role="status"></span>
+          </button>
+          <button type="button" class="btn btn-cancel-3d" (click)="goToRecoveryStep1()">Back</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Sign Up Form -->
+  <div class="form-container sign-up-container">
+    <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+      <h2 class="fw-extrabold mb-1">Create Account</h2>
+      <p class="text-muted small mb-4">Join our special learning community</p>
+
+      <!-- Bootstrap Alert Banner for Sign Up Errors -->
+      <div *ngIf="showSignUpError" class="alert alert-danger alert-dismissible fade show w-100 p-3 text-start rounded-4 mb-3 small d-flex align-items-center justify-content-between" role="alert" style="background-color: #fff1f2; border: 1px solid rgba(239, 68, 68, 0.2); color: #9f1239;">
+        <span><i class="bi bi-exclamation-triangle-fill me-2 fs-6 text-danger"></i><strong>Error:</strong> {{ signUpErrorMessage }}</span>
+        <button type="button" (click)="showSignUpError = false" style="background: transparent; border: none; font-size: 1.4rem; font-weight: bold; cursor: pointer; color: #9f1239; line-height: 1;">&times;</button>
+      </div>
+
+      <div class="input-group-custom w-100">
+        <label class="form-input-label" for="signup-user"><i class="bi bi-person-fill-add"></i> Full Name</label>
+        <input type="text" id="signup-user" placeholder="Enter Full Name" formControlName="user" required />
+        <div *ngIf="userForm.get('user')?.touched && userForm.get('user')?.invalid" class="validation-message text-danger small text-start ps-1">
+          Name is required (minimum 5 letters).
+        </div>
+      </div>
+
+      <div class="input-group-custom w-100">
+        <label class="form-input-label" for="signup-pass"><i class="bi bi-shield-lock-fill"></i> Password</label>
+        <input type="password" id="signup-pass" placeholder="Create Password" formControlName="pass" required />
+        <div *ngIf="userForm.get('pass')?.touched && userForm.get('pass')?.invalid" class="validation-message text-danger small text-start ps-1">
+          Must be >= 8 chars and contain a special character.
+        </div>
+      </div>
+
+      <div class="input-group-custom w-100">
+        <label class="form-input-label" for="signup-disability"><i class="bi bi-credit-card-2-front-fill"></i> Disability ID Card</label>
+        <input type="text" id="signup-disability" placeholder="e.g. DIS123456789" formControlName="disabilityId" required />
+        <div *ngIf="userForm.get('disabilityId')?.touched && userForm.get('disabilityId')?.invalid" class="validation-message text-danger small text-start ps-1">
+          Must start with DIS followed by 9 digits.
+        </div>
+      </div>
+
+      <div class="input-group-custom w-100">
+        <label class="form-input-label" for="signup-question"><i class="bi bi-shield-lock-fill"></i> Security Question</label>
+        <select id="signup-question" formControlName="securityQuestion" required>
+          <option value="" disabled>Choose a Question</option>
+          <option value="What is your pet's name?">What is your pet's name?</option>
+          <option value="What is your mother's maiden name?">What is your mother's maiden name?</option>
+          <option value="In what city were you born?">In what city were you born?</option>
+          <option value="What was your first school name?">What was your first school name?</option>
+        </select>
+        <div *ngIf="userForm.get('securityQuestion')?.touched && userForm.get('securityQuestion')?.invalid" class="validation-message text-danger small text-start ps-1">
+          Security question is required.
+        </div>
+      </div>
+
+      <div class="input-group-custom w-100">
+        <label class="form-input-label" for="signup-answer"><i class="bi bi-key-fill"></i> Security Answer</label>
+        <input type="text" id="signup-answer" placeholder="Answer to your question" formControlName="securityAnswer" required />
+        <div *ngIf="userForm.get('securityAnswer')?.touched && userForm.get('securityAnswer')?.invalid" class="validation-message text-danger small text-start ps-1">
+          Security answer is required.
+        </div>
+      </div>
+      
+      <div class="form-actions-row">
+        <button type="submit" class="btn btn-submit-3d" [disabled]="isLoading">
+          <span *ngIf="!isLoading"><i class="bi bi-person-plus-fill me-1"></i> Register</span>
+          <span *ngIf="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          <span *ngIf="isLoading"> Loading...</span>
+        </button>
+        <button type="reset" class="btn btn-reset-3d" (click)="onreset()" [disabled]="isLoading">Reset</button>
+      </div>
+
+      <!-- Mobile-only Switcher -->
+      <div class="mobile-toggle-footer">
+        <span>Already have an account?</span>
+        <button type="button" class="btn-toggle-link" (click)="togglePanel(false)">Sign In</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Sliding Overlay (Desktop) -->
+  <div class="overlay-container">
+    <div class="overlay">
+      <div class="overlay-panel overlay-left">
+        <img src="indian flag 2.png" alt="Welcome Image">
+        <h2 class="fw-extrabold text-white mb-2">Welcome Back!</h2>
+        <p class="mb-4 text-white-50">To keep connected, please login with your personal info</p>
+        <button class="ghost-btn py-3 px-5" (click)="togglePanel(false)">Sign In</button>
+      </div>
+      <div class="overlay-panel overlay-right">
+        <img src="indian flag 2.png" alt="Welcome Image">
+        <h2 class="fw-extrabold text-white mb-2">Siksha Setu</h2>
+        <p class="mb-4 text-white-50">Enter your personal details and start your journey with us</p>
+        <button class="ghost-btn py-3 px-5" (click)="togglePanel(true)">Sign Up</button>
+      </div>
+    </div>
+  </div>
+</div>

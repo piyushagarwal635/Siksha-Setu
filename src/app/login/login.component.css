@@ -1,0 +1,439 @@
+:host {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  /* Use a premium gradient background with floating shapes for the host page if viewed directly */
+  background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 50%, #f1e9ff 100%);
+  font-family: var(--font-family);
+  padding: 1.5rem;
+}
+
+/* 1. Premium Glassmorphic Core Container */
+.container {
+  position: relative;
+  width: 100%;
+  max-width: 960px;
+  min-height: 700px;
+  border-radius: 32px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  box-shadow: var(--shadow-3d);
+}
+
+/* Form Container Grid Placement */
+.form-container {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+  background: transparent;
+  overflow-y: auto;
+}
+
+.sign-in-container {
+  left: 0;
+  width: 50%;
+  z-index: 2;
+  opacity: 1;
+}
+
+.sign-up-container {
+  left: 0;
+  width: 50%;
+  opacity: 0;
+  z-index: 1;
+}
+
+/* Form Styling */
+form {
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 2rem 3rem;
+  min-height: 100%;
+  height: auto;
+  text-align: center;
+}
+
+form h2 {
+  font-size: 2.25rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: #1e1b4b;
+  margin-bottom: 0.5rem;
+}
+
+form p {
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+/* 2. Custom Input Groups with Visual Tags */
+.input-group-custom {
+  margin-bottom: 1.15rem;
+  text-align: left;
+}
+
+.form-input-label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #334155;
+  margin-bottom: 0.45rem;
+}
+
+.form-input-label i {
+  color: var(--primary);
+  margin-right: 0.35rem;
+  font-size: 1.05rem;
+}
+
+input:not([type="checkbox"]), select {
+  background: rgba(79, 70, 229, 0.03);
+  border: 2px solid rgba(79, 70, 229, 0.1);
+  padding: 0.9rem 1.25rem;
+  width: 100%;
+  border-radius: 16px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  transition: var(--transition-smooth);
+}
+
+input:not([type="checkbox"]):focus, select:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15) !important;
+}
+
+input:not([type="checkbox"]):disabled, select:disabled {
+  background: rgba(148, 163, 184, 0.08);
+  border-color: rgba(148, 163, 184, 0.15);
+  cursor: not-allowed;
+}
+
+.form-check {
+  display: flex;
+  align-items: center;
+}
+
+.form-check-input {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.validation-message {
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-top: 0.35rem;
+}
+
+.forgot-password {
+  color: var(--muted);
+  font-size: 0.88rem;
+  font-weight: 700;
+  margin: 0.25rem 0 1.25rem;
+  align-self: flex-end;
+  transition: var(--transition-smooth);
+}
+
+.forgot-password:hover {
+  color: var(--primary);
+  text-decoration: underline;
+}
+
+/* 3. Action Buttons */
+.form-actions-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1rem;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.btn-submit-3d {
+  background: var(--primary-gradient);
+  color: #ffffff;
+  padding: 1rem 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.25);
+  border: none;
+}
+
+.btn-submit-3d:hover:not(:disabled) {
+  background: linear-gradient(135deg, #5c53eb 0%, #874ef5 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(79, 70, 229, 0.45);
+}
+
+.btn-submit-3d:disabled {
+  background: #cbd5e1;
+  color: #94a3b8;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.btn-reset-3d {
+  background: #ffffff;
+  color: #475569;
+  padding: 1rem;
+  border: 2px solid rgba(79, 70, 229, 0.12);
+  border-radius: 16px;
+}
+
+.btn-reset-3d:hover:not(:disabled) {
+  background: #f1f5f9;
+  color: #1e293b;
+  transform: translateY(-2px);
+  border-color: rgba(79, 70, 229, 0.2);
+}
+
+/* 4. Sliding Overlay (Desktop) */
+.overlay-container {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 50%;
+  height: 100%;
+  overflow: hidden;
+  transition: transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+  z-index: 100;
+}
+
+.overlay {
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #4f46e5 100%);
+  color: #ffffff;
+  position: relative;
+  left: -100%;
+  height: 100%;
+  width: 200%;
+  transform: translateX(0);
+  transition: transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.overlay-panel {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 0 3.5rem;
+  text-align: center;
+  top: 0;
+  height: 100%;
+  width: 50%;
+  transform: translateX(0);
+  transition: transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.overlay-panel::before {
+  content: '';
+  position: absolute;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+  top: -30px;
+  left: -30px;
+}
+
+.overlay-left {
+  transform: translateX(-20%);
+}
+
+.overlay-right {
+  right: 0;
+  transform: translateX(0);
+}
+
+.overlay-panel img {
+  width: 105px;
+  height: 105px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid rgba(255, 255, 255, 0.25);
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  animation: floatOverlay 3s ease-in-out infinite alternate;
+}
+
+@keyframes floatOverlay {
+  0% { transform: translateY(0px); }
+  100% { transform: translateY(-8px); }
+}
+
+.overlay-panel h2 {
+  font-size: 2.3rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.overlay-panel p {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #cbd5e1;
+}
+
+/* Ghost Switcher Buttons */
+.ghost-btn {
+  background-color: transparent;
+  border: 2px solid #ffffff;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 0.95rem;
+  border-radius: 16px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: var(--transition-bounce);
+}
+
+.ghost-btn:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  transform: scale(1.05);
+}
+
+/* Sliding active panel properties */
+.container.right-panel-active .sign-in-container {
+  transform: translateX(100%);
+  opacity: 0;
+  z-index: 1;
+}
+
+.container.right-panel-active .sign-up-container {
+  transform: translateX(100%);
+  opacity: 1;
+  z-index: 5;
+}
+
+.container.right-panel-active .overlay-container {
+  transform: translateX(-100%);
+}
+
+.container.right-panel-active .overlay {
+  transform: translateX(50%);
+}
+
+.container.right-panel-active .overlay-left {
+  transform: translateX(0);
+}
+
+.container.right-panel-active .overlay-right {
+  transform: translateX(20%);
+}
+
+/* Mobile Toggle Helper Blocks */
+.mobile-toggle-footer {
+  display: none;
+}
+
+/* RESPONSIVE DESIGN (Mobile Phones) */
+@media (max-width: 600px) {
+  :host {
+    padding: 0;
+    background: transparent;
+  }
+
+  .container {
+    max-width: 100%;
+    min-height: auto;
+    border-radius: 20px;
+    box-shadow: none;
+    border: none;
+    background: rgba(255, 255, 255, 0.95);
+  }
+
+  .form-container {
+    position: relative;
+    width: 100%;
+    height: auto;
+    transform: none !important;
+    opacity: 0;
+    display: none;
+    transition: none;
+  }
+
+  .container.right-panel-active .sign-in-container {
+    display: none;
+    opacity: 0;
+  }
+
+  .container.right-panel-active .sign-up-container {
+    display: block;
+    opacity: 1;
+  }
+
+  .container:not(.right-panel-active) .sign-in-container {
+    display: block;
+    opacity: 1;
+  }
+
+  form {
+    padding: 2rem 1.25rem;
+    min-height: auto;
+  }
+
+  form h2 {
+    font-size: 1.85rem;
+  }
+
+  .form-actions-row {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .overlay-container {
+    display: none;
+  }
+
+  .mobile-toggle-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 2rem;
+    width: 100%;
+    font-size: 0.92rem;
+    color: var(--muted);
+  }
+
+  .btn-toggle-link {
+    background: none;
+    border: none;
+    color: var(--primary);
+    font-weight: 800;
+    padding: 0;
+    font-size: 0.92rem;
+    text-decoration: underline;
+    width: auto;
+    text-transform: none;
+  }
+
+  .btn-toggle-link:hover {
+    color: #4338ca;
+  }
+}
+
+.forgot-password-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2rem 3rem;
+  width: 100%;
+  min-height: 100%;
+  text-align: left;
+  overflow-y: auto;
+}
+
+@media (max-width: 600px) {
+  .forgot-password-wrapper {
+    padding: 2rem 1.25rem;
+  }
+}
+

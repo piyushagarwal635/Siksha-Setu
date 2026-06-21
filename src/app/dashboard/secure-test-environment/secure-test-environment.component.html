@@ -1,0 +1,109 @@
+<div class="secure-test-wrapper" [class.unselectable]="true">
+  
+  <!-- SECURITY OVERLAY WARNING -->
+  <div class="security-banner" *ngIf="tabSwitches > 0" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-2" aria-hidden="true"></i>
+    Warning: Tab switch detected. You have {{MAX_TAB_SWITCHES - tabSwitches}} attempts remaining.
+  </div>
+
+  <!-- HEADER -->
+  <header class="test-header d-flex justify-content-between align-items-center">
+    <h1 class="brand fs-5 mb-0">
+      <i class="bi bi-shield-lock-fill me-2 text-success"></i>
+      Secure Test Mode
+    </h1>
+    <div class="timers d-flex align-items-center gap-4">
+      <button class="btn btn-sm btn-outline-light" (click)="submitTest()" *ngIf="!testFinished">
+        Force Submit
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="test-container" *ngIf="!testFinished && testQuestions.length > 0">
+    
+    <div class="question-header d-flex justify-content-between align-items-center mb-4">
+      <h2 class="h4 mb-0 text-muted">Question {{currentTestIndex + 1}} of {{testQuestions.length}}</h2>
+      <div class="question-timer badge rounded-pill" 
+           [ngClass]="questionTimerSeconds > 30 ? 'bg-primary' : 'bg-danger'">
+        <i class="bi bi-stopwatch me-1"></i>
+        {{questionTimerSeconds}}s remaining
+      </div>
+    </div>
+
+    <!-- The Question -->
+    <div class="card border-0 shadow-sm mb-4 test-card">
+      <div class="card-body p-5">
+        <h3 id="test-question-text" tabindex="-1" class="question-text">{{testQuestions[currentTestIndex].question}}</h3>
+        
+        <div class="options-container mt-5" role="radiogroup" aria-label="Question options">
+          <div 
+            class="option-item" 
+            *ngFor="let opt of testQuestions[currentTestIndex].options; let i = index"
+            [class.selected]="testAnswers[currentTestIndex] === i"
+            (click)="selectOption(i)"
+            tabindex="0"
+            (keyup.enter)="selectOption(i)"
+            role="radio"
+            [attr.aria-checked]="testAnswers[currentTestIndex] === i ? 'true' : 'false'"
+            [attr.aria-label]="['Option A', 'Option B', 'Option C', 'Option D', 'Option E'][i] + ': ' + opt">
+            <div class="option-marker" aria-hidden="true">{{ ['A', 'B', 'C', 'D', 'E'][i] }}</div>
+            <div class="option-text" aria-hidden="true">{{opt}}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Bar -->
+    <div class="action-bar d-flex justify-content-end">
+      <button 
+        class="btn btn-primary btn-lg px-5 next-btn" 
+        (click)="nextQuestion()"
+        [disabled]="testAnswers[currentTestIndex] === -1">
+        {{ currentTestIndex === testQuestions.length - 1 ? 'Submit Test' : 'Next Question' }}
+        <i class="bi bi-arrow-right ms-2"></i>
+      </button>
+    </div>
+  </main>
+
+  <!-- TEST RESULTS -->
+  <main class="results-container text-center" *ngIf="testFinished">
+    <div class="card border-0 shadow-lg result-card mx-auto">
+      <div class="card-body p-5">
+        <div class="result-icon mb-4">
+          <i class="bi" 
+             [ngClass]="testPassed ? 'bi-check-circle-fill text-success' : 'bi-x-circle-fill text-danger'"
+             style="font-size: 5rem;"
+             aria-hidden="true"></i>
+        </div>
+        
+        <h1 id="test-result-heading" tabindex="-1" class="h2 mb-3">{{ testPassed ? 'Congratulations!' : 'Test Failed' }}</h1>
+        <p class="text-muted fs-5 mb-4">You have completed the secure test.</p>
+        
+        <div class="score-display mb-4">
+          <div class="display-1 fw-bold" [ngClass]="testPassed ? 'text-success' : 'text-danger'">
+            {{testScore | number:'1.0-0'}}%
+          </div>
+        </div>
+
+        <div class="stats-grid mb-5">
+          <div class="stat-box">
+            <div class="stat-label">Security Flags</div>
+            <div class="stat-value text-warning">{{tabSwitches + fullscreenExits}}</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Status</div>
+            <div class="stat-value" [ngClass]="testPassed ? 'text-success' : 'text-danger'">
+              {{testPassed ? 'PASSED' : 'FAILED'}}
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-outline-secondary btn-lg px-5" (click)="exitToDashboard()">
+          {{ testPassed ? 'Go to dashboard to download your certificate' : 'Return to Dashboard' }}
+        </button>
+      </div>
+    </div>
+  </main>
+
+</div>

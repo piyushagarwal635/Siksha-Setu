@@ -1,29 +1,331 @@
-<div class="form-container">
-    <h2>Student Registration Form</h2>
+<div class="profile-dashboard-wrapper">
+  <!-- Profile Header Card -->
+  <div class="profile-header-card glass-panel shadow-3d mb-4">
+    <div class="profile-header-content">
+      <div class="avatar-container">
+        <img [src]="userForm.get('profileImage')?.value || 'https://api.dicebear.com/7.x/adventurer/svg?seed=' + userId" 
+             alt="Profile Picture" class="profile-avatar shadow-sm" />
+        <label for="profileImageInput" class="avatar-edit-badge" [class.locked]="isFieldLocked('profileImage')"
+               [title]="isFieldLocked('profileImage') ? 'Request Edit Profile Image' : 'Upload Profile Image'">
+          <i class="bi" [class.bi-lock-fill]="isFieldLocked('profileImage')" [class.bi-camera-fill]="!isFieldLocked('profileImage')"></i>
+        </label>
+        <input type="file" id="profileImageInput" (change)="onProfileImageSelected($event)" style="display: none;" 
+               [disabled]="isFieldLocked('profileImage')" />
+      </div>
+      <div class="profile-title-info">
+        <h2 class="profile-name">{{ userForm.get('name')?.value || 'User Profile' }}</h2>
+        <div class="profile-role-badge" [class.admin]="userRole === 'ADMIN'">
+          <i class="bi" [class.bi-shield-fill-check]="userRole === 'ADMIN'" [class.bi-person-badge-fill]="userRole !== 'ADMIN'"></i>
+          {{ userRole === 'ADMIN' ? 'ADMINISTRATOR' : 'STUDENT' }}
+        </div>
+        <p class="profile-id-text mt-1 text-muted">
+          <strong>ID:</strong> {{ userId }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State Indicator -->
+  <div *ngIf="isLoading" class="text-center my-5 py-5">
+    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="text-muted mt-3 fw-bold">Processing details...</p>
+  </div>
+
+  <!-- Profile Details Form -->
+  <div *ngIf="!isLoading" class="form-container glass-panel shadow-3d border-top-primary">
+    <h3 class="fw-extrabold text-indigo mb-2"><i class="bi bi-card-list text-primary me-2"></i>Personal Details</h3>
+    <p *ngIf="userRole !== 'ADMIN'" class="text-muted small mb-4">Fields with lock icon are locked. Click the lock icon to request Admin approval to modify them.</p>
+
     <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
-      
-      <label for="id">Disability ID:</label>
-      <input type="text" id="id" formControlName="id" [disabled]="true" />
-  
-      <label for="name">Name:</label>
-      <input type="text" id="name" formControlName="name" [disabled]="true" />
-  
-      <label for="course">Select Course:</label>
-      <select id="course" formControlName="course">
-        <option value="" disabled>Select Course</option>
-        <option *ngFor="let course of courses" [value]="course">{{ course }}</option>
-      </select>
-  
-      <label for="phone">Phone Number:</label>
-      <input type="tel" id="phone" formControlName="phone" placeholder="Enter phone number" />
-  
-      <label for="email">Email ID:</label>
-      <input type="email" id="email" formControlName="email" placeholder="Enter email address" />
-  
-      <label for="incomeCertificate">Income Certificate:</label>
-      <input type="file" id="incomeCertificate" formControlName="incomeCertificate" />
-  
-      <button type="submit" [disabled]="!userForm.valid">Submit</button>
+      <!-- Disability/Admin ID (Permanent Readonly) -->
+      <div class="form-group-custom">
+        <label class="form-label-custom">
+          <i class="bi bi-credit-card-2-front-fill text-primary me-2"></i> {{ userRole === 'ADMIN' ? 'Admin ID' : 'Disability ID' }}
+        </label>
+        <div class="input-action-wrapper">
+          <input type="text" formControlName="id" class="input-readonly" readonly />
+        </div>
+      </div>
+
+      <!-- Full Name -->
+      <div class="form-group-custom">
+        <label class="form-label-custom" for="name">
+          <i class="bi bi-person-fill text-primary me-2"></i> Full Name
+        </label>
+        <div class="input-action-wrapper" [class.unlocked-field]="isFieldApproved('name')">
+          <input type="text" id="name" formControlName="name" placeholder="Enter full name" />
+          <button type="button" *ngIf="isFieldLocked('name')" class="field-lock-btn" (click)="openEditRequestModal('name', 'Full Name')" title="Request Edit">
+            <i class="bi bi-lock-fill text-danger"></i>
+          </button>
+          <span *ngIf="isRequestPendingForField('name')" class="field-pending-badge">Pending</span>
+          <button type="button" *ngIf="isFieldApproved('name')" class="field-save-btn" (click)="saveSpecificField('name')" title="Save this field">
+            <i class="bi bi-check-circle-fill"></i> Save
+          </button>
+        </div>
+        <div *ngIf="userForm.get('name')?.touched && userForm.get('name')?.invalid" class="text-danger small mt-1">
+          Name is required and must be at least 3 characters.
+        </div>
+      </div>
+
+      <!-- Select Course (Student only) -->
+      <div *ngIf="userRole !== 'ADMIN'" class="form-group-custom">
+        <label class="form-label-custom" for="course">
+          <i class="bi bi-book-half text-primary me-2"></i> Select Course
+        </label>
+        <div class="input-action-wrapper" [class.unlocked-field]="isFieldApproved('course')">
+          <select id="course" formControlName="course">
+            <option value="" disabled>Select Course</option>
+            <option *ngFor="let course of courses" [value]="course">{{ course }}</option>
+          </select>
+          <button type="button" *ngIf="isFieldLocked('course')" class="field-lock-btn" (click)="openEditRequestModal('course', 'Course')" title="Request Edit">
+            <i class="bi bi-lock-fill text-danger"></i>
+          </button>
+          <span *ngIf="isRequestPendingForField('course')" class="field-pending-badge">Pending</span>
+          <button type="button" *ngIf="isFieldApproved('course')" class="field-save-btn" (click)="saveSpecificField('course')" title="Save this field">
+            <i class="bi bi-check-circle-fill"></i> Save
+          </button>
+        </div>
+        <div *ngIf="userForm.get('course')?.touched && userForm.get('course')?.invalid" class="text-danger small mt-1">
+          Course selection is required.
+        </div>
+      </div>
+
+      <!-- Phone Number -->
+      <div class="form-group-custom">
+        <label class="form-label-custom" for="phone">
+          <i class="bi bi-telephone-fill text-primary me-2"></i> Phone Number
+        </label>
+        <div class="input-action-wrapper" [class.unlocked-field]="isFieldApproved('phone')">
+          <input type="tel" id="phone" formControlName="phone" placeholder="Enter phone number" />
+          <button type="button" *ngIf="isFieldLocked('phone')" class="field-lock-btn" (click)="openEditRequestModal('phone', 'Phone Number')" title="Request Edit">
+            <i class="bi bi-lock-fill text-danger"></i>
+          </button>
+          <span *ngIf="isRequestPendingForField('phone')" class="field-pending-badge">Pending</span>
+          <button type="button" *ngIf="isFieldApproved('phone')" class="field-save-btn" (click)="saveSpecificField('phone')" title="Save this field">
+            <i class="bi bi-check-circle-fill"></i> Save
+          </button>
+        </div>
+        <div *ngIf="userForm.get('phone')?.touched && userForm.get('phone')?.invalid" class="text-danger small mt-1">
+          Please enter a valid 10-digit phone number.
+        </div>
+      </div>
+
+      <!-- Email ID -->
+      <div class="form-group-custom">
+        <label class="form-label-custom" for="email">
+          <i class="bi bi-envelope-fill text-primary me-2"></i> Email ID
+        </label>
+        <div class="input-action-wrapper" [class.unlocked-field]="isFieldApproved('email')">
+          <input type="email" id="email" formControlName="email" placeholder="Enter email address" />
+          <button type="button" *ngIf="isFieldLocked('email')" class="field-lock-btn" (click)="openEditRequestModal('email', 'Email Address')" title="Request Edit">
+            <i class="bi bi-lock-fill text-danger"></i>
+          </button>
+          <span *ngIf="isRequestPendingForField('email')" class="field-pending-badge">Pending</span>
+          <button type="button" *ngIf="isFieldApproved('email')" class="field-save-btn" (click)="saveSpecificField('email')" title="Save this field">
+            <i class="bi bi-check-circle-fill"></i> Save
+          </button>
+        </div>
+        <div *ngIf="userForm.get('email')?.touched && userForm.get('email')?.invalid" class="text-danger small mt-1">
+          Please enter a valid email address.
+        </div>
+      </div>
+
+      <!-- Address (Student only) -->
+      <div *ngIf="userRole !== 'ADMIN'" class="form-group-custom">
+        <label class="form-label-custom" for="address">
+          <i class="bi bi-house-door-fill text-primary me-2"></i> Home Address
+        </label>
+        <div class="input-action-wrapper" [class.unlocked-field]="isFieldApproved('address')">
+          <input type="text" id="address" formControlName="address" placeholder="Enter physical address" />
+          <button type="button" *ngIf="isFieldLocked('address')" class="field-lock-btn" (click)="openEditRequestModal('address', 'Home Address')" title="Request Edit">
+            <i class="bi bi-lock-fill text-danger"></i>
+          </button>
+          <span *ngIf="isRequestPendingForField('address')" class="field-pending-badge">Pending</span>
+          <button type="button" *ngIf="isFieldApproved('address')" class="field-save-btn" (click)="saveSpecificField('address')" title="Save this field">
+            <i class="bi bi-check-circle-fill"></i> Save
+          </button>
+        </div>
+        <div *ngIf="userForm.get('address')?.touched && userForm.get('address')?.invalid" class="text-danger small mt-1">
+          Home address is required.
+        </div>
+      </div>
+
+      <!-- Income Certificate (Student only) -->
+      <div *ngIf="userRole !== 'ADMIN'" class="form-group-custom">
+        <label class="form-label-custom" for="incomeCertificate">
+          <i class="bi bi-file-earmark-arrow-up-fill text-primary me-2"></i> Income Certificate Document
+        </label>
+        <div class="input-action-wrapper" [class.unlocked-field]="isFieldApproved('incomeCertificate')">
+          <div class="file-uploader-box">
+            <input type="file" id="incomeCertificate" (change)="onIncomeCertificateSelected($event)" 
+                   [disabled]="isFieldLocked('incomeCertificate')" />
+            <span *ngIf="userForm.get('incomeCertificate')?.value" class="text-success small d-block mt-1">
+              <i class="bi bi-check-circle"></i> File uploaded.
+            </span>
+          </div>
+          <button type="button" *ngIf="isFieldLocked('incomeCertificate')" class="field-lock-btn" 
+                  (click)="openEditRequestModal('incomeCertificate', 'Income Certificate')" title="Request Edit">
+            <i class="bi bi-lock-fill text-danger"></i>
+          </button>
+          <span *ngIf="isRequestPendingForField('incomeCertificate')" class="field-pending-badge">Pending</span>
+        </div>
+
+        <!-- Preview of uploaded income certificate -->
+        <div *ngIf="userForm.get('incomeCertificate')?.value" class="certificate-preview-container mt-3 p-3 border rounded bg-light text-center">
+          <span class="text-indigo small d-block mb-2 fw-bold"><i class="bi bi-eye-fill"></i> Uploaded Income Certificate:</span>
+          <img *ngIf="userForm.get('incomeCertificate')?.value.startsWith('data:image')" 
+               [src]="userForm.get('incomeCertificate')?.value" 
+               alt="Income Certificate Preview" 
+               class="img-thumbnail cursor-pointer" 
+               style="max-height: 250px; max-width: 100%; border-radius: 12px; transition: transform 0.2s;" 
+               (click)="openImageInNewTab(userForm.get('incomeCertificate')?.value)" 
+               title="Click to view full document" />
+          <div *ngIf="!userForm.get('incomeCertificate')?.value.startsWith('data:image')" class="p-2">
+            <button type="button" (click)="openImageInNewTab(userForm.get('incomeCertificate')?.value)" class="btn btn-outline-indigo btn-sm">
+              <i class="bi bi-file-earmark-pdf-fill"></i> View Certificate Document
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Security Questions List -->
+      <div class="security-questions-section mt-4 border-top pt-3">
+        <h4 class="text-indigo mb-2"><i class="bi bi-shield-lock-fill text-primary me-2"></i>Security Questions (For Password Recovery)</h4>
+        <p class="text-muted small mb-3">Configure one or more security questions to verify your identity when resetting your password.</p>
+
+        <div *ngFor="let pair of securityPairs; let idx = index" class="security-pair-row p-3 mb-3 border rounded bg-light">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="badge bg-indigo" style="font-size: 0.8rem; padding: 0.35rem 0.65rem;">Question #{{ idx + 1 }}</span>
+            <button type="button" class="btn btn-sm text-danger border-0 bg-transparent" (click)="removeSecurityPair(idx)" title="Remove Question">
+              <i class="bi bi-trash-fill"></i> Remove
+            </button>
+          </div>
+
+          <div class="form-group-custom mb-3">
+            <label class="form-label-custom">Select Question:</label>
+            <select [name]="'sq_' + idx" [(ngModel)]="pair.question" [ngModelOptions]="{standalone: true}" class="form-control">
+              <option value="" disabled>Choose a Question</option>
+              <!-- Show the current value as an option if it's not in the preset list -->
+              <option *ngIf="pair.question && !securityQuestionsList.includes(pair.question)" [value]="pair.question">
+                {{ pair.question }}
+              </option>
+              <option *ngFor="let q of securityQuestionsList" [value]="q">{{ q }}</option>
+            </select>
+          </div>
+
+          <div class="form-group-custom mb-1">
+            <label class="form-label-custom">Security Answer:</label>
+            <input type="text" [name]="'sa_' + idx" [(ngModel)]="pair.answer" [ngModelOptions]="{standalone: true}" placeholder="Answer to this security question" class="form-control" />
+          </div>
+        </div>
+
+        <button type="button" class="btn btn-sm btn-outline-indigo mb-4 py-2 px-3" (click)="addSecurityPair()">
+          <i class="bi bi-plus-circle-fill me-1"></i> Add Another Security Question
+        </button>
+      </div>
+
+      <!-- Cookie Consent Settings -->
+      <div class="cookie-consent-settings-section mt-4 border-top pt-3">
+        <h4 class="text-indigo mb-2"><i class="bi bi-shield-check-fill text-primary me-2"></i>Privacy & Cookie Settings</h4>
+        <p class="text-muted small mb-3">Manage your cookie preferences. Secure session cookies verify authentication credentials and maintain active login sessions.</p>
+        
+        <div class="cookie-settings-card p-3 mb-4 border rounded bg-light d-flex justify-content-between align-items-center">
+          <div class="text-start">
+            <span class="fw-bold text-dark d-block">Enable Secure Cookies</span>
+            <span class="text-muted small">Keep me logged in across page refreshes using HttpOnly cookies</span>
+          </div>
+          <div class="form-check form-switch fs-4">
+            <input class="form-check-input cursor-pointer" type="checkbox" role="switch" id="cookieSwitch" 
+                   [checked]="cookieConsent === 'accepted'" (change)="onCookieConsentChange($event)">
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="button-group-row mt-4">
+        <!-- Main save button (saves any un-locked fields/changes) -->
+        <button type="submit" class="btn btn-submit-3d" [disabled]="userForm.invalid || !isSecurityPairsValid() || isLoading">
+          <i class="bi bi-cloud-arrow-up-fill me-2"></i> Save Profile Details
+        </button>
+        <button type="button" class="btn btn-cancel-3d" (click)="onCancel()" [disabled]="isLoading">
+          Back to Dashboard
+        </button>
+      </div>
     </form>
   </div>
-  
+</div>
+
+<!-- ==========================================
+     MODALS SECTION
+     ========================================== -->
+
+<!-- STUDENT: EDIT REQUEST MODAL -->
+<div class="modal-overlay" *ngIf="showEditRequestModal">
+  <div class="modal-container glass-panel shadow-3d">
+    <div class="modal-header">
+      <h4>Request Profile Update: <strong>{{ fieldLabelForRequest }}</strong></h4>
+      <button class="close-btn" (click)="closeEditRequestModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <!-- Proposed Value / File Selection -->
+      <div class="form-group-custom" *ngIf="fieldNameForRequest !== 'incomeCertificate'">
+        <label class="form-label-custom">Proposed New Value:</label>
+        
+        <!-- If Course -->
+        <select *ngIf="fieldNameForRequest === 'course'" [(ngModel)]="proposedValue" class="form-control">
+          <option value="" disabled>Select Proposed Course</option>
+          <option *ngFor="let course of courses" [value]="course">{{ course }}</option>
+        </select>
+        
+        <!-- Default Text Input -->
+        <input *ngIf="fieldNameForRequest !== 'course'" 
+               type="text" [(ngModel)]="proposedValue" class="form-control" placeholder="Enter new value" />
+      </div>
+
+      <!-- If Income Certificate request, only show one file upload box for the new certificate -->
+      <div class="form-group-custom" *ngIf="fieldNameForRequest === 'incomeCertificate'">
+        <label class="form-label-custom">Upload New Income Certificate File:</label>
+        <input type="file" (change)="onModalProofSelected($event)" class="form-control" />
+        <span *ngIf="proofDocument" class="text-success small mt-1 d-block"><i class="bi bi-paperclip"></i> Certificate file attached.</span>
+      </div>
+
+      <div class="form-group-custom">
+        <label class="form-label-custom">Reason for Edit:</label>
+        <textarea [(ngModel)]="reasonForRequest" class="form-control" placeholder="Why do you need to change this detail?" rows="3"></textarea>
+      </div>
+
+      <!-- Proof upload only for fields other than incomeCertificate -->
+      <div class="form-group-custom" *ngIf="fieldNameForRequest !== 'incomeCertificate'">
+        <label class="form-label-custom">Upload Proof Document (e.g. Identity Card, Certificate):</label>
+        <input type="file" (change)="onModalProofSelected($event)" class="form-control" />
+        <span *ngIf="proofDocument" class="text-success small mt-1 d-block"><i class="bi bi-paperclip"></i> Proof attached.</span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-submit-3d py-2" (click)="submitEditRequest()">Submit Request</button>
+      <button class="btn btn-cancel-3d py-2" (click)="closeEditRequestModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- PREMIUM CONFIRMATION MODAL -->
+<div class="modal-overlay" *ngIf="showConfirmModal">
+  <div class="modal-container glass-panel shadow-3d confirm-modal" style="max-width: 450px;">
+    <div class="modal-header border-0 pb-0">
+      <h4 class="fw-extrabold text-indigo m-0 d-flex align-items-center gap-2">
+        <i class="bi bi-question-circle-fill text-warning fs-4"></i>
+        {{ confirmTitle }}
+      </h4>
+      <button class="close-btn" (click)="onConfirmCancel()">&times;</button>
+    </div>
+    <div class="modal-body py-3">
+      <p class="text-muted m-0" style="font-size: 0.95rem; line-height: 1.5;">{{ confirmMessage }}</p>
+    </div>
+    <div class="modal-footer border-0 pt-0 d-flex gap-2 justify-content-end">
+      <button class="btn btn-submit-3d py-2 px-4" (click)="onConfirmAccept()">Yes, Proceed</button>
+      <button class="btn btn-cancel-3d py-2 px-4" (click)="onConfirmCancel()">Cancel</button>
+    </div>
+  </div>
+</div>

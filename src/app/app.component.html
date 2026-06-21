@@ -1,1 +1,27 @@
+<div class="global-loader-overlay" *ngIf="isLoading$ | async">
+  <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem; border-width: 0.3em;">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+
 <router-outlet></router-outlet>
+<app-accessibility-widget></app-accessibility-widget>
+
+<!-- Cookie Consent Banner Overlay -->
+<div *ngIf="showCookieBanner" class="cookie-banner-container">
+  <div class="d-flex align-items-start gap-3">
+    <div class="cookie-icon-wrapper">
+      <i class="bi bi-shield-fill-check fs-4"></i>
+    </div>
+    <div class="cookie-text-content">
+      <h5 class="fw-bold text-dark m-0" style="font-size: 1.05rem;">We Respect Your Privacy</h5>
+      <p class="text-muted small m-0 mt-1" style="line-height: 1.45; font-size: 0.85rem;">
+        Siksha Setu uses secure session cookies to verify authentication credentials, keep you logged in between refreshes, and support 'Remember Me' preferences. By accepting, you consent to our secure cookie usage. You can change this at any time in the settings.
+      </p>
+    </div>
+  </div>
+  <div class="cookie-actions d-flex gap-2 justify-content-end mt-2">
+    <button (click)="declineCookies()" class="btn btn-sm btn-decline px-3 py-1.5 fw-bold rounded-pill" style="font-size: 0.8rem;">Decline</button>
+    <button (click)="acceptCookies()" class="btn btn-sm btn-accept px-4 py-1.5 fw-bold rounded-pill" style="font-size: 0.8rem;">Accept Cookies</button>
+  </div>
+</div>

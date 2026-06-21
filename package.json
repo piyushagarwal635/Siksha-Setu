@@ -1,5 +1,5 @@
 {
-  "name": "my-angular-app",
+  "name": "SikshaSetu",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
@@ -7,7 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:MY-Angular-App": "node dist/my-angular-app/server/server.mjs"
+    "serve:ssr:SikshaSetu": "node dist/SikshaSetu/server/server.mjs"
   },
   "private": true,
   "dependencies": {
@@ -25,6 +25,8 @@
     "@angular/router": "^19.1.6",
     "@angular/ssr": "^19.1.8",
     "@google-cloud/dialogflow": "^6.14.0",
+    "@nguniversal/express-engine": "^7.0.2",
+    "@types/three": "^0.184.1",
     "bootstrap": "^5.3.3",
     "chart.js": "^4.4.7",
     "express": "^4.18.2",
@@ -33,6 +35,7 @@
     "inflight": "^1.0.6",
     "rimraf": "^6.0.1",
     "rxjs": "~7.8.0",
+    "three": "^0.184.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"
   },

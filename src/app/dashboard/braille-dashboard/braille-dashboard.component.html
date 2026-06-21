@@ -1,0 +1,107 @@
+<main class="braille-page" aria-labelledby="braille-title">
+  <div *ngIf="isLoading" class="loading-state" role="status">
+    <div class="spinner-border text-primary"></div>
+    <p>Preparing the Braille learning workspace…</p>
+  </div>
+
+  <ng-container *ngIf="!isLoading">
+    <header class="workspace-header">
+      <div>
+        <button type="button" class="back-button" (click)="goBack()" aria-label="Return to course">
+          <i class="bi bi-arrow-left"></i>
+        </button>
+        <div>
+          <p class="eyebrow">{{ courseDetails?.title }}</p>
+          <h1 id="braille-title">{{ selectedResource?.title || 'Braille Mode' }}</h1>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <a routerLink="/dashboard/braille-testing" class="test-link">Open testing lab</a>
+        <div class="mode-switch" aria-label="Braille dot mode">
+          <button type="button" [class.active]="dotMode === 6" (click)="setDotMode(6)">6-dot</button>
+          <button type="button" [class.active]="dotMode === 8" (click)="setDotMode(8)">8-dot</button>
+        </div>
+      </div>
+    </header>
+
+    <section class="hardware-bar" aria-labelledby="hardware-heading">
+      <div>
+        <span class="status-light" [class.connected]="hardwareStatus.state === 'connected'"></span>
+        <div>
+          <h2 id="hardware-heading">
+            {{ hardwareStatus.state === 'connected' ? 'Physical Braille display' : 'Virtual Braille display' }}
+          </h2>
+          <p aria-live="polite">{{ hardwareStatus.message }}</p>
+        </div>
+      </div>
+      <div class="hardware-actions">
+        <button type="button" *ngIf="hardwareStatus.state !== 'connected'" (click)="connectUsb()">
+          <i class="bi bi-usb-symbol"></i> USB
+        </button>
+        <button type="button" *ngIf="hardwareStatus.state !== 'connected'" (click)="connectBluetooth()">
+          <i class="bi bi-bluetooth"></i> Bluetooth
+        </button>
+        <button type="button" class="danger" *ngIf="hardwareStatus.state === 'connected'" (click)="disconnect()">
+          Disconnect {{ hardwareStatus.deviceName }}
+        </button>
+      </div>
+    </section>
+
+    <div *ngIf="translationError" class="service-error" role="alert">
+      <strong>Translation unavailable.</strong> {{ translationError }}
+    </div>
+
+    <section class="viewer-grid" [attr.aria-busy]="isTranslating">
+      <article class="viewer-panel original-panel">
+        <div class="panel-heading">
+          <span>01</span>
+          <div>
+            <p>Source</p>
+            <h2>Original text</h2>
+          </div>
+        </div>
+        <div class="text-surface" tabindex="0">{{ originalText }}</div>
+      </article>
+
+      <article class="viewer-panel translation-panel">
+        <div class="panel-heading">
+          <span>02</span>
+          <div>
+            <p>Liblouis · {{ translation?.table || 'waiting' }}</p>
+            <h2>Braille translation</h2>
+          </div>
+          <div *ngIf="isTranslating" class="spinner-border spinner-border-sm text-primary ms-auto"></div>
+        </div>
+        <div class="braille-surface" tabindex="0"
+             aria-label="Braille translation. Screen readers may announce Unicode Braille patterns.">
+          {{ translation?.braille || 'Translation will appear here.' }}
+        </div>
+        <footer>
+          <span>{{ translation?.cells?.length || 0 }} cells</span>
+          <span>{{ dotMode }}-dot mode</span>
+        </footer>
+      </article>
+
+      <article class="viewer-panel hardware-panel">
+        <div class="panel-heading">
+          <span>03</span>
+          <div>
+            <p>{{ hardwareStatus.transport }}</p>
+            <h2>Pin output</h2>
+          </div>
+        </div>
+        <app-braille-3d-display
+          [cells]="translation?.cells || []"
+          [dotMode]="dotMode"
+          [maxCells]="20">
+        </app-braille-3d-display>
+      </article>
+    </section>
+
+    <p class="screen-reader-note">
+      Braille Mode complements NVDA, JAWS, and VoiceOver. Original text remains available to assistive
+      technologies, and status changes are announced without replacing normal screen-reader navigation.
+    </p>
+  </ng-container>
+</main>

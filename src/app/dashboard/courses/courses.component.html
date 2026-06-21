@@ -1,0 +1,211 @@
+<main class="courses-container mt-3">
+  <!-- Page Header -->
+  <div class="courses-header glass-panel shadow-3d p-4 rounded-5 mb-4 position-relative overflow-hidden">
+    <div class="header-decor"></div>
+    <div class="position-relative z-2">
+      <span class="badge bg-indigo text-white px-3 py-1.5 rounded-pill fw-bold text-uppercase mb-2 shadow-sm">
+        ðŸ“š Skill Building
+      </span>
+      <h1 class="fw-extrabold mb-3 text-indigo">Interactive Study Courses</h1>
+      <p class="text-muted leading-relaxed max-w-xl">
+        Explore interactive lessons tailored for absolute accessibility. You can read, listen to voice descriptions, or test your skills with our interactive Testzes!
+      </p>
+
+      <!-- Search & Filters Row -->
+      <div class="row g-3 mt-2 align-items-center">
+        <div class="col-md-6">
+          <div class="search-box position-relative">
+            <i class="bi bi-search search-icon text-indigo"></i>
+            <input 
+              type="text" 
+              class="form-control rounded-pill ps-5 py-3 shadow-sm border-0" 
+              placeholder="Search course titles or details..." 
+              [(ngModel)]="searchQuery"
+              aria-label="Search courses"
+            />
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="d-flex flex-wrap gap-2 justify-content-md-end">
+            <button class="btn btn-tab" [class.active]="activeTab === 'all'" (click)="activeTab = 'all'">All</button>
+            <button class="btn btn-tab" [class.active]="activeTab === 'technical'" (click)="activeTab = 'technical'"><i class="bi bi-laptop me-1"></i> Technical</button>
+            <button class="btn btn-tab" [class.active]="activeTab === 'soft-skills'" (click)="activeTab = 'soft-skills'"><i class="bi bi-chat-left-dots me-1"></i> Communication</button>
+            <button class="btn btn-tab" [class.active]="activeTab === 'creative'" (click)="activeTab = 'creative'"><i class="bi bi-palette me-1"></i> Creative</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Courses Grid -->
+  <div class="row g-4 mb-5">
+    <div class="col-12 text-center py-5" *ngIf="filteredCourses.length === 0">
+      <i class="bi bi-journal-x display-1 text-muted"></i>
+      <h4 class="fw-bold mt-3">No Courses Found</h4>
+      <p class="text-muted">Try clearing your filters or changing your search search words.</p>
+    </div>
+
+    <div *ngFor="let course of filteredCourses" class="col-lg-6 col-md-12">
+      <div 
+        class="card course-card hover-effect h-100 border-0 rounded-4 overflow-hidden position-relative d-flex flex-column"
+        tabindex="0"
+        (keyup.enter)="openCourseDetails(course)"
+        [attr.aria-label]="course.title + '. ' + course.description">
+        <div class="course-img-wrapper position-relative">
+          <img [src]="course.image" class="card-img-top course-img" alt="{{ course.title }}" aria-hidden="true">
+          <div class="course-overlay-gradient" aria-hidden="true"></div>
+          <span class="badge course-badge bg-primary text-white text-uppercase fw-bold shadow" aria-hidden="true">{{ course.category }}</span>
+          
+          <!-- TTS Play button on top right of image -->
+          <button 
+            class="tts-quick-btn shadow" 
+            (click)="readCourseAloud(course, $event)" 
+            title="Read Course Description Aloud"
+            [attr.aria-label]="'Read description aloud for ' + course.title">
+            <i class="bi bi-volume-up-fill"></i>
+          </button>
+        </div>
+
+        <div class="card-body p-4 d-flex flex-column flex-grow-1">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="text-muted small fw-bold"><i class="bi bi-clock me-1"></i>{{ course.duration }}</span>
+            <span class="text-muted small fw-bold"><i class="bi bi-book me-1"></i>{{ course.lessons }} Chapters</span>
+          </div>
+
+          <h2 class="fw-extrabold text-indigo mb-2 fs-5 text-truncate" title="{{ course.title }}">{{ course.title }}</h2>
+          <p class="text-muted small leading-relaxed mb-2" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; height: 4.5em;">
+            {{ course.description }}
+          </p>
+
+          <!-- What You Will Learn (1 line with ellipsis) -->
+          <div class="mb-2" *ngIf="course.whatYouWillLearn">
+            <small class="text-muted fw-bold d-block" style="font-size: 0.72rem;"><i class="bi bi-compass-fill me-1 text-primary"></i>What you will learn:</small>
+            <p class="text-muted small text-truncate mb-0" style="font-style: italic;" title="{{ course.whatYouWillLearn }}">
+              {{ course.whatYouWillLearn }}
+            </p>
+          </div>
+
+          <!-- If Enrolled, show Progress Bar -->
+          <div *ngIf="userEnrollmentMap[course.id]" class="course-progress-container mt-2 mb-1">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <span class="text-muted small fw-bold">Course Progress</span>
+              <span class="text-success small fw-bold">{{ userEnrollmentMap[course.id].progressPercent || 0 | number:'1.0-0' }}%</span>
+            </div>
+            <div class="progress rounded-pill shadow-inner" style="height: 8px; background-color: rgba(99, 102, 241, 0.08);">
+              <div class="progress-bar bg-success rounded-pill" role="progressbar" 
+                   [style.width]="(userEnrollmentMap[course.id].progressPercent || 0) + '%'"
+                   [attr.aria-valuenow]="userEnrollmentMap[course.id].progressPercent || 0" 
+                   aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+          </div>
+
+          <!-- Actions aligned based on enrollment state -->
+          <div class="d-flex align-items-center gap-2 mt-auto pt-3 border-top border-light">
+            <button *ngIf="userEnrollmentMap[course.id]" class="btn btn-primary flex-fill py-2.5 rounded-pill fw-bold shadow-sm" (click)="openCourseDetails(course)" [attr.aria-label]="'Continue learning ' + course.title">
+              Continue Learning <i class="bi bi-play-fill ms-1"></i>
+            </button>
+            <button *ngIf="userEnrollmentMap[course.id]" class="btn btn-outline-danger p-2.5 rounded-circle shadow-sm d-flex align-items-center justify-content-center" (click)="openUnenrollModal(course, $event)" title="Unenroll from Course" [attr.aria-label]="'Unenroll from ' + course.title" style="width: 42px; height: 42px;">
+              <i class="bi bi-trash3-fill"></i>
+            </button>
+            <button *ngIf="!userEnrollmentMap[course.id]" class="btn btn-success flex-fill py-2.5 rounded-pill fw-bold shadow-sm" (click)="openCourseDetails(course)" [attr.aria-label]="'View details for ' + course.title">
+              View Details <i class="bi bi-arrow-right-short ms-1"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Enrollment Modal -->
+  <div class="modal-backdrop-custom" *ngIf="showEnrollModal" (click)="closeEnrollModal()">
+    <div class="modal-dialog-custom glass-panel shadow-3d" (click)="$event.stopPropagation()" style="max-width: 520px;">
+      <button class="modal-close-custom" (click)="closeEnrollModal()" aria-label="Close enroll modal">&times;</button>
+      
+      <div class="p-4" *ngIf="selectedCourse">
+        <h4 class="fw-extrabold text-indigo mb-3"><i class="bi bi-person-plus-fill me-2 text-success"></i>Enroll in Course</h4>
+        <p class="text-muted small mb-4">Select your preferred learning mode for <strong>{{ selectedCourse.title }}</strong>. This helps customize your study tools.</p>
+        
+        <div class="mb-4">
+          <label class="form-label fw-bold text-dark mb-3">Choose Your Preferred Learning Mode:</label>
+          <div class="d-flex flex-column gap-2" style="max-height: 350px; overflow-y: auto; padding-right: 5px;">
+            <div *ngFor="let pref of preferencesList" 
+                 class="preference-option-card border rounded-3 p-3 d-flex align-items-center justify-content-between transition-all"
+                 [class.active]="selectedPreferences[pref]"
+                 [class.disabled-pref]="!isFormatAvailable(pref) || (pref !== 'All Resources' && selectedPreferences['All Resources'])"
+                 (click)="isFormatAvailable(pref) && !(pref !== 'All Resources' && selectedPreferences['All Resources']) && togglePreference(pref)"
+                 style="background: rgba(255,255,255,0.7); border-color: rgba(99,102,241,0.1) !important; cursor: pointer;">
+              <div class="d-flex align-items-center gap-3">
+                <div class="pref-icon-circle rounded-circle p-2 bg-indigo-soft text-indigo d-grid place-items-center" style="width: 40px; height: 40px;">
+                  <i class="bi" [ngClass]="{
+                    'bi-file-earmark-text-fill': pref === 'Text',
+                    'bi-play-circle-fill': pref === 'Video',
+                    'bi-volume-up-fill': pref === 'Audio',
+                    'bi-person-badge-fill': pref === 'Sign Language',
+                    'bi-grid-3x3-gap-fill': pref === 'Braille',
+                    'bi-collection-play-fill': pref === 'All Resources'
+                  }" style="font-size: 1.1rem;"></i>
+                </div>
+                <div class="text-start">
+                  <h6 class="fw-bold mb-0 text-dark" style="font-size: 0.95rem;">
+                    {{ pref }}
+                    <span class="text-danger small ms-1" style="font-size: 0.7rem;" *ngIf="pref !== 'All Resources' && !isFormatAvailable(pref)">(Not available)</span>
+                  </h6>
+                  <span class="text-muted small" style="font-size: 0.75rem;">Study using {{ pref | lowercase }} materials</span>
+                </div>
+              </div>
+              <div class="pref-check-circle rounded-3 border border-2 d-grid place-items-center"
+                   [class.bg-indigo]="selectedPreferences[pref]"
+                   [class.border-indigo]="selectedPreferences[pref]"
+                   style="width: 22px; height: 22px;">
+                <i class="bi bi-check-lg text-white" style="font-size: 0.8rem;" *ngIf="selectedPreferences[pref]"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex gap-2">
+          <button class="btn btn-success flex-fill py-3 rounded-pill fw-bold" (click)="submitEnrollment()">
+            Confirm Enrollment <i class="bi bi-check-circle-fill ms-1"></i>
+          </button>
+          <button class="btn btn-outline-secondary px-4 py-3 rounded-pill fw-bold" (click)="closeEnrollModal()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Unenroll Modal -->
+  <div class="modal-backdrop-custom" *ngIf="showUnenrollModal" (click)="closeUnenrollModal()">
+    <div class="modal-dialog-custom glass-panel shadow-3d" (click)="$event.stopPropagation()" style="max-width: 500px;">
+      <button class="modal-close-custom" (click)="closeUnenrollModal()" aria-label="Close unenroll modal">&times;</button>
+      
+      <div class="p-4" *ngIf="selectedCourse">
+        <div class="text-center mb-4">
+          <div class="bg-danger bg-opacity-10 text-danger rounded-circle p-3 d-inline-flex mb-3" style="font-size: 2rem;">
+            <i class="bi bi-exclamation-triangle-fill text-danger"></i>
+          </div>
+          <h4 class="fw-extrabold text-indigo mb-2">Unenroll from Course?</h4>
+          <p class="text-muted small">Are you sure you want to unenroll from <strong>{{ selectedCourse.title }}</strong>? This will permanently delete all your progress for this course.</p>
+        </div>
+
+        <div class="mb-4">
+          <label for="unenrollReviewInput" class="form-label fw-bold text-dark mb-2">Help us improve (Optional Review/Feedback):</label>
+          <textarea 
+            id="unenrollReviewInput"
+            class="form-control rounded-3 border-light p-3 small shadow-sm" 
+            rows="3" 
+            placeholder="Tell us why you are leaving or share your experience..."
+            [(ngModel)]="unenrollReview">
+          </textarea>
+        </div>
+
+        <div class="d-flex gap-2">
+          <button class="btn btn-danger flex-fill py-3 rounded-pill fw-bold text-white" (click)="submitUnenroll()">
+            Yes, Unenroll <i class="bi bi-box-arrow-right ms-1"></i>
+          </button>
+          <button class="btn btn-outline-secondary px-4 py-3 rounded-pill fw-bold" (click)="closeUnenrollModal()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>

@@ -1,0 +1,88 @@
+<div class="streak-container fade-in">
+  <!-- Restoration Banner -->
+  <div class="alert alert-warning restoration-banner" *ngIf="isStreakBroken">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <h4 class="alert-heading mb-1"><i class="fas fa-exclamation-triangle"></i> Streak Broken!</h4>
+        <p class="mb-0">You lost your streak of <strong>{{previousStreak}}</strong> days. You have <strong>{{timeLeftToRestore}}</strong> left to restore it!</p>
+      </div>
+      <button class="btn btn-danger btn-lg pulse-btn" (click)="restoreStreak()">
+        Restore Streak Now
+      </button>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Left Column: Streak Stats & Graph -->
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4 text-center">
+          <i class="fas fa-fire streak-fire mb-3" [class.active]="currentStreak > 0"></i>
+          <h2 class="display-4 fw-bold">{{currentStreak}} <span class="fs-4 text-muted">Days</span></h2>
+          <p class="text-muted mb-0">Current Streak</p>
+          
+          <div class="mt-4 pt-3 border-top">
+            <h5 class="text-muted"><i class="fas fa-trophy text-warning"></i> Longest Streak: {{longestStreak}} Days</h5>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contribution Graph -->
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0 pt-4 pb-0">
+          <h5 class="mb-0"><i class="fas fa-chart-line text-primary"></i> Last 30 Days Activity</h5>
+        </div>
+        <div class="card-body">
+          <div class="contribution-graph">
+            <div class="graph-day" 
+                 *ngFor="let data of contributionData" 
+                 [class]="data.colorClass"
+                 [title]="data.date + ': Level ' + data.level">
+            </div>
+          </div>
+          <div class="d-flex justify-content-end align-items-center mt-3 text-muted small">
+            <span class="me-2">Less</span>
+            <div class="graph-day activity-level-0 me-1"></div>
+            <div class="graph-day activity-level-1 me-1"></div>
+            <div class="graph-day activity-level-2 me-1"></div>
+            <div class="graph-day activity-level-3 me-1"></div>
+            <div class="graph-day activity-level-4 me-2"></div>
+            <span>More</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Rewards -->
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm h-100 bg-light">
+        <div class="card-header bg-light border-0 pt-4 pb-0">
+          <h5 class="mb-0"><i class="fas fa-gift text-danger"></i> Milestone Rewards</h5>
+          <p class="text-muted small mt-1 mb-0">Keep your streak alive to unlock these rewards!</p>
+        </div>
+        <div class="card-body p-4">
+          <div class="reward-item mb-3 p-3 rounded" *ngFor="let reward of rewards" 
+               [ngClass]="reward.achieved ? 'bg-white shadow-sm border-start border-4 border-success' : 'bg-white opacity-75'">
+            <div class="d-flex align-items-center">
+              <div class="reward-icon-wrapper rounded-circle d-flex align-items-center justify-content-center me-3"
+                   [style.backgroundColor]="reward.achieved ? reward.color + '20' : '#e9ecef'"
+                   [style.color]="reward.achieved ? reward.color : '#adb5bd'">
+                <i [class]="reward.icon + ' fs-4'"></i>
+              </div>
+              <div class="flex-grow-1">
+                <h6 class="mb-0 fw-bold" [class.text-muted]="!reward.achieved">{{reward.name}}</h6>
+                <small class="text-muted">{{reward.threshold}} Day Streak</small>
+              </div>
+              <div *ngIf="reward.achieved" class="text-success fs-4">
+                <i class="fas fa-check-circle"></i>
+              </div>
+              <div *ngIf="!reward.achieved" class="text-muted">
+                <i class="fas fa-lock"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

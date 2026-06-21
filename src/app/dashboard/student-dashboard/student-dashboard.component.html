@@ -1,67 +1,644 @@
+<div class="student-container p-3 p-md-4 fade-in">
+  
+  <!-- Modern Shell: 2 Column Layout -->
+  <div class="row g-4">
+    
+    <!-- Left Column: Navigation & Profile -->
+    <div class="col-lg-3">
+      <div class="sticky-top" style="top: 100px; z-index: 1020;">
+      <!-- Premium Profile Card -->
+      <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+        <div class="bg-primary-gradient position-relative" style="height: 80px;"></div>
+        <div class="card-body text-center pt-0 px-4 pb-4">
+          <div class="position-relative d-inline-block mx-auto mb-3" style="margin-top: -40px;">
+            <img [src]="studentInfo.profileImage || 'assets/default-avatar.png'" alt="Avatar" class="rounded-circle border border-4 border-white shadow-sm bg-white" style="width: 80px; height: 80px; object-fit: cover;">
+            <span class="position-absolute bottom-0 end-0 bg-success border border-2 border-white rounded-circle" style="width: 16px; height: 16px; transform: translate(-5px, -5px);" title="Online"></span>
+          </div>
+          <h5 class="fw-bolder text-dark mb-0">{{ studentInfo.name || 'Student' }}</h5>
+          <p class="text-muted small mb-1">ID: {{ studentInfo.disabilityId }}</p>
+          <p class="text-muted small mb-3" *ngIf="studentInfo.course"><i class="bi bi-book-fill text-primary me-1"></i>{{ studentInfo.course }}</p>
+          
+          <div class="d-flex justify-content-center gap-2">
+            <div class="bg-light text-dark border px-3 py-2 rounded-3 flex-grow-1 text-start">
+              <small class="d-block fw-bold text-muted" style="font-size: 0.65rem; text-transform: uppercase;">Current Streak</small>
+              <span class="fw-bolder fs-5"><i class="bi bi-fire text-warning me-1"></i>{{ analytics.currentStreak }}</span>
+            </div>
+            <div class="bg-light text-dark border px-3 py-2 rounded-3 text-start" style="min-width: 70px;">
+              <small class="d-block fw-bold text-muted" style="font-size: 0.65rem; text-transform: uppercase;">Logins</small>
+              <span class="fw-bolder fs-5">{{ analytics.totalLogins }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
-
-<div class="container mt-3">
-  <!-- Welcome Section -->
-  <div class="card mb-4 p-4">
-    <h2>Welcome, {{ studentInfo.name }}</h2>
-    <p>Disability ID: {{ studentInfo.disabilityId }}</p>
-    <p>Course: {{ studentInfo.course }}</p>
-    <p>Current Semester: {{ studentInfo.semester }}</p>
-    <p><strong>Pending Dues: {{ studentInfo.dues }}</strong></p>
-  </div>
-
-  <!-- Notifications Section -->
-<div class="card mb-4">
-  <div class="card-header">
-    <h3>Notifications</h3>
-  </div>
-  <ul class="list-group list-group-flush">
-    <li *ngFor="let notification of notifications" class="list-group-item d-flex align-items-center">
-      <i class="bi bi-bell-fill text-primary me-2"></i>
-      {{ notification }}
-    </li>
-  </ul>
-</div>
-
-<!-- Recent Activities Section -->
-<div class="card mb-4">
-  <div class="card-header">
-    <h3>Recent Activities</h3>
-  </div>
-  <ul class="list-group list-group-flush">
-    <li *ngFor="let activity of recentActivities" class="list-group-item d-flex align-items-center">
-      <i class="bi bi-check-circle-fill text-success me-2"></i>
-      <strong>{{ activity.date }}</strong>: {{ activity.activity }}
-    </li>
-  </ul>
-</div>
-
-
-  <!-- Quick Links Section -->
-  <div class="card mb-4">
-    <div class="card-header">
-      <h3>Quick Links</h3>
+      <!-- Vertical Nav Pills -->
+      <div class="card border-0 shadow-sm rounded-4 p-3">
+        <h6 class="fw-bold text-muted mb-3 px-2 text-uppercase" style="font-size: 0.75rem;">Menu</h6>
+        <div class="nav flex-column nav-pills gap-2">
+          <button class="nav-link text-start rounded-pill fw-bold" [class.active]="activeSection === 'overview'" (click)="setSection('overview')">
+            <i class="bi bi-grid-fill me-2"></i> Overview
+          </button>
+          <button class="nav-link text-start rounded-pill fw-bold" [class.active]="activeSection === 'courses'" (click)="setSection('courses')">
+            <i class="bi bi-journal-bookmark-fill me-2"></i> Courses
+          </button>
+          <button class="nav-link text-start rounded-pill fw-bold d-flex justify-content-between align-items-center"
+                  [class.active]="activeSection === 'notifications'"
+                  (click)="setSection('notifications'); markAllNotificationsRead()">
+            <span><i class="bi bi-bell-fill me-2"></i> Notifications</span>
+            <span class="badge bg-danger rounded-pill ms-2" *ngIf="unreadNotificationsCount > 0">{{ unreadNotificationsCount }}</span>
+          </button>
+          <button class="nav-link text-start rounded-pill fw-bold" [class.active]="activeSection === 'requests'" (click)="setSection('requests')">
+            <i class="bi bi-ticket-detailed-fill me-2"></i> My Requests
+          </button>
+          <button class="nav-link text-start rounded-pill fw-bold" [class.active]="activeSection === 'achievements'" (click)="setSection('achievements')">
+            <i class="bi bi-award-fill me-2"></i> Achievements
+          </button>
+        </div>
+      </div>
+      </div>
     </div>
-    <div class="card-body">
-      <div class="row">
-        <div *ngFor="let link of quickLinks" class="col-md-3 mb-3">
-          <button class="btn btn-primary w-100">{{ link }}</button>
+
+    <!-- Right Column: Main Content -->
+    <div class="col-lg-9" id="activeSectionContainer">
+            <!-- Welcome Greeting Banner -->
+        <div class="student-welcome mb-4 p-4 p-md-5 rounded-4 position-relative">
+          <h1 class="fw-extrabold display-6 mb-2">Welcome Back, {{ studentInfo.name || 'Student' }}! 👋</h1>
+        <p class="fs-5 text-white-50 mb-0">Ready to conquer your goals today? Dive into your courses and build that streak!</p>
+      </div>
+
+      <!-- ==================== OVERVIEW SECTION ==================== -->
+      <div *ngIf="activeSection === 'overview'" class="row g-4 fade-in">
+        
+        <!-- Quick Stats Row: 4 cards -->
+        <div class="col-6 col-md-3">
+          <div class="card border-0 shadow-sm rounded-4 h-100 text-center p-4">
+            <div class="overview-stat-icon bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3 mx-auto" style="width: 52px; height: 52px; font-size: 1.4rem;">
+              <i class="bi bi-fire"></i>
+            </div>
+            <h3 class="fw-bolder mb-0 text-dark fs-2">{{ analytics.currentStreak }}</h3>
+            <p class="text-muted small mb-0 fw-bold">Day Streak</p>
+            <p class="text-success" style="font-size: 0.78rem;"><i class="bi bi-trophy-fill me-1"></i>Best: {{ analytics.longestStreak }}</p>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card border-0 shadow-sm rounded-4 h-100 text-center p-4">
+            <div class="overview-stat-icon bg-indigo bg-opacity-10 text-indigo rounded-circle d-inline-flex align-items-center justify-content-center mb-3 mx-auto" style="width: 52px; height: 52px; font-size: 1.4rem; background: rgba(99,102,241,0.1) !important; color: var(--primary-color) !important;">
+              <i class="bi bi-box-arrow-in-right"></i>
+            </div>
+            <h3 class="fw-bolder mb-0 text-dark fs-2">{{ analytics.totalLogins }}</h3>
+            <p class="text-muted small mb-0 fw-bold">Total Logins</p>
+            <p style="font-size: 0.78rem; color: var(--primary-color);"><i class="bi bi-graph-up me-1"></i>All time</p>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card border-0 shadow-sm rounded-4 h-100 text-center p-4">
+            <div class="overview-stat-icon bg-success bg-opacity-10 text-success rounded-circle d-inline-flex align-items-center justify-content-center mb-3 mx-auto" style="width: 52px; height: 52px; font-size: 1.4rem;">
+              <i class="bi bi-journal-check"></i>
+            </div>
+            <h3 class="fw-bolder mb-0 text-dark fs-2">{{ enrolledCourses.length }}</h3>
+            <p class="text-muted small mb-0 fw-bold">Enrolled Courses</p>
+            <button class="btn btn-link p-0 text-success" style="font-size: 0.78rem;" (click)="setSection('courses')">Browse <i class="bi bi-arrow-right"></i></button>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card border-0 shadow-sm rounded-4 h-100 text-center p-4">
+            <div class="overview-stat-icon bg-warning bg-opacity-10 text-warning rounded-circle d-inline-flex align-items-center justify-content-center mb-3 mx-auto" style="width: 52px; height: 52px; font-size: 1.4rem;">
+              <i class="bi bi-bell-fill"></i>
+            </div>
+            <h3 class="fw-bolder mb-0 text-dark fs-2">{{ unreadNotificationsCount }}</h3>
+            <p class="text-muted small mb-0 fw-bold">Unread Alerts</p>
+            <button class="btn btn-link btn-sm text-warning p-0" style="font-size: 0.78rem;" (click)="setSection('notifications'); markAllNotificationsRead()">
+              View all <i class="bi bi-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Enrolled Courses Progress -->
+        <div class="col-12">
+          <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-transparent border-0 pt-4 pb-0 px-4 d-flex justify-content-between align-items-center">
+              <h2 class="h5 fw-bold mb-0 text-indigo"><i class="bi bi-journal-check text-success me-2"></i> My Enrolled Courses</h2>
+              <button class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-bold" (click)="setSection('courses')">View All</button>
+            </div>
+            <div class="card-body p-4">
+              <div *ngIf="enrolledCourses.length > 0" class="row g-3">
+                <div class="col-md-6" *ngFor="let enrollment of enrolledCourses">
+                  <div 
+                    class="enrolled-course-card p-3 rounded-3 border d-flex gap-3 align-items-start" 
+                    style="background: rgba(79, 70, 229, 0.02);"
+                    tabindex="0"
+                    (keyup.enter)="openCourseDetails(enrollment.course)"
+                    [attr.aria-label]="(enrollment.course?.title || 'Course') + '. ' + (enrollment.course?.description || '')">
+                    <div class="flex-shrink-0" aria-hidden="true">
+                      <img [src]="enrollment.course?.image || 'assets/default-course.png'" alt="Course"
+                           class="rounded-3 border shadow-sm" style="width: 60px; height: 60px; object-fit: cover;">
+                    </div>
+                    <div class="flex-grow-1 min-width-0">
+                      <h6 class="fw-bold text-dark mb-1 text-truncate" title="{{ enrollment.course?.title }}" aria-hidden="true">
+                        {{ enrollment.course?.title || 'Course' }}
+                      </h6>
+                      <span class="badge bg-primary bg-opacity-10 text-primary small mb-2" aria-hidden="true">{{ enrollment.course?.category }}</span>
+                      <div class="d-flex justify-content-between align-items-center mb-1" aria-hidden="true">
+                        <span class="text-muted" style="font-size: 0.78rem;">Progress</span>
+                        <span class="text-success fw-bold" style="font-size: 0.78rem;">{{ enrollment.progressPercent || 0 | number:'1.0-0' }}%</span>
+                      </div>
+                      <div class="progress rounded-pill" style="height: 6px; background: rgba(99,102,241,0.1);" aria-hidden="true">
+                        <div class="progress-bar bg-success rounded-pill" role="progressbar"
+                             [style.width]="(enrollment.progressPercent || 0) + '%'"
+                             [attr.aria-valuenow]="enrollment.progressPercent || 0"
+                             aria-valuemin="0" aria-valuemax="100"></div>
+                      </div>
+                      <button class="btn btn-link btn-sm text-primary p-0 mt-1" style="font-size: 0.78rem;" (click)="openCourseDetails(enrollment.course)" [attr.aria-label]="'Continue learning ' + enrollment.course?.title">
+                        Continue <i class="bi bi-play-fill"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="enrolledCourses.length === 0" class="text-center py-4 text-muted">
+                <i class="bi bi-journal-x fs-1 d-block mb-2 opacity-50"></i>
+                <p class="fw-bold mb-1">No Courses Enrolled Yet</p>
+                <button class="btn btn-sm btn-primary rounded-pill px-4 mt-2" (click)="setSection('courses')">Browse Courses</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Profile Summary + Activity Tracker side-by-side -->
+        <div class="col-md-5">
+          <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-header bg-transparent border-0 pt-4 pb-0 px-4">
+              <h2 class="h5 fw-bold mb-0 text-indigo"><i class="bi bi-person-badge-fill text-primary me-2"></i> Profile Summary</h2>
+            </div>
+            <div class="card-body p-4">
+              <ul class="list-unstyled mb-0">
+                <li class="d-flex align-items-center gap-3 py-2 border-bottom border-light">
+                  <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2" style="width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-person-fill"></i>
+                  </div>
+                  <div>
+                    <small class="text-muted d-block" style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700;">Full Name</small>
+                    <span class="fw-bold text-dark">{{ studentInfo.name || 'Not set' }}</span>
+                  </div>
+                </li>
+                <li class="d-flex align-items-center gap-3 py-2 border-bottom border-light">
+                  <div class="bg-success bg-opacity-10 text-success rounded-circle p-2" style="width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-envelope-fill"></i>
+                  </div>
+                  <div class="min-width-0">
+                    <small class="text-muted d-block" style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700;">Email</small>
+                    <span class="fw-bold text-dark text-truncate d-block" style="max-width: 180px;">{{ studentInfo.email || 'Not set' }}</span>
+                  </div>
+                </li>
+                <li class="d-flex align-items-center gap-3 py-2 border-bottom border-light">
+                  <div class="bg-info bg-opacity-10 text-info rounded-circle p-2" style="width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-telephone-fill"></i>
+                  </div>
+                  <div>
+                    <small class="text-muted d-block" style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700;">Phone</small>
+                    <span class="fw-bold text-dark">{{ studentInfo.phone || 'Not set' }}</span>
+                  </div>
+                </li>
+                <li class="d-flex align-items-center gap-3 py-2 border-bottom border-light">
+                  <div class="bg-warning bg-opacity-10 text-warning rounded-circle p-2" style="width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-book-fill"></i>
+                  </div>
+                  <div>
+                    <small class="text-muted d-block" style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700;">Course</small>
+                    <span class="fw-bold text-dark">{{ studentInfo.course || 'Not enrolled' }}</span>
+                  </div>
+                </li>
+                <li class="d-flex align-items-center gap-3 py-2">
+                  <div class="bg-danger bg-opacity-10 text-danger rounded-circle p-2" style="width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-geo-alt-fill"></i>
+                  </div>
+                  <div>
+                    <small class="text-muted d-block" style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700;">Address</small>
+                    <span class="fw-bold text-dark text-truncate d-block" style="max-width: 180px;">{{ studentInfo.address || 'Not set' }}</span>
+                  </div>
+                </li>
+              </ul>
+              <div class="mt-3 text-center">
+                <a routerLink="/dashboard/profile" class="btn btn-outline-primary btn-sm rounded-pill px-4 fw-bold">
+                  <i class="bi bi-pencil-square me-1"></i> Edit Profile
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Activity Tracker with fixed height + scroll -->
+        <div class="col-md-7">
+          <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-header bg-transparent border-0 pt-4 pb-0 px-4 d-flex justify-content-between align-items-center">
+              <h2 class="h5 fw-bold mb-0 text-indigo"><i class="bi bi-calendar-check text-primary me-2"></i> Activity Tracker</h2>
+              <span class="badge bg-primary-soft text-primary rounded-pill px-3 py-2">{{ activityFeed.length }} entries</span>
+            </div>
+            <div class="card-body p-4">
+              <!-- Scrollable Activity Timeline -->
+              <div class="activity-scroll-container">
+                <div class="timeline position-relative border-start border-2 border-primary ms-3 ps-4 pt-2">
+                  <div *ngFor="let item of activityFeed" class="mb-4 position-relative">
+                    <span class="position-absolute top-0 start-0 translate-middle bg-white rounded-circle p-1" style="left: -1.5rem !important;">
+                      <i class="bi fs-5" [ngClass]="item.icon"></i>
+                    </span>
+                    <h6 class="fw-bold text-dark mb-1">{{ item.text }}</h6>
+                    <p class="small text-muted mb-0">{{ item.date | date:'medium' }}</p>
+                  </div>
+                  <!-- Fallback if no history -->
+                  <div *ngIf="activityFeed.length === 0" class="text-muted py-3">
+                    <p><i class="bi bi-info-circle me-1"></i> No activities recorded yet. Start exploring your courses to build history!</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <!-- END OVERVIEW -->
+
+      <!-- ==================== COURSES SECTION ==================== -->
+      <div *ngIf="activeSection === 'courses'" class="row g-4 fade-in">
+        <div class="col-12">
+          <h2 class="h4 fw-extrabold text-indigo mb-1"><i class="bi bi-journal-text me-2 text-primary"></i> Available Courses</h2>
+        </div>
+        
+        <div *ngFor="let course of availableCourses" class="col-md-6">
+          <div 
+            class="card course-card hover-effect h-100 border-0 rounded-4 overflow-hidden position-relative d-flex flex-column"
+            tabindex="0"
+            (keyup.enter)="openCourseDetails(course)"
+            [attr.aria-label]="course.title + '. ' + course.description">
+            <div class="course-img-wrapper position-relative">
+              <img [src]="course.image || 'assets/default-course.png'" class="card-img-top course-img" alt="{{ course.title }}" aria-hidden="true">
+              <div class="course-overlay-gradient" aria-hidden="true"></div>
+              <span class="badge course-badge bg-primary text-white text-uppercase fw-bold shadow" aria-hidden="true">{{ course.category }}</span>
+              <button class="tts-quick-btn shadow" (click)="readCourseAloud(course, $event)" title="Read Course Description Aloud" [attr.aria-label]="'Read description aloud for ' + course.title">
+                <i class="bi bi-volume-up-fill"></i>
+              </button>
+            </div>
+
+            <div class="card-body p-4 d-flex flex-column flex-grow-1">
+              <div class="d-flex justify-content-between align-items-center mb-2" aria-hidden="true">
+                <span class="text-muted small fw-bold"><i class="bi bi-clock me-1"></i>{{ course.duration || '2 Weeks' }}</span>
+                <span class="text-muted small fw-bold"><i class="bi bi-book me-1"></i>{{ course.lessons || 5 }} Chapters</span>
+              </div>
+
+              <h3 class="fw-extrabold text-indigo mb-2 fs-5 text-truncate" title="{{ course.title || course.name }}" aria-hidden="true">{{ course.title || course.name }}</h3>
+              <p class="text-muted small leading-relaxed mb-2" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; height: 4.5em;" aria-hidden="true">
+                {{ course.description || 'Learn the fundamentals and advanced topics in this comprehensive course.' }}
+              </p>
+
+              <!-- What You Will Learn (1 line with ellipsis) -->
+              <div class="mb-2" *ngIf="course.whatYouWillLearn" aria-hidden="true">
+                <small class="text-muted fw-bold d-block" style="font-size: 0.72rem;"><i class="bi bi-compass-fill me-1 text-primary"></i>What you will learn:</small>
+                <p class="text-muted small text-truncate mb-0" style="font-style: italic;" title="{{ course.whatYouWillLearn }}">
+                  {{ course.whatYouWillLearn }}
+                </p>
+              </div>
+
+              <!-- If Enrolled, show Progress Bar -->
+              <div *ngIf="userEnrollmentMap[course.id]" class="course-progress-container mt-2 mb-1" aria-hidden="true">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <span class="text-muted small fw-bold">Course Progress</span>
+                  <span class="text-success small fw-bold">{{ userEnrollmentMap[course.id].progressPercent || 0 | number:'1.0-0' }}%</span>
+                </div>
+                <div class="progress rounded-pill shadow-inner" style="height: 8px; background-color: rgba(99, 102, 241, 0.08);">
+                  <div class="progress-bar bg-success rounded-pill" role="progressbar" 
+                       [style.width]="(userEnrollmentMap[course.id].progressPercent || 0) + '%'"
+                       [attr.aria-valuenow]="userEnrollmentMap[course.id].progressPercent || 0" 
+                       aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+              </div>
+
+              <div class="d-flex align-items-center gap-2 mt-auto pt-3 border-top border-light">
+                <button *ngIf="userEnrollmentMap[course.id]" class="btn btn-primary flex-fill py-2.5 rounded-pill fw-bold shadow-sm" (click)="openCourseDetails(course)" [attr.aria-label]="'Continue learning ' + (course.title || course.name)">
+                  Continue Learning <i class="bi bi-play-fill ms-1"></i>
+                </button>
+                <button *ngIf="userEnrollmentMap[course.id]" class="btn btn-outline-danger p-2.5 rounded-circle shadow-sm d-flex align-items-center justify-content-center" (click)="openUnenrollModal(course, $event)" title="Unenroll from Course" [attr.aria-label]="'Unenroll from ' + (course.title || course.name)" style="width: 42px; height: 42px;">
+                  <i class="bi bi-trash3-fill"></i>
+                </button>
+                <button *ngIf="!userEnrollmentMap[course.id]" class="btn btn-success flex-fill py-2.5 rounded-pill fw-bold shadow-sm" (click)="openCourseDetails(course)" [attr.aria-label]="'View details for ' + (course.title || course.name)">
+                  View Details <i class="bi bi-arrow-right-short ms-1"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div *ngIf="availableCourses.length === 0" class="col-12 text-center py-5 card border-0 rounded-4 shadow-sm">
+          <i class="bi bi-journal-x fs-1 text-muted mb-3 d-block"></i>
+          <h5 class="fw-bold">No courses found</h5>
+          <p class="text-muted">Courses will appear here once the administrator adds them.</p>
+        </div>
+      </div>
+
+      <!-- ==================== NOTIFICATIONS SECTION ==================== -->
+      <div *ngIf="activeSection === 'notifications'" class="row g-4 fade-in">
+        
+        <!-- Search bar full width -->
+        <div class="col-12">
+          <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <h2 class="h4 fw-extrabold text-indigo mb-0">
+              <i class="bi bi-bell-fill text-warning me-2"></i> All Notifications
+              <span class="badge bg-warning text-dark rounded-pill ms-2 fs-6">{{ notifications.length }}</span>
+            </h2>
+            <div class="input-group shadow-sm rounded-pill overflow-hidden" style="width: 260px; border: 1px solid #dee2e6;">
+              <span class="input-group-text bg-white border-0"><i class="bi bi-search text-muted small"></i></span>
+              <input type="text" class="form-control bg-white border-0 shadow-none small" 
+                     placeholder="Search notifications..." [(ngModel)]="notificationSearchQuery">
+            </div>
+          </div>
+        </div>
+
+        <!-- Personal / System Notifications -->
+        <div class="col-lg-6">
+          <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-header bg-transparent border-0 pt-4 pb-2 px-4">
+              <h3 class="h6 fw-bold mb-0 d-flex align-items-center gap-2">
+                <span class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                  <i class="bi bi-person-fill small"></i>
+                </span>
+                Personal Notifications
+                <span class="badge bg-primary rounded-pill ms-auto">{{ personalNotifications.length }}</span>
+              </h3>
+              <small class="text-muted" style="font-size: 0.73rem; padding-left: 40px;">Approval updates, profile changes</small>
+            </div>
+            <div class="card-body p-0 notif-scroll-box">
+              <div class="list-group list-group-flush">
+                <div *ngFor="let notif of getFilteredPersonalNotifications()"
+                     class="list-group-item px-4 py-3 border-bottom border-light d-flex align-items-start gap-3 bg-transparent notif-item"
+                     [class.notif-unread]="!notif.isRead && !notif.read"
+                     tabindex="0"
+                     [attr.aria-label]="'Notification: ' + notif.message + '. Received at ' + (notif.createdAt | date:'d MMMM, h:mm a')">
+                  <div class="bg-primary bg-opacity-10 text-primary rounded-circle flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; margin-top: 2px;">
+                    <i class="bi bi-bell-fill" style="font-size: 0.85rem;"></i>
+                  </div>
+                  <div class="flex-grow-1 min-width-0">
+                    <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-1 gap-sm-2">
+                      <p class="mb-0 fw-semibold text-dark" style="font-size: 0.85rem; line-height: 1.4;">{{ notif.message }}</p>
+                      <small class="text-muted flex-shrink-0" style="font-size: 0.72rem; white-space: nowrap;">
+                        {{ notif.createdAt | date:'d MMM, HH:mm' }}
+                      </small>
+                    </div>
+                  </div>
+                </div>
+                <div *ngIf="getFilteredPersonalNotifications().length === 0" class="text-center text-muted py-5">
+                  <i class="bi bi-bell-slash fs-2 d-block mb-2 opacity-50"></i>
+                  <p class="mb-0 fw-bold small">No personal notifications yet.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Broadcast / Announcements -->
+        <div class="col-lg-6">
+          <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-header bg-transparent border-0 pt-4 pb-2 px-4">
+              <h3 class="h6 fw-bold mb-0 d-flex align-items-center gap-2">
+                <span class="bg-warning bg-opacity-10 text-warning rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                  <i class="bi bi-megaphone-fill small"></i>
+                </span>
+                Public Announcements
+                <span class="badge bg-warning text-dark rounded-pill ms-auto">{{ broadcastNotifications.length }}</span>
+              </h3>
+              <small class="text-muted" style="font-size: 0.73rem; padding-left: 40px;">Admin announcements for all students</small>
+            </div>
+            <div class="card-body p-0 notif-scroll-box">
+              <div class="list-group list-group-flush">
+                <div *ngFor="let notif of getFilteredBroadcastNotifications()"
+                     class="list-group-item px-4 py-3 border-bottom border-light d-flex align-items-start gap-3 bg-transparent notif-item broadcast-item"
+                     [class.notif-unread]="!notif.isRead && !notif.read"
+                     tabindex="0"
+                     [attr.aria-label]="'Announcement: ' + notif.message + '. Received at ' + (notif.createdAt | date:'d MMMM, h:mm a')">
+                  <ng-container *ngIf="getBroadcastCategoryDetails(notif.type) as cat">
+                    <div class="bg-{{cat.colorClass}} bg-opacity-15 text-{{cat.colorClass}} rounded-circle flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; margin-top: 2px;">
+                      <i class="bi {{cat.icon}}" style="font-size: 0.85rem;"></i>
+                    </div>
+                    <div class="flex-grow-1 min-width-0">
+                      <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-1 gap-sm-2">
+                        <div>
+                          <span class="badge bg-{{cat.colorClass}} bg-opacity-10 text-{{cat.colorClass}} border border-{{cat.colorClass}} border-opacity-25 rounded-pill mb-1" style="font-size: 0.6rem; letter-spacing: 0.5px;">{{ cat.label }}</span>
+                          <p class="mb-0 fw-semibold text-dark" style="font-size: 0.85rem; line-height: 1.4;">{{ notif.message }}</p>
+                        </div>
+                        <small class="text-muted flex-shrink-0" style="font-size: 0.72rem; white-space: nowrap;">
+                          {{ notif.createdAt | date:'d MMM, HH:mm' }}
+                        </small>
+                      </div>
+                    </div>
+                  </ng-container>
+                </div>
+                <div *ngIf="getFilteredBroadcastNotifications().length === 0" class="text-center text-muted py-5">
+                  <i class="bi bi-megaphone fs-2 d-block mb-2 opacity-50"></i>
+                  <p class="mb-0 fw-bold small">No announcements yet.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Government Schemes -->
+        <div class="col-12" id="government-schemes">
+          <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-transparent border-0 pt-4 pb-2 px-4 d-flex align-items-center justify-content-between">
+              <h2 class="h6 fw-bold mb-0 d-flex align-items-center gap-2">
+                <span class="bg-success bg-opacity-10 text-success rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                  <i class="bi bi-shield-check small"></i>
+                </span>
+                Government Schemes
+                <span class="badge bg-success rounded-pill ms-2">{{ schemes.length }}</span>
+              </h2>
+            </div>
+            <div class="card-body p-4">
+              <div *ngIf="getFilteredSchemes().length > 0" class="row g-3">
+                <div class="col-md-4" *ngFor="let scheme of getFilteredSchemes()">
+                  <div class="p-3 rounded-3 border scheme-card" style="background: rgba(16, 185, 129, 0.02); height: 100%; display: flex; flex-direction: column;">
+                    <h3 class="h6 fw-bold text-dark mb-1">{{ scheme.title }}</h3>
+                    <p class="small text-muted mb-3 flex-grow-1" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ scheme.summary }}</p>
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mt-auto">
+                      <button type="button" class="btn btn-sm btn-outline-primary rounded-pill fw-bold"
+                              (click)="openBrailleScheme(scheme)">
+                        <i class="bi bi-grid-3x3-gap-fill me-1"></i> Braille Mode
+                      </button>
+                      <a *ngIf="scheme.link" [href]="scheme.link" target="_blank" class="small fw-bold text-success text-decoration-none">
+                        Apply Now <i class="bi bi-arrow-right"></i>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="getFilteredSchemes().length === 0 && !isLoading" class="text-center text-muted py-4">
+                <i class="bi bi-shield-x fs-2 d-block mb-2 opacity-50"></i>
+                <p class="mb-0">No schemes available.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+            <!-- Achievements Section -->
+      <div *ngIf="activeSection === 'achievements'" class="fade-in">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2 class="h4 fw-extrabold text-dark mb-0"><i class="bi bi-award-fill text-warning me-2"></i>My Achievements</h2>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+          <h3 class="h5 fw-bold text-indigo mb-4 border-bottom pb-2">Certificates</h3>
+          <div class="row g-4">
+            <!-- Iterate over enrolled courses that have a certificate generated -->
+            <ng-container *ngFor="let enrollment of enrolledCourses; let i = index">
+              <div class="col-md-6" *ngIf="enrollment.certificateUrl">
+                <div [id]="'certificate-card-' + i" class="certificate-card position-relative rounded-4 p-4 text-center overflow-hidden shadow-sm" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); border: 2px solid #cbd5e1;">
+                  <div class="position-absolute top-0 start-0 w-100 h-100" style="background: url('assets/cert-pattern.png') center/cover opacity-5;"></div>
+                  <div class="position-relative z-2">
+                    <i class="bi bi-patch-check-fill text-success" style="font-size: 3rem;"></i>
+                    <h4 class="h5 fw-extrabold text-dark mt-3 mb-1">Certificate of Completion</h4>
+                    <p class="text-muted small mb-3">This certifies that <strong>{{ studentInfo.name }}</strong> has successfully completed</p>
+                    <h5 class="h4 fw-bold text-indigo mb-3">{{ enrollment.course?.title }}</h5>
+                    <div class="d-flex justify-content-between align-items-center bg-white px-3 py-2 rounded-3 shadow-sm mx-auto mb-3" style="max-width: 250px;">
+                      <div class="text-start">
+                        <small class="d-block text-muted" style="font-size: 0.65rem;">SCORE</small>
+                        <span class="fw-bold text-dark">{{ enrollment.testPercentage | number:'1.0-0' }}%</span>
+                      </div>
+                      <div class="text-end">
+                        <small class="d-block text-muted" style="font-size: 0.65rem;">CERT ID</small>
+                        <code class="text-primary fw-bold">{{ enrollment.certificateUrl }}</code>
+                      </div>
+                    </div>
+                    <button class="btn btn-outline-primary btn-sm rounded-pill fw-bold" (click)="downloadCertificate('certificate-card-' + i, enrollment.course?.title || 'Course')">
+                      <i class="bi bi-download me-1"></i> Download Certificate
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+            
+            <!-- Empty State for Certificates -->
+            <div class="col-12 text-center py-5" *ngIf="!hasCertificates()">
+              <div class="bg-light rounded-circle d-inline-flex p-4 mb-3">
+                <i class="bi bi-file-earmark-break text-muted" style="font-size: 2.5rem;"></i>
+              </div>
+              <h5 class="fw-bold text-muted">No Certificates Yet</h5>
+              <p class="text-muted small">Complete courses and pass tests to earn certificates.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4 p-4">
+          <h3 class="h5 fw-bold text-indigo mb-4 border-bottom pb-2">Badges & Streaks</h3>
+          <div class="d-flex flex-wrap gap-4">
+            
+            <!-- Streak Badge -->
+            <div class="badge-card text-center" *ngIf="analytics.currentStreak > 0">
+              <div class="badge-icon rounded-circle bg-warning bg-opacity-10 d-inline-flex p-4 mb-2 shadow-sm border border-warning border-opacity-25">
+                <i class="bi bi-fire text-warning" style="font-size: 2.5rem;"></i>
+              </div>
+              <h6 class="fw-bold text-dark mb-0">{{ analytics.currentStreak }}-Day Streak!</h6>
+              <small class="text-muted">Keep it up!</small>
+            </div>
+
+            <!-- Empty State for Badges -->
+            <div class="text-center w-100 py-4" *ngIf="analytics.currentStreak === 0">
+               <p class="text-muted small mb-0">Login daily to build your learning streak and unlock badges.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== MY REQUESTS SECTION ==================== -->
+      <div *ngIf="activeSection === 'requests'" class="row g-4 fade-in">
+        <div class="col-12">
+          <h2 class="h4 fw-extrabold text-indigo mb-3"><i class="bi bi-ticket-detailed me-2 text-primary"></i> Edit Requests Status</h2>
+          <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle">
+                  <thead class="table-light">
+                    <tr>
+                      <th class="px-4 py-3 border-0 rounded-start-4">Field</th>
+                      <th class="py-3 border-0">Requested Value</th>
+                      <th class="py-3 border-0">Status</th>
+                      <th class="px-4 py-3 border-0 rounded-end-4 text-end">Reason</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let req of myEditRequests"
+                        tabindex="0"
+                        [attr.aria-label]="'Request for ' + (req.fieldName || req.field) + '. Requested value: ' + (req.fieldName === 'incomeCertificate' || req.fieldName === 'profileImage' ? 'File' : (req.newValue || req.requestedValue)) + '. Status: ' + req.status + '. Reason: ' + (req.reason || req.rejectionReason || 'None')">
+                      <td class="px-4 py-3 fw-semibold">{{ req.fieldName || req.field }}</td>
+                      <td class="py-3">
+                        <span *ngIf="req.fieldName === 'incomeCertificate' || req.fieldName === 'profileImage'">[File]</span>
+                        <span *ngIf="req.fieldName !== 'incomeCertificate' && req.fieldName !== 'profileImage'">{{ req.newValue || req.requestedValue }}</span>
+                      </td>
+                      <td class="py-3">
+                        <span class="badge rounded-pill px-3 py-2" [ngClass]="{
+                          'bg-warning text-dark': req.status === 'PENDING',
+                          'bg-success': req.status === 'APPROVED',
+                          'bg-danger': req.status === 'REJECTED'
+                        }">{{ req.status }}</span>
+                      </td>
+                      <td class="px-4 py-3 text-end text-muted small">{{ req.reason || req.rejectionReason || '-' }}</td>
+                    </tr>
+                    <tr *ngIf="myEditRequests.length === 0">
+                      <td colspan="4" class="text-center py-4 text-muted">
+                        No active requests found.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Unenroll Modal -->
+  <div class="modal-backdrop-custom" *ngIf="showUnenrollModal" (click)="closeUnenrollModal()">
+    <div class="modal-dialog-custom glass-panel shadow-3d" (click)="$event.stopPropagation()" style="max-width: 500px;">
+      <button class="modal-close-custom" (click)="closeUnenrollModal()" aria-label="Close unenroll modal">&times;</button>
+      
+      <div class="p-4" *ngIf="selectedCourse">
+        <div class="text-center mb-4">
+          <div class="bg-danger bg-opacity-10 text-danger rounded-circle p-3 d-inline-flex mb-3" style="font-size: 2rem;">
+            <i class="bi bi-exclamation-triangle-fill text-danger"></i>
+          </div>
+          <h4 class="fw-extrabold text-indigo mb-2">Unenroll from Course?</h4>
+          <p class="text-muted small">Are you sure you want to unenroll from <strong>{{ selectedCourse.title }}</strong>? This will permanently delete all your progress for this course.</p>
+        </div>
+
+        <div class="mb-4">
+          <label for="unenrollReviewInput" class="form-label fw-bold text-dark mb-2">Help us improve (Optional Review/Feedback):</label>
+          <textarea 
+            id="unenrollReviewInput"
+            class="form-control rounded-3 border-light p-3 small shadow-sm" 
+            rows="3" 
+            placeholder="Tell us why you are leaving or share your experience..."
+            [(ngModel)]="unenrollReview">
+          </textarea>
+        </div>
+
+        <div class="d-flex gap-2">
+          <button class="btn btn-danger flex-fill py-3 rounded-pill fw-bold text-white" (click)="submitUnenroll()">
+            Yes, Unenroll <i class="bi bi-box-arrow-right ms-1"></i>
+          </button>
+          <button class="btn btn-outline-secondary px-4 py-3 rounded-pill fw-bold" (click)="closeUnenrollModal()">Cancel</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Study Resources Section -->
-  <div class="card">
-    <div class="card-header">
-      <h3>Study Resources</h3>
-    </div>
-    <div class="card-body">
-      <ul>
-        <li *ngFor="let resource of studyResources">
-          <a href="{{ resource.link }}" target="_blank">{{ resource.title }}</a>
-        </li>
-      </ul>
-    </div>
-  </div>
 </div>
+
+<app-braille-content-viewer
+  *ngIf="selectedBrailleScheme"
+  [title]="selectedBrailleScheme.title"
+  [text]="selectedBrailleScheme.title + '\n\n' + selectedBrailleScheme.summary"
+  contentArea="GOVERNMENT_SCHEME"
+  (closed)="closeBrailleScheme()">
+</app-braille-content-viewer>

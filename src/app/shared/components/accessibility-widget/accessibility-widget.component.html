@@ -1,0 +1,232 @@
+<!-- Reading Ruler Spotlight overlay -->
+<div 
+  class="focus-ruler" 
+  [style.top.px]="rulerTop" 
+  *ngIf="accService.focusRuler">
+</div>
+
+<!-- Combined Accessibility & Voice Pill -->
+<div class="accessibility-widget-pill">
+  <button 
+    class="accessibility-btn" 
+    (click)="togglePanel()" 
+    aria-label="Accessibility Settings Panel" 
+    title="Accessibility Controls (Alt + A)">
+    <i class="bi bi-universal-access"></i>
+  </button>
+  <button 
+    class="voice-btn" 
+    [class.listening]="accService.voiceCommandsEnabled"
+    (click)="toggleVoiceRecognition()" 
+    aria-label="Voice Assistant Panel" 
+    title="Voice Assistant (Alt + V)">
+    <i class="bi" [ngClass]="accService.voiceCommandsEnabled ? 'bi-mic-fill' : 'bi-mic'"></i>
+  </button>
+</div>
+
+<!-- Sliding Accessibilities Menu -->
+<div class="accessibility-drawer" [class.open]="isOpen" role="dialog" aria-labelledby="acc-title">
+  <div class="drawer-header">
+    <div class="d-flex align-items-center gap-2">
+      <i class="bi bi-universal-access-circle fs-3 text-primary"></i>
+      <div>
+        <h5 id="acc-title" class="mb-0 fw-extrabold text-indigo">Accessibility Desk</h5>
+        <span class="text-muted small">Personalize your view</span>
+      </div>
+    </div>
+    <button class="drawer-close" (click)="togglePanel()" aria-label="Close Accessibility Panel">&times;</button>
+  </div>
+
+  <div class="drawer-body">
+    <!-- Quick Reset -->
+    <div class="mb-4">
+      <button class="btn btn-outline-danger w-100 py-2.5 rounded-4 fw-extrabold d-flex align-items-center justify-content-center gap-2" (click)="resetAll()">
+        <i class="bi bi-arrow-counterclockwise fs-5"></i> Reset All Settings
+      </button>
+    </div>
+
+    <!-- Speech & Audio Assistants -->
+    <div class="settings-group mb-4">
+      <h6 class="settings-group-title"><i class="bi bi-volume-up-fill me-2"></i>Speech & Audio Cues</h6>
+      
+      <div class="option-row">
+        <div class="option-info">
+          <span class="option-label">Hover to Speak (TTS)</span>
+          <span class="option-desc">Reads text under mouse pointer</span>
+        </div>
+        <div class="form-check form-switch m-0">
+          <input class="form-check-input" type="checkbox" role="switch" [checked]="accService.ttsEnabled" (change)="toggleTts()">
+        </div>
+      </div>
+
+      <div class="option-row">
+        <div class="option-info">
+          <span class="option-label">Tactile Sound Cues</span>
+          <span class="option-desc">Audio tones on buttons & links</span>
+        </div>
+        <div class="form-check form-switch m-0">
+          <input class="form-check-input" type="checkbox" role="switch" [checked]="accService.soundsEnabled" (change)="toggleSounds()">
+        </div>
+      </div>
+
+      <div class="option-row voice-option" (click)="toggleVoiceRecognition()">
+        <div class="option-info">
+          <span class="option-label text-primary"><i class="bi bi-mic-fill me-1"></i> Voice Commands</span>
+          <span class="option-desc">Navigate platform using speech</span>
+        </div>
+        <button class="btn btn-primary btn-sm rounded-pill px-3 py-1 text-white fw-bold">Open</button>
+      </div>
+    </div>
+
+    <!-- Visual Adjustments -->
+    <div class="settings-group mb-4">
+      <h6 class="settings-group-title"><i class="bi bi-eye-fill me-2"></i>Visual Adjustments</h6>
+
+      <!-- Contrast Modes -->
+      <div class="mb-3">
+        <span class="option-label d-block mb-2">Contrast Theme</span>
+        <div class="grid-buttons">
+          <button class="contrast-btn normal" [class.active]="accService.contrastMode === 'normal'" (click)="setContrast('normal')">
+            <span class="dot"></span> Default
+          </button>
+          <button class="contrast-btn yellow-black" [class.active]="accService.contrastMode === 'yellow-black'" (click)="setContrast('yellow-black')">
+            Aa High Contrast
+          </button>
+          <button class="contrast-btn white-black" [class.active]="accService.contrastMode === 'white-black'" (click)="setContrast('white-black')">
+            Aa Light On Dark
+          </button>
+          <button class="contrast-btn grayscale" [class.active]="accService.contrastMode === 'grayscale'" (click)="setContrast('grayscale')">
+            Black & White
+          </button>
+        </div>
+      </div>
+
+      <!-- Font Size Slider/Buttons -->
+      <div class="mb-3">
+        <span class="option-label d-block mb-2">Text Zoom</span>
+        <div class="d-flex align-items-center justify-content-between gap-3 bg-light p-2 rounded-4">
+          <button class="btn btn-outline-primary btn-sm rounded-circle border-0 d-grid place-items-center" style="width: 38px; height: 38px;" (click)="adjustFontSize(-2)" aria-label="Decrease font size">
+            <i class="bi bi-dash fs-4"></i>
+          </button>
+          <span class="fw-bold">{{ accService.fontSize }}px</span>
+          <button class="btn btn-outline-primary btn-sm rounded-circle border-0 d-grid place-items-center" style="width: 38px; height: 38px;" (click)="adjustFontSize(2)" aria-label="Increase font size">
+            <i class="bi bi-plus fs-4"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Letter Spacing -->
+      <div class="mb-3">
+        <span class="option-label d-block mb-2">Letter Spacing</span>
+        <div class="d-flex gap-2">
+          <button class="btn flex-fill py-2 rounded-3 text-center btn-spacing" [class.btn-primary]="accService.letterSpacing === 'normal'" [class.btn-light]="accService.letterSpacing !== 'normal'" (click)="setSpacing('normal')">Normal</button>
+          <button class="btn flex-fill py-2 rounded-3 text-center btn-spacing" [class.btn-primary]="accService.letterSpacing === 'loose'" [class.btn-light]="accService.letterSpacing !== 'loose'" (click)="setSpacing('loose')">Loose</button>
+          <button class="btn flex-fill py-2 rounded-3 text-center btn-spacing" [class.btn-primary]="accService.letterSpacing === 'extra'" [class.btn-light]="accService.letterSpacing !== 'extra'" (click)="setSpacing('extra')">Extra</button>
+        </div>
+      </div>
+
+      <!-- Line Height -->
+      <div class="mb-3">
+        <span class="option-label d-block mb-2">Line Height</span>
+        <div class="d-flex gap-2">
+          <button class="btn flex-fill py-2 rounded-3 text-center btn-spacing" [class.btn-primary]="accService.lineHeight === 'normal'" [class.btn-light]="accService.lineHeight !== 'normal'" (click)="setLineHeight('normal')">Standard</button>
+          <button class="btn flex-fill py-2 rounded-3 text-center btn-spacing" [class.btn-primary]="accService.lineHeight === 'double'" [class.btn-light]="accService.lineHeight !== 'double'" (click)="setLineHeight('double')">Double</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reading Assistance -->
+    <div class="settings-group mb-4">
+      <h6 class="settings-group-title"><i class="bi bi-lightbulb-fill me-2"></i>Reading Assistance</h6>
+
+      <div class="option-row">
+        <div class="option-info">
+          <span class="option-label">Dyslexia-Friendly Text</span>
+          <span class="option-desc">Improves letter reading clarity</span>
+        </div>
+        <div class="form-check form-switch m-0">
+          <input class="form-check-input" type="checkbox" role="switch" [checked]="accService.dyslexiaFont" (change)="toggleDyslexia()">
+        </div>
+      </div>
+
+      <div class="option-row">
+        <div class="option-info">
+          <span class="option-label">Line Highlighter Ruler</span>
+          <span class="option-desc">Guides eye line focus across page</span>
+        </div>
+        <div class="form-check form-switch m-0">
+          <input class="form-check-input" type="checkbox" role="switch" [checked]="accService.focusRuler" (change)="toggleRuler()">
+        </div>
+      </div>
+
+      <div class="option-row">
+        <div class="option-info">
+          <span class="option-label">Spotlight Cursor</span>
+          <span class="option-desc">Displays a large colored pointer</span>
+        </div>
+        <div class="form-check form-switch m-0">
+          <input class="form-check-input" type="checkbox" role="switch" [checked]="accService.largeCursor" (change)="toggleCursor()">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="drawer-footer text-center">
+    <div class="keyboard-shortcuts bg-light p-2 rounded-3 text-muted small">
+      <div>Keyboard Shortcuts:</div>
+      <div class="d-flex justify-content-around mt-1">
+        <span><strong>Alt + A</strong>: Toggle Menu</span>
+        <span><strong>Alt + V</strong>: Voice Mic</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Voice Command Modal Overlay -->
+<div class="voice-modal-backdrop" *ngIf="showVoiceModal" (click)="toggleVoiceRecognition()">
+  <div class="voice-modal shadow-3d" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+    <button class="voice-close" (click)="toggleVoiceRecognition()" aria-label="Close Mic">&times;</button>
+    
+    <div class="text-center p-4">
+      <div class="mic-glow-outer mb-4">
+        <div class="mic-glow-inner">
+          <i class="bi bi-mic-fill text-white fs-1"></i>
+        </div>
+        <!-- Sound waves -->
+        <div class="sound-wave">
+          <span class="bar bar-1"></span>
+          <span class="bar bar-2"></span>
+          <span class="bar bar-3"></span>
+          <span class="bar bar-4"></span>
+          <span class="bar bar-5"></span>
+          <span class="bar bar-6"></span>
+        </div>
+      </div>
+
+      <h4 class="fw-extrabold text-dark mb-2">Voice Assistant Active</h4>
+      
+      <div class="voice-transcript-wrapper mb-4 bg-light p-3 rounded-4 border text-center">
+        <p class="voice-transcript text-primary fw-bold fs-5 mb-2" style="min-height: 24px; line-height: 1.4;">{{ recognizedText }}</p>
+        <p class="voice-response text-success fw-semibold fs-6 m-0" *ngIf="lastExecutedCommand" style="min-height: 20px; line-height: 1.4;">{{ lastExecutedCommand }}</p>
+      </div>
+
+      <div class="card bg-light border-0 rounded-4 p-3 mb-4 text-start">
+        <div class="fw-bold text-muted mb-2 small"><i class="bi bi-question-circle-fill me-1 text-primary"></i> Try Saying:</div>
+        <div class="grid-hints">
+          <span>"how many courses"</span>
+          <span>"what courses"</span>
+          <span>"how many schemes"</span>
+          <span>"open schemes"</span>
+          <span>"open notifications"</span>
+          <span>"how many notifications"</span>
+          <span>"yellow contrast"</span>
+          <span>"reset settings"</span>
+        </div>
+      </div>
+
+      <button class="btn btn-danger rounded-pill px-5 py-2.5 fw-bold" (click)="toggleVoiceRecognition()">
+        <i class="bi bi-mic-mute-fill me-1"></i> Stop Listening
+      </button>
+    </div>
+  </div>
+</div>

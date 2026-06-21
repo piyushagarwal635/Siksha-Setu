@@ -1,0 +1,1664 @@
+<div class="container-fluid py-4 animate-fade-in" style="min-height: 90vh">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="text-center py-5 my-5">
+    <div
+      class="spinner-border text-primary"
+      role="status"
+      style="width: 3.5rem; height: 3.5rem"
+    >
+      <span class="visually-hidden">Loading course details...</span>
+    </div>
+    <h5 class="text-muted mt-3 fw-bold">
+      Preparing your learning environment...
+    </h5>
+  </div>
+
+  <div *ngIf="!isLoading && courseDetails">
+    <!-- ===================================================================== -->
+    <!-- STATE 1: COURSE DETAILS VIEW (NOT ENROLLED)                           -->
+    <!-- ===================================================================== -->
+    <main *ngIf="!isEnrolled" class="details-layout">
+      <!-- Premium Overlapping Banner -->
+      <header
+        class="course-banner position-relative rounded-5 overflow-hidden shadow-sm mb-4"
+      >
+        <div class="banner-gradient"></div>
+        <div
+          class="position-absolute bottom-0 start-0 p-4 p-md-5 text-white z-2 w-100"
+        >
+          <button
+            class="btn btn-light rounded-pill btn-sm fw-bold mb-3 shadow"
+            (click)="goBack()"
+          >
+            <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+          </button>
+          <span
+            class="badge bg-white text-indigo text-uppercase px-3 py-1.5 rounded-pill fw-extrabold mb-2 shadow-sm"
+            style="font-size: 0.8rem"
+          >
+            {{ courseDetails.category }}
+          </span>
+          <h1 id="course-title-heading" tabindex="-1" class="display-5 fw-extrabold text-white leading-tight mb-1">
+            {{ courseDetails.title }}
+          </h1>
+          <p class="text-white-50 mb-0">
+            Course ID:
+            <code
+              class="text-white bg-dark bg-opacity-25 px-2 py-0.5 rounded"
+              >{{ courseDetails.id }}</code
+            >
+          </p>
+        </div>
+      </header>
+
+      <!-- Main Course Snapshot Details -->
+      <div class="row g-4 justify-content-center" style="margin-top: -20px">
+        <div class="col-lg-8">
+          <section
+            class="card glass-panel shadow-3d border-0 rounded-4 p-4 p-md-5 mb-4"
+            aria-labelledby="about-course-heading"
+          >
+            <h2 id="about-course-heading" class="h4 fw-extrabold text-indigo mb-3">
+              <i class="bi bi-info-circle-fill me-2"></i>About the Course
+            </h2>
+            <p
+              class="text-muted leading-relaxed mb-4"
+              style="font-size: 1.05rem"
+            >
+              {{ courseDetails.description }}
+            </p>
+
+            <hr class="my-4 opacity-10" />
+
+            <div class="row g-4">
+              <!-- What You Will Learn -->
+              <article class="col-md-6" *ngIf="courseDetails.whatYouWillLearn">
+                <div
+                  class="p-3 bg-indigo-soft rounded-4 h-100 border border-primary border-opacity-10"
+                >
+                  <h3 class="h5 fw-bold text-indigo mb-2">
+                    <i class="bi bi-compass me-2"></i>What You Will Learn
+                  </h3>
+                  <p class="text-muted small mb-0 leading-relaxed">
+                    {{ courseDetails.whatYouWillLearn }}
+                  </p>
+                </div>
+              </article>
+
+              <!-- Learning Outcomes -->
+              <article class="col-md-6" *ngIf="courseDetails.learningOutcomes">
+                <div
+                  class="p-3 bg-success bg-opacity-10 rounded-4 h-100 border border-success border-opacity-10"
+                >
+                  <h3 class="h5 fw-bold text-success mb-2">
+                    <i class="bi bi-award-fill me-2"></i>Learning Outcomes
+                  </h3>
+                  <p class="text-muted small mb-0 leading-relaxed">
+                    {{ courseDetails.learningOutcomes }}
+                  </p>
+                </div>
+              </article>
+            </div>
+
+            <!-- Accessibility features -->
+            <article class="mt-4" *ngIf="courseDetails.accessibilityFeatures" aria-labelledby="accessibility-accommodations-heading">
+              <h3 id="accessibility-accommodations-heading" class="h5 fw-bold text-dark mb-2">
+                <i class="bi bi-shield-check-fill text-warning me-2"></i
+                >Accessibility Accommodations
+              </h3>
+              <div class="p-3 bg-light rounded-3">
+                <span class="text-muted small leading-relaxed">{{
+                  courseDetails.accessibilityFeatures
+                }}</span>
+              </div>
+            </article>
+          </section>
+        </div>
+
+        <!-- Right Card: Call To Action Details -->
+        <aside class="col-lg-4">
+          <section
+            class="card glass-panel border-0 rounded-4 p-4 shadow-3d sticky-top"
+            style="top: 100px"
+            aria-labelledby="course-snapshot-heading"
+          >
+            <h2 id="course-snapshot-heading" class="h5 fw-bold text-indigo mb-3 border-bottom pb-2">
+              Course Snapshot
+            </h2>
+            <ul class="list-unstyled mb-4">
+              <li class="mb-3 d-flex align-items-center">
+                <i class="bi bi-clock-fill text-primary me-3 fs-4"></i>
+                <div>
+                  <span class="d-block text-muted small fw-bold text-uppercase"
+                    >Duration</span
+                  >
+                  <span class="fw-bold text-dark">{{
+                    courseDetails.duration || "2 Weeks"
+                  }}</span>
+                </div>
+              </li>
+              <li class="mb-3 d-flex align-items-center">
+                <i class="bi bi-journal-richtext text-warning me-3 fs-4"></i>
+                <div>
+                  <span class="d-block text-muted small fw-bold text-uppercase"
+                    >Total Chapters</span
+                  >
+                  <span class="fw-bold text-dark"
+                    >{{ courseDetails.lessons || 5 }} Modules</span
+                  >
+                </div>
+              </li>
+              <li class="mb-3 d-flex align-items-center">
+                <i class="bi bi-shield-check text-success me-3 fs-4"></i>
+                <div>
+                  <span class="d-block text-muted small fw-bold text-uppercase"
+                    >Difficulty</span
+                  >
+                  <span class="fw-bold text-dark">{{
+                    courseDetails.difficulty || "All Levels"
+                  }}</span>
+                </div>
+              </li>
+            </ul>
+
+            <button
+              class="btn btn-success w-100 py-3 rounded-pill fw-bold text-uppercase shadow-sm mb-3"
+              (click)="enrollCourse()"
+            >
+              Enroll in Course <i class="bi bi-person-plus-fill ms-1"></i>
+            </button>
+            <p class="text-center text-muted small mb-0">
+              Enrollment is free for registered students.
+            </p>
+          </section>
+        </aside>
+      </div>
+    </main>
+
+    <!-- ===================================================================== -->
+    <!-- STATE 2: RESOURCE VIEWER DASHBOARD (ENROLLED)                         -->
+    <!-- ===================================================================== -->
+    <main *ngIf="isEnrolled" class="resource-viewer-layout">
+      <!-- Workspace Header -->
+      <header
+        class="workspace-header glass-panel p-3 rounded-4 mb-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3"
+      >
+        <div class="d-flex align-items-center gap-3">
+          <button
+            class="btn btn-outline-secondary rounded-circle p-0 d-grid place-items-center shadow-sm"
+            style="width: 44px; height: 44px"
+            (click)="goBack()"
+            title="Back to Student Dashboard"
+          >
+            <i class="bi bi-chevron-left fs-5"></i>
+          </button>
+          <div>
+            <h1 id="course-title-heading" tabindex="-1" class="h4 fw-extrabold text-indigo mb-0">
+              {{ courseDetails.title }}
+            </h1>
+            <span class="text-muted small"
+              >Access Mode:
+              <strong>{{ enrollment.resourcePreference }}</strong></span
+            >
+          </div>
+        </div>
+
+        <!-- Progress Tracker & Test Action -->
+        <div class="d-flex align-items-center gap-4">
+          <div class="progress-box text-md-end" style="min-width: 180px">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <span class="text-muted small fw-bold">Course Completed</span>
+              <span class="text-success small fw-bold"
+                >{{ enrollment.progressPercent || 0 | number: "1.0-0" }}%</span
+              >
+            </div>
+            <div
+              class="progress rounded-pill shadow-inner"
+              style="height: 8px; background-color: rgba(99, 102, 241, 0.08)"
+            >
+              <div
+                class="progress-bar bg-success rounded-pill"
+                role="progressbar"
+                [style.width]="(enrollment.progressPercent || 0) + '%'"
+                [attr.aria-valuenow]="enrollment.progressPercent || 0"
+                aria-valuemin="0"
+                aria-valuemax="100"
+              ></div>
+            </div>
+          </div>
+          <button
+            *ngIf="!enrollment?.testPassed"
+            class="btn btn-warning py-2.5 px-4 rounded-pill fw-bold text-dark shadow-sm border border-warning"
+            [disabled]="!enrollment?.testUnlocked"
+            (click)="startTest()"
+          >
+            <i class="bi bi-trophy-fill me-1.5 text-indigo"></i> Take Final Test
+          </button>
+
+          <button
+            *ngIf="enrollment?.testPassed && !enrollment?.certificateUrl"
+            class="btn btn-primary py-2.5 px-4 rounded-pill fw-bold shadow-sm"
+            (click)="generateCertificate()"
+          >
+            <i class="bi bi-award-fill me-1.5"></i> Generate Certificate
+          </button>
+
+          <button
+            *ngIf="enrollment?.testPassed && enrollment?.certificateUrl"
+            class="btn btn-success py-2.5 px-4 rounded-pill fw-bold shadow-sm"
+            (click)="goToAchievements()"
+          >
+            <i class="bi bi-patch-check-fill me-1.5"></i> Go to Achievements
+            section
+          </button>
+
+          <button
+            *ngIf="!enrollment?.testPassed"
+            class="btn btn-outline-danger py-2.5 px-4 rounded-pill fw-bold shadow-sm d-flex align-items-center gap-1"
+            (click)="openUnenrollModal()"
+          >
+            <i class="bi bi-box-arrow-right"></i> Unenroll
+          </button>
+        </div>
+      </header>
+
+      <!-- Main Columns -->
+      <div class="row g-4">
+        <!-- Left Sidebar: Course Resources Nav -->
+        <aside class="col-lg-3">
+          <nav
+            class="card border-0 shadow-sm rounded-4 p-3 sidebar-card sticky-top"
+            style="top: 100px"
+            aria-labelledby="course-materials-heading"
+          >
+            <h2
+              id="course-materials-heading"
+              class="h6 fw-extrabold text-muted mb-3 px-2 text-uppercase"
+              style="font-size: 0.75rem; letter-spacing: 1px"
+            >
+              Course Materials
+            </h2>
+
+            <div class="accordion accordion-flush" id="resourceAccordion">
+              <!-- Text Notes Section -->
+              <div
+                class="accordion-item border-0 mb-2"
+                *ngIf="textResources.length > 0"
+              >
+                <h3 class="accordion-header" id="headingText">
+                  <button
+                    class="accordion-button rounded-3 fw-bold d-flex align-items-center"
+                    [class.collapsed]="!expandedSections['text']"
+                    [class.disabled-category]="textResources.length === 0"
+                    [attr.disabled]="textResources.length === 0 ? true : null"
+                    [attr.title]="
+                      textResources.length === 0
+                        ? 'Not available in this course'
+                        : null
+                    "
+                    type="button"
+                    (click)="handleCategoryHeaderClick('text', $event)"
+                  >
+                    <i
+                      class="bi bi-file-earmark-text-fill text-primary me-2"
+                    ></i>
+                    Text Notes
+                    <span
+                      class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary ms-auto me-3 small"
+                      style="font-size: 0.65rem"
+                      *ngIf="
+                        textResources.length > 0 && !isCategoryEnabled('text')
+                      "
+                    >
+                      <i class="bi bi-lock-fill me-1"></i> Locked
+                    </span>
+                    <span
+                      class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 ms-auto me-3 small"
+                      style="font-size: 0.65rem"
+                      *ngIf="textResources.length === 0"
+                    >
+                      <i class="bi bi-slash-circle me-1"></i> Unavailable
+                    </span>
+                  </button>
+                </h3>
+                <div
+                  id="collapseText"
+                  class="accordion-collapse custom-collapse"
+                  [class.show]="
+                    expandedSections['text'] && textResources.length > 0
+                  "
+                >
+                  <div class="accordion-body p-2 d-flex flex-column gap-1">
+                    <button
+                      *ngFor="let res of textResources"
+                      class="btn resource-btn text-start p-2.5 rounded-3 d-flex flex-column gap-1"
+                      [class.active]="selectedResource?.id === res.id"
+                      [class.locked-resource]="!isCategoryEnabled('text')"
+                      [attr.title]="
+                        !isCategoryEnabled('text')
+                          ? 'Unlock this format to access this resource'
+                          : null
+                      "
+                      (click)="
+                        isCategoryEnabled('text')
+                          ? selectResource(res, 'text')
+                          : promptUnlockCategory('text')
+                      "
+                    >
+                      <div
+                        class="d-flex align-items-center justify-content-between w-100"
+                      >
+                        <div
+                          class="d-flex align-items-center flex-grow-1 text-truncate pe-2"
+                        >
+                          <i
+                            class="bi flex-shrink-0"
+                            [ngClass]="
+                              !isCategoryEnabled('text')
+                                ? 'bi-lock-fill text-muted me-2'
+                                : 'bi-journal-text me-2'
+                            "
+                          ></i
+                          ><span class="text-truncate small ms-2">{{
+                            res.title
+                          }}</span>
+                        </div>
+                        <i
+                          class="bi bi-check-circle-fill text-success ms-2"
+                          *ngIf="
+                            isCategoryEnabled('text') &&
+                            isResourceCompleted(res.id)
+                          "
+                        ></i>
+                      </div>
+                      <div
+                        class="w-100 mt-1"
+                        style="
+                          height: 4px;
+                          background-color: rgba(99, 102, 241, 0.08);
+                          border-radius: 2px;
+                          overflow: hidden;
+                        "
+                        *ngIf="isCategoryEnabled('text')"
+                      >
+                        <div
+                          class="h-100 transition-all"
+                          [class.bg-success]="isResourceCompleted(res.id)"
+                          [class.bg-secondary]="!isResourceCompleted(res.id)"
+                          [style.width]="
+                            isResourceCompleted(res.id) ? '100%' : '0%'
+                          "
+                        ></div>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Videos Section -->
+              <div
+                class="accordion-item border-0 mb-2"
+                *ngIf="videoResources.length > 0"
+              >
+                <h3 class="accordion-header" id="headingVideo">
+                  <button
+                    class="accordion-button rounded-3 fw-bold d-flex align-items-center"
+                    [class.collapsed]="!expandedSections['video']"
+                    [class.disabled-category]="videoResources.length === 0"
+                    [attr.disabled]="videoResources.length === 0 ? true : null"
+                    [attr.title]="
+                      videoResources.length === 0
+                        ? 'Not available in this course'
+                        : null
+                    "
+                    type="button"
+                    (click)="handleCategoryHeaderClick('video', $event)"
+                  >
+                    <i class="bi bi-play-circle-fill text-danger me-2"></i>
+                    Video Lessons
+                    <span
+                      class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary ms-auto me-3 small"
+                      style="font-size: 0.65rem"
+                      *ngIf="
+                        videoResources.length > 0 && !isCategoryEnabled('video')
+                      "
+                    >
+                      <i class="bi bi-lock-fill me-1"></i> Locked
+                    </span>
+                    <span
+                      class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 ms-auto me-3 small"
+                      style="font-size: 0.65rem"
+                      *ngIf="videoResources.length === 0"
+                    >
+                      <i class="bi bi-slash-circle me-1"></i> Unavailable
+                    </span>
+                  </button>
+                </h3>
+                <div
+                  id="collapseVideo"
+                  class="accordion-collapse custom-collapse"
+                  [class.show]="
+                    expandedSections['video'] && videoResources.length > 0
+                  "
+                >
+                  <div class="accordion-body p-2 d-flex flex-column gap-1">
+                    <button
+                      *ngFor="let res of videoResources"
+                      class="btn resource-btn text-start p-2.5 rounded-3 d-flex flex-column gap-1"
+                      [class.active]="selectedResource?.id === res.id"
+                      [class.locked-resource]="!isCategoryEnabled('video')"
+                      [attr.title]="
+                        !isCategoryEnabled('video')
+                          ? 'Unlock this format to access this resource'
+                          : null
+                      "
+                      (click)="
+                        isCategoryEnabled('video')
+                          ? selectResource(res, 'video')
+                          : promptUnlockCategory('video')
+                      "
+                    >
+                      <div
+                        class="d-flex align-items-center justify-content-between w-100"
+                      >
+                        <div
+                          class="d-flex align-items-center flex-grow-1 text-truncate pe-2"
+                        >
+                          <i
+                            class="bi flex-shrink-0"
+                            [ngClass]="
+                              !isCategoryEnabled('video')
+                                ? 'bi-lock-fill text-muted me-2'
+                                : 'bi-play-btn me-2'
+                            "
+                          ></i
+                          ><span class="text-truncate small ms-2">{{
+                            res.title
+                          }}</span>
+                        </div>
+                        <i
+                          class="bi bi-check-circle-fill text-success ms-2"
+                          *ngIf="
+                            isCategoryEnabled('video') &&
+                            isResourceCompleted(res.id)
+                          "
+                        ></i>
+                      </div>
+                      <div
+                        class="w-100 mt-1"
+                        style="
+                          height: 4px;
+                          background-color: rgba(99, 102, 241, 0.08);
+                          border-radius: 2px;
+                          overflow: hidden;
+                        "
+                        *ngIf="isCategoryEnabled('video')"
+                      >
+                        <div
+                          class="h-100 transition-all"
+                          [class.bg-success]="isResourceCompleted(res.id)"
+                          [class.bg-secondary]="!isResourceCompleted(res.id)"
+                          [style.width]="
+                            isResourceCompleted(res.id) ? '100%' : '0%'
+                          "
+                        ></div>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Audio Section -->
+              <div
+                class="accordion-item border-0 mb-2"
+                *ngIf="audioResources.length > 0"
+              >
+                <h3 class="accordion-header" id="headingAudio">
+                  <button
+                    class="accordion-button rounded-3 fw-bold d-flex align-items-center"
+                    [class.collapsed]="!expandedSections['audio']"
+                    [class.disabled-category]="audioResources.length === 0"
+                    [attr.disabled]="audioResources.length === 0 ? true : null"
+                    [attr.title]="
+                      audioResources.length === 0
+                        ? 'Not available in this course'
+                        : null
+                    "
+                    type="button"
+                    (click)="handleCategoryHeaderClick('audio', $event)"
+                  >
+                    <i class="bi bi-volume-up-fill text-warning me-2"></i> Audio
+                    Lessons
+                    <span
+                      class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary ms-auto me-3 small"
+                      style="font-size: 0.65rem"
+                      *ngIf="
+                        audioResources.length > 0 && !isCategoryEnabled('audio')
+                      "
+                    >
+                      <i class="bi bi-lock-fill me-1"></i> Locked
+                    </span>
+                    <span
+                      class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 ms-auto me-3 small"
+                      style="font-size: 0.65rem"
+                      *ngIf="audioResources.length === 0"
+                    >
+                      <i class="bi bi-slash-circle me-1"></i> Unavailable
+                    </span>
+                  </button>
+                </h3>
+                <div
+                  id="collapseAudio"
+                  class="accordion-collapse custom-collapse"
+                  [class.show]="
+                    expandedSections['audio'] && audioResources.length > 0
+                  "
+                >
+                  <div class="accordion-body p-2 d-flex flex-column gap-1">
+                    <button
+                      *ngFor="let res of audioResources"
+                      class="btn resource-btn text-start p-2.5 rounded-3 d-flex flex-column gap-1"
+                      [class.active]="selectedResource?.id === res.id"
+                      [class.locked-resource]="!isCategoryEnabled('audio')"
+                      [attr.title]="
+                        !isCategoryEnabled('audio')
+                          ? 'Unlock this format to access this resource'
+                          : null
+                      "
+                      (click)="
+                        isCategoryEnabled('audio')
+                          ? selectResource(res, 'audio')
+                          : promptUnlockCategory('audio')
+                      "
+                    >
+                      <div
+                        class="d-flex align-items-center justify-content-between w-100"
+                      >
+                        <div
+                          class="d-flex align-items-center flex-grow-1 text-truncate pe-2"
+                        >
+                          <i
+                            class="bi flex-shrink-0"
+                            [ngClass]="
+                              !isCategoryEnabled('audio')
+                                ? 'bi-lock-fill text-muted me-2'
+                                : 'bi-mic me-2'
+                            "
+                          ></i
+                          ><span class="text-truncate small ms-2">{{
+                            res.title
+                          }}</span>
+                        </div>
+                        <i
+                          class="bi bi-check-circle-fill text-success ms-2"
+                          *ngIf="
+                            isCategoryEnabled('audio') &&
+                            isResourceCompleted(res.id)
+                          "
+                        ></i>
+                      </div>
+                      <div
+                        class="w-100 mt-1"
+                        style="
+                          height: 4px;
+                          background-color: rgba(99, 102, 241, 0.08);
+                          border-radius: 2px;
+                          overflow: hidden;
+                        "
+                        *ngIf="isCategoryEnabled('audio')"
+                      >
+                        <div
+                          class="h-100 transition-all"
+                          [class.bg-success]="isResourceCompleted(res.id)"
+                          [class.bg-secondary]="!isResourceCompleted(res.id)"
+                          [style.width]="
+                            isResourceCompleted(res.id) ? '100%' : '0%'
+                          "
+                        ></div>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Sign Language Section -->
+              <div
+                class="accordion-item border-0 mb-2"
+                *ngIf="signLanguageResources.length > 0"
+              >
+                <h3 class="accordion-header" id="headingSign">
+                  <button
+                    class="accordion-button rounded-3 fw-bold d-flex align-items-center"
+                    [class.collapsed]="!expandedSections['sign']"
+                    [class.disabled-category]="
+                      signLanguageResources.length === 0
+                    "
+                    [attr.disabled]="
+                      signLanguageResources.length === 0 ? true : null
+                    "
+                    [attr.title]="
+                      signLanguageResources.length === 0
+                        ? 'Not available in this course'
+                        : null
+                    "
+                    type="button"
+                    (click)="handleCategoryHeaderClick('sign', $event)"
+                  >
+                    <i class="bi bi-person-video text-info me-2"></i> Sign
+                    Language
+                    <span
+                      class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary ms-auto me-3 small"
+                      style="font-size: 0.65rem"
+                      *ngIf="
+                        signLanguageResources.length > 0 &&
+                        !isCategoryEnabled('sign')
+                      "
+                    >
+                      <i class="bi bi-lock-fill me-1"></i> Locked
+                    </span>
+                    <span
+                      class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 ms-auto me-3 small"
+                      style="font-size: 0.65rem"
+                      *ngIf="signLanguageResources.length === 0"
+                    >
+                      <i class="bi bi-slash-circle me-1"></i> Unavailable
+                    </span>
+                  </button>
+                </h3>
+                <div
+                  id="collapseSign"
+                  class="accordion-collapse custom-collapse"
+                  [class.show]="
+                    expandedSections['sign'] && signLanguageResources.length > 0
+                  "
+                >
+                  <div class="accordion-body p-2 d-flex flex-column gap-1">
+                    <button
+                      *ngFor="let res of signLanguageResources"
+                      class="btn resource-btn text-start p-2.5 rounded-3 d-flex flex-column gap-1"
+                      [class.active]="selectedResource?.id === res.id"
+                      [class.locked-resource]="!isCategoryEnabled('sign')"
+                      [attr.title]="
+                        !isCategoryEnabled('sign')
+                          ? 'Unlock this format to access this resource'
+                          : null
+                      "
+                      (click)="
+                        isCategoryEnabled('sign')
+                          ? selectResource(res, 'sign')
+                          : promptUnlockCategory('sign')
+                      "
+                    >
+                      <div
+                        class="d-flex align-items-center justify-content-between w-100"
+                      >
+                        <div
+                          class="d-flex align-items-center flex-grow-1 text-truncate pe-2"
+                        >
+                          <i
+                            class="bi flex-shrink-0"
+                            [ngClass]="
+                              !isCategoryEnabled('sign')
+                                ? 'bi-lock-fill text-muted me-2'
+                                : 'bi-person-badge me-2'
+                            "
+                          ></i
+                          ><span class="text-truncate small ms-2">{{
+                            res.title
+                          }}</span>
+                        </div>
+                        <i
+                          class="bi bi-check-circle-fill text-success ms-2"
+                          *ngIf="
+                            isCategoryEnabled('sign') &&
+                            isResourceCompleted(res.id)
+                          "
+                        ></i>
+                      </div>
+                      <div
+                        class="w-100 mt-1"
+                        style="
+                          height: 4px;
+                          background-color: rgba(99, 102, 241, 0.08);
+                          border-radius: 2px;
+                          overflow: hidden;
+                        "
+                        *ngIf="isCategoryEnabled('sign')"
+                      >
+                        <div
+                          class="h-100 transition-all"
+                          [class.bg-success]="isResourceCompleted(res.id)"
+                          [class.bg-secondary]="!isResourceCompleted(res.id)"
+                          [style.width]="
+                            isResourceCompleted(res.id) ? '100%' : '0%'
+                          "
+                        ></div>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Braille Mode Section -->
+              <div
+                class="accordion-item border-0 mb-2"
+                *ngIf="brailleResources.length > 0"
+              >
+                <h3 class="accordion-header" id="headingBraille">
+                  <button
+                    class="accordion-button rounded-3 fw-bold d-flex align-items-center"
+                    [class.collapsed]="!expandedSections['braille']"
+                    [class.disabled-category]="brailleResources.length === 0"
+                    [attr.disabled]="
+                      brailleResources.length === 0 ? true : null
+                    "
+                    [attr.title]="
+                      brailleResources.length === 0
+                        ? 'Not available in this course'
+                        : null
+                    "
+                    type="button"
+                    (click)="handleCategoryHeaderClick('braille', $event)"
+                  >
+                    <i class="bi bi-grid-3x3-gap-fill text-secondary me-2"></i>
+                    Braille Mode
+                    <span
+                      class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary ms-auto me-3 small"
+                      style="font-size: 0.65rem"
+                      *ngIf="
+                        brailleResources.length > 0 &&
+                        !isCategoryEnabled('braille')
+                      "
+                    >
+                      <i class="bi bi-lock-fill me-1"></i> Locked
+                    </span>
+                    <span
+                      class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 ms-auto me-3 small"
+                      style="font-size: 0.65rem"
+                      *ngIf="brailleResources.length === 0"
+                    >
+                      <i class="bi bi-slash-circle me-1"></i> Unavailable
+                    </span>
+                  </button>
+                </h3>
+                <div
+                  id="collapseBraille"
+                  class="accordion-collapse custom-collapse"
+                  [class.show]="
+                    expandedSections['braille'] && brailleResources.length > 0
+                  "
+                >
+                  <div class="accordion-body p-2 d-flex flex-column gap-1">
+                    <button
+                      *ngFor="let res of brailleResources"
+                      class="btn resource-btn text-start p-2.5 rounded-3 d-flex flex-column gap-1"
+                      [class.active]="selectedResource?.id === res.id"
+                      [class.locked-resource]="!isCategoryEnabled('braille')"
+                      [attr.title]="
+                        !isCategoryEnabled('braille')
+                          ? 'Unlock this format to access this resource'
+                          : null
+                      "
+                      (click)="
+                        isCategoryEnabled('braille')
+                          ? selectResource(res, 'braille')
+                          : promptUnlockCategory('braille')
+                      "
+                    >
+                      <div
+                        class="d-flex align-items-center justify-content-between w-100"
+                      >
+                        <div
+                          class="d-flex align-items-center flex-grow-1 text-truncate pe-2"
+                        >
+                          <i
+                            class="bi flex-shrink-0"
+                            [ngClass]="
+                              !isCategoryEnabled('braille')
+                                ? 'bi-lock-fill text-muted me-2'
+                                : 'bi-keyboard me-2'
+                            "
+                          ></i
+                          ><span class="text-truncate small ms-2">{{
+                            res.title
+                          }}</span>
+                        </div>
+                        <i
+                          class="bi bi-check-circle-fill text-success ms-2"
+                          *ngIf="
+                            isCategoryEnabled('braille') &&
+                            isResourceCompleted(res.id)
+                          "
+                        ></i>
+                      </div>
+                      <div
+                        class="w-100 mt-1"
+                        style="
+                          height: 4px;
+                          background-color: rgba(99, 102, 241, 0.08);
+                          border-radius: 2px;
+                          overflow: hidden;
+                        "
+                        *ngIf="isCategoryEnabled('braille')"
+                      >
+                        <div
+                          class="h-100 transition-all"
+                          [class.bg-success]="isResourceCompleted(res.id)"
+                          [class.bg-secondary]="!isResourceCompleted(res.id)"
+                          [style.width]="
+                            isResourceCompleted(res.id) ? '100%' : '0%'
+                          "
+                        ></div>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </nav>
+        </aside>
+
+        <!-- Right Side: Content Area / Resource Viewer -->
+        <section class="col-lg-9" aria-label="Resource Details and Content">
+          <!-- TAB 1: RESOURCE VIEWER AREA -->
+          <article
+            *ngIf="activeTab === 'resources'"
+            class="card glass-panel border-0 rounded-4 shadow-3d overflow-hidden"
+            (contextmenu)="disableContextMenu($event)"
+            style="-webkit-user-select: none; user-select: none"
+          >
+            <div *ngIf="!selectedResource" class="text-center py-5 my-5">
+              <i
+                class="bi bi-file-earmark-lock-fill display-1 text-indigo opacity-25"
+              ></i>
+              <h5 class="fw-bold text-dark mt-3">
+                Select a study lesson from the sidebar to begin learning
+              </h5>
+            </div>
+
+            <div *ngIf="selectedResource">
+              <!-- Viewer Header bar -->
+              <div
+                class="bg-indigo-soft p-3.5 border-bottom d-flex justify-content-between align-items-center"
+              >
+                <div>
+                  <span
+                    class="badge bg-indigo text-uppercase mb-1"
+                    style="font-size: 0.65rem"
+                    >{{ activeFormat }} mode</span
+                  >
+                  <h2 class="h5 fw-extrabold text-dark mb-0" id="resource-title-heading" tabindex="-1">
+                    {{ selectedResource.title }}
+                  </h2>
+                </div>
+                <!-- Complete Button -->
+                <button
+                  class="btn btn-sm rounded-pill px-3 py-2 fw-bold d-flex align-items-center gap-1.5 transition-all"
+                  [class.btn-success]="isResourceCompleted(selectedResource.id)"
+                  [class.btn-outline-success]="
+                    !isResourceCompleted(selectedResource.id)
+                  "
+                  (click)="markAsCompleted(selectedResource)"
+                >
+                  <i
+                    class="bi"
+                    [ngClass]="
+                      isResourceCompleted(selectedResource.id)
+                        ? 'bi-check-circle-fill'
+                        : 'bi-circle'
+                    "
+                  ></i>
+                  {{
+                    isResourceCompleted(selectedResource.id)
+                      ? "Lesson Completed"
+                      : "Mark as Completed"
+                  }}
+                </button>
+              </div>
+
+              <!-- Secure Loader -->
+              <div *ngIf="isResourceLoading" class="text-center py-5 my-5">
+                <div class="spinner-border text-indigo" role="status" style="width: 3.5rem; height: 3.5rem">
+                  <span class="visually-hidden">Loading secure resource...</span>
+                </div>
+                <h5 class="text-muted mt-3 fw-bold">Securing stream & loading content...</h5>
+              </div>
+
+              <!-- Media Viewer Area -->
+              <div
+                *ngIf="!isResourceLoading"
+                class="viewer-content p-4"
+                id="resource-content-area"
+                tabindex="-1"
+                style="min-height: 400px; background: rgba(255, 255, 255, 0.45)"
+              >
+                <!-- Visually Hidden Resource Details Summary for Screen Readers -->
+                <div class="visually-hidden">
+                  <h3>Resource Details</h3>
+                  <p>Title: {{ selectedResource.title }}</p>
+                  <p>Learning Format: {{ activeFormat }} Mode</p>
+                  <p>Completion Status: {{ isResourceCompleted(selectedResource.id) ? 'Completed' : 'Incomplete' }}</p>
+                  <p *ngIf="selectedResource.description">Description: {{ selectedResource.description }}</p>
+                </div>
+                <!-- A. Text Notes Viewer -->
+                <div
+                  *ngIf="activeFormat === 'text'"
+                  class="text-viewer-container"
+                >
+                  <div
+                    *ngIf="isPdfResource(selectedResource)"
+                    class="pdf-viewer-wrapper rounded-4 overflow-hidden border shadow-sm bg-light mb-3 p-3 d-flex flex-column align-items-center"
+                    (contextmenu)="disableContextMenu($event)"
+                    style="user-select: none;"
+                  >
+                    <!-- PDF Canvas Scroll/Render Wrapper -->
+                    <div class="pdf-canvas-container" style="max-height: 600px; overflow-y: auto; width: 100%; text-align: center;">
+                      <canvas #pdfCanvas style="max-width: 100%; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);"></canvas>
+                    </div>
+                    
+                    <!-- PDF Custom Controls -->
+                    <div class="pdf-controls d-flex align-items-center justify-content-between w-100 mt-3 px-3 py-2 bg-white rounded-3 border">
+                      <button class="btn btn-sm btn-outline-indigo" [disabled]="pdfPageNumber <= 1" (click)="prevPdfPage()">
+                        <i class="bi bi-chevron-left"></i> Previous Page
+                      </button>
+                      <span class="text-muted small fw-bold">Page {{pdfPageNumber}} of {{pdfTotalPages}}</span>
+                      <button class="btn btn-sm btn-outline-indigo" [disabled]="pdfPageNumber >= pdfTotalPages" (click)="nextPdfPage()">
+                        Next Page <i class="bi bi-chevron-right"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div
+                    *ngIf="!isPdfResource(selectedResource)"
+                    class="p-4 bg-white rounded-4 border shadow-sm leading-relaxed"
+                    style="
+                      max-height: 550px;
+                      overflow-y: auto;
+                      font-size: 1.05rem;
+                      text-align: justify;
+                      color: #334155;
+                    "
+                  >
+                    <h4
+                      class="fw-extrabold mb-3 text-indigo border-bottom pb-2"
+                    >
+                      {{ selectedResource.title }}
+                    </h4>
+                    <p>
+                      {{
+                        selectedResource.description ||
+                          "Welcome to the textual notes for this chapter. Please read thoroughly."
+                      }}
+                    </p>
+                  </div>
+                  <p class="mt-3 text-muted small">
+                    <i class="bi bi-lock-fill"></i> Protected Material: Sharing,
+                    printing, or copying text from this portal is strictly
+                    disabled.
+                  </p>
+                </div>
+
+                <!-- B. Video Lessons Viewer (Controls Enabled, Downloads Disabled) -->
+                <div
+                  *ngIf="activeFormat === 'video'"
+                  class="video-viewer-container text-center"
+                >
+                  <div
+                    class="custom-video-player ratio ratio-16x9 rounded-4 overflow-hidden border shadow-sm bg-black position-relative"
+                    (contextmenu)="disableContextMenu($event)"
+                  >
+                    <video
+                      #customVideoPlayer
+                      [src]="secureVideoSrc"
+                      disablePictureInPicture
+                      (loadedmetadata)="onVideoMetadataLoaded()"
+                      (timeupdate)="onVideoTimeUpdate()"
+                      (volumechange)="onVideoVolumeChange()"
+                      (play)="isVideoPlaying = true"
+                      (pause)="isVideoPlaying = false"
+                      (ended)="onVideoEnded()"
+                      (click)="toggleVideoPlay()"
+                      style="width: 100%; height: 100%; object-fit: contain; cursor: pointer;"
+                    ></video>
+
+                    <div class="video-controls-overlay position-absolute bottom-0 start-0 w-100 p-3 d-flex flex-column gap-2 text-white bg-dark bg-opacity-75 transition-all">
+                      <input
+                        type="range"
+                        class="video-seek-bar w-100"
+                        min="0"
+                        [max]="videoDuration"
+                        [value]="videoCurrentTime"
+                        (input)="onVideoSeek($event)"
+                        style="cursor: pointer; accent-color: #6366f1;"
+                        aria-label="Seek Video"
+                      />
+                      
+                      <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-3">
+                          <button class="btn btn-link text-white p-0" (click)="toggleVideoPlay()" [attr.aria-label]="isVideoPlaying ? 'Pause Video' : 'Play Video'">
+                            <i class="bi" [ngClass]="isVideoPlaying ? 'bi-pause-fill' : 'bi-play-fill'" style="font-size: 1.5rem;"></i>
+                          </button>
+                          <span class="small fw-semibold">{{ videoTimeDisplay }}</span>
+                        </div>
+
+                        <div class="d-flex align-items-center gap-3">
+                          <div class="d-flex align-items-center gap-2">
+                            <button class="btn btn-link text-white p-0" (click)="toggleVideoMute()" [attr.aria-label]="isVideoMuted ? 'Unmute Video' : 'Mute Video'">
+                              <i class="bi" [ngClass]="isVideoMuted ? 'bi-volume-mute-fill' : 'bi-volume-up-fill'" style="font-size: 1.25rem;"></i>
+                            </button>
+                            <input
+                              type="range"
+                              class="volume-bar"
+                              min="0"
+                              max="1"
+                              step="0.05"
+                              [value]="isVideoMuted ? 0 : videoVolume"
+                              (input)="onVideoVolumeInput($event)"
+                              style="width: 70px; cursor: pointer; accent-color: #6366f1;"
+                              aria-label="Video Volume"
+                            />
+                          </div>
+
+                          <button class="btn btn-link text-white p-0" (click)="toggleVideoFullscreen()" aria-label="Toggle Fullscreen">
+                            <i class="bi bi-fullscreen" style="font-size: 1.1rem;"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <p class="text-muted mt-3 small">
+                    <i class="bi bi-shield-fill-check"></i> Security Active:
+                    Video download and frame grabbing options are restricted.
+                  </p>
+                </div>
+
+                <!-- C. Audio Lessons Viewer (No Downloads) -->
+                <div
+                  *ngIf="activeFormat === 'audio'"
+                  class="audio-viewer-container py-5 text-center"
+                >
+                  <div
+                    class="bg-white rounded-4 p-5 border shadow-sm d-flex flex-column align-items-center justify-content-center"
+                    style="max-width: 500px; margin: 0 auto"
+                    (contextmenu)="disableContextMenu($event)"
+                  >
+                    <div
+                      class="bg-indigo-soft text-indigo rounded-circle p-4 mb-4"
+                      [class.animate-pulse]="isAudioPlaying"
+                    >
+                      <i class="bi bi-headphones fs-1"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">{{ selectedResource.title }}</h5>
+                    <p class="text-muted small mb-4">
+                      Listening Accommodation Mode
+                    </p>
+
+                    <audio
+                      #customAudioPlayer
+                      [src]="secureAudioSrc"
+                      (loadedmetadata)="onAudioMetadataLoaded()"
+                      (timeupdate)="onAudioTimeUpdate()"
+                      (volumechange)="onAudioVolumeChange()"
+                      (play)="isAudioPlaying = true"
+                      (pause)="isAudioPlaying = false"
+                      (ended)="onAudioEnded()"
+                    ></audio>
+
+                    <div class="audio-controls w-100 mb-4 px-2 d-flex flex-column gap-2.5">
+                      <input
+                        type="range"
+                        class="audio-seek-bar w-100"
+                        min="0"
+                        [max]="audioDuration"
+                        [value]="audioCurrentTime"
+                        (input)="onAudioSeek($event)"
+                        style="cursor: pointer; accent-color: #6366f1;"
+                        aria-label="Seek Audio"
+                      />
+                      
+                      <div class="d-flex align-items-center justify-content-between mt-1">
+                        <div class="d-flex align-items-center gap-2">
+                          <button class="btn btn-indigo rounded-circle p-0 d-grid place-items-center" style="width: 42px; height: 42px;" (click)="toggleAudioPlay()" [attr.aria-label]="isAudioPlaying ? 'Pause Audio' : 'Play Audio'">
+                            <i class="bi" [ngClass]="isAudioPlaying ? 'bi-pause-fill' : 'bi-play-fill'" style="font-size: 1.3rem;"></i>
+                          </button>
+                          <span class="small fw-semibold text-muted">{{ audioTimeDisplay }}</span>
+                        </div>
+
+                        <div class="d-flex align-items-center gap-2">
+                          <button class="btn btn-link text-indigo p-0" (click)="toggleAudioMute()" [attr.aria-label]="isAudioMuted ? 'Unmute Audio' : 'Mute Audio'">
+                            <i class="bi" [ngClass]="isAudioMuted ? 'bi-volume-mute-fill' : 'bi-volume-up-fill'" style="font-size: 1.25rem;"></i>
+                          </button>
+                          <input
+                            type="range"
+                            class="volume-bar"
+                            min="0"
+                            max="1"
+                            step="0.05"
+                            [value]="isAudioMuted ? 0 : audioVolume"
+                            (input)="onAudioVolumeInput($event)"
+                            style="width: 65px; cursor: pointer; accent-color: #6366f1;"
+                            aria-label="Audio Volume"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <span class="text-muted small"
+                      ><i class="bi bi-lock-fill"></i> Protected Audio Stream</span
+                    >
+                  </div>
+                </div>
+
+                <!-- D. Sign Language Videos Viewer -->
+                <div
+                  *ngIf="activeFormat === 'sign'"
+                  class="sign-viewer-container text-center"
+                >
+                  <div
+                    class="custom-video-player ratio ratio-16x9 rounded-4 overflow-hidden border shadow-sm bg-black position-relative"
+                    (contextmenu)="disableContextMenu($event)"
+                  >
+                    <video
+                      #customVideoPlayer
+                      [src]="secureVideoSrc"
+                      disablePictureInPicture
+                      (loadedmetadata)="onVideoMetadataLoaded()"
+                      (timeupdate)="onVideoTimeUpdate()"
+                      (volumechange)="onVideoVolumeChange()"
+                      (play)="isVideoPlaying = true"
+                      (pause)="isVideoPlaying = false"
+                      (ended)="onVideoEnded()"
+                      (click)="toggleVideoPlay()"
+                      style="width: 100%; height: 100%; object-fit: contain; cursor: pointer;"
+                    ></video>
+
+                    <div class="video-controls-overlay position-absolute bottom-0 start-0 w-100 p-3 d-flex flex-column gap-2 text-white bg-dark bg-opacity-75 transition-all">
+                      <input
+                        type="range"
+                        class="video-seek-bar w-100"
+                        min="0"
+                        [max]="videoDuration"
+                        [value]="videoCurrentTime"
+                        (input)="onVideoSeek($event)"
+                        style="cursor: pointer; accent-color: #6366f1;"
+                        aria-label="Seek Sign Language Video"
+                      />
+                      
+                      <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-3">
+                          <button class="btn btn-link text-white p-0" (click)="toggleVideoPlay()" [attr.aria-label]="isVideoPlaying ? 'Pause Sign Language Video' : 'Play Sign Language Video'">
+                            <i class="bi" [ngClass]="isVideoPlaying ? 'bi-pause-fill' : 'bi-play-fill'" style="font-size: 1.5rem;"></i>
+                          </button>
+                          <span class="small fw-semibold">{{ videoTimeDisplay }}</span>
+                        </div>
+
+                        <div class="d-flex align-items-center gap-3">
+                          <div class="d-flex align-items-center gap-2">
+                            <button class="btn btn-link text-white p-0" (click)="toggleVideoMute()" [attr.aria-label]="isVideoMuted ? 'Unmute Sign Language Video' : 'Mute Sign Language Video'">
+                              <i class="bi" [ngClass]="isVideoMuted ? 'bi-volume-mute-fill' : 'bi-volume-up-fill'" style="font-size: 1.25rem;"></i>
+                            </button>
+                            <input
+                              type="range"
+                              class="volume-bar"
+                              min="0"
+                              max="1"
+                              step="0.05"
+                              [value]="isVideoMuted ? 0 : videoVolume"
+                              (input)="onVideoVolumeInput($event)"
+                              style="width: 70px; cursor: pointer; accent-color: #6366f1;"
+                              aria-label="Sign Language Video Volume"
+                            />
+                          </div>
+
+                          <button class="btn btn-link text-white p-0" (click)="toggleVideoFullscreen()" aria-label="Toggle Sign Language Fullscreen">
+                            <i class="bi bi-fullscreen" style="font-size: 1.1rem;"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <p class="text-muted mt-3 small">
+                    <i class="bi bi-person-fill-check"></i> Interactive Sign
+                    Interpretation Active
+                  </p>
+                </div>
+
+                <!-- E. Braille Mode Launcher Card -->
+                <div
+                  *ngIf="activeFormat === 'braille'"
+                  class="braille-launcher-container py-5 text-center"
+                >
+                  <div
+                    class="bg-white rounded-4 p-5 border shadow-sm d-flex flex-column align-items-center justify-content-center"
+                    style="max-width: 650px; margin: 0 auto"
+                  >
+                    <div
+                      class="bg-indigo-soft text-indigo rounded-circle p-4 mb-4 animate-pulse"
+                    >
+                      <i class="bi bi-keyboard fs-1"></i>
+                    </div>
+                    <h4 class="fw-extrabold text-indigo mb-2">
+                      Dedicated Braille Workspace Console
+                    </h4>
+                    <p
+                      class="text-muted leading-relaxed mb-4"
+                      style="font-size: 1.05rem"
+                    >
+                      To provide the best learning experience, this resource
+                      requires a widescreen Braille hardware display emulator.
+                      Click below to launch your dedicated full-screen console
+                      containing the interactive text editor and 40/80-cell
+                      display grid.
+                    </p>
+
+                    <div class="d-flex flex-column gap-2 mb-4 w-100 px-md-5">
+                      <div
+                        class="d-flex justify-content-between border-bottom py-2 text-start"
+                      >
+                        <span class="text-muted small">Resource Title:</span>
+                        <span class="fw-bold text-dark small">{{
+                          selectedResource.title
+                        }}</span>
+                      </div>
+                      <div
+                        class="d-flex justify-content-between border-bottom py-2 text-start"
+                      >
+                        <span class="text-muted small">File Format:</span>
+                        <span class="badge bg-secondary text-uppercase small">{{
+                          selectedResource.fileUrl
+                            ?.toLowerCase()
+                            ?.endsWith(".brf")
+                            ? "BRF (ASCII Braille)"
+                            : "TXT/Text document"
+                        }}</span>
+                      </div>
+                    </div>
+
+                    <button
+                      (click)="openResourceBraille()"
+                      class="btn btn-indigo py-3 px-5 rounded-pill fw-bold text-uppercase shadow-lg d-inline-flex align-items-center gap-2"
+                    >
+                      Launch Braille Console
+                      <i class="bi bi-box-arrow-up-right"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- TAB 3: CERTIFICATE VIEW -->
+          <div
+            *ngIf="activeTab === 'certificate'"
+            class="card border-0 p-0 shadow-3d rounded-5 overflow-hidden animate-fade-in"
+          >
+            <!-- Printing Container -->
+            <div
+              class="certificate-print-wrap p-5 bg-white text-center border-5 border-double border-indigo rounded-5 position-relative m-3"
+              id="certificateBox"
+              style="border-style: double"
+            >
+              <!-- Border decorations -->
+              <div class="cert-border-decor"></div>
+
+              <div class="position-relative z-2">
+                <h5
+                  class="fw-extrabold text-indigo tracking-widest text-uppercase mb-4"
+                  style="letter-spacing: 3px"
+                >
+                  Siksha Setu Certificate
+                </h5>
+
+                <i
+                  class="bi bi-patch-check-fill text-indigo display-1 d-block mb-4"
+                ></i>
+
+                <h2
+                  class="font-serif fw-normal text-slate-800 mb-2"
+                  style="font-family: Georgia, serif"
+                >
+                  Certificate of Completion
+                </h2>
+                <p class="text-muted italic mb-5">
+                  This document successfully certifies that
+                </p>
+
+                <h1
+                  class="display-6 fw-extrabold text-dark border-bottom border-indigo border-2 d-inline-block px-5 pb-2 mb-2"
+                >
+                  {{ enrollment.user?.name || "Student" }}
+                </h1>
+
+                <p class="text-muted mt-2 mb-4">
+                  Student Disability ID:
+                  <code
+                    class="text-indigo bg-light px-2.5 py-1 rounded fw-bold"
+                    >{{ enrollment.user?.disabilityId }}</code
+                  >
+                </p>
+
+                <p class="text-muted leading-relaxed max-w-xl mx-auto mb-5">
+                  has successfully completed all requirements, active study
+                  lessons, and passed the final assessment Test for the course
+                </p>
+
+                <h3 class="fw-extrabold text-indigo mb-1">
+                  {{ courseDetails.title }}
+                </h3>
+                <p class="text-muted small mb-5">
+                  Course ID: <strong>{{ courseDetails.id }}</strong>
+                </p>
+
+                <div class="row mt-5 pt-3 align-items-end">
+                  <div class="col-md-6 text-md-start">
+                    <span class="d-block small text-muted"
+                      >ASSESSMENT GRADE:</span
+                    >
+                    <h5 class="fw-bold text-success mb-0">
+                      {{ enrollment.testPercentage || 0 | number: "1.0-0" }}%
+                      Score
+                    </h5>
+                  </div>
+                  <div class="col-md-6 text-md-end">
+                    <span class="d-block small text-muted"
+                      >VERIFICATION CODE:</span
+                    >
+                    <code class="text-dark small fw-bold">{{
+                      enrollment.certificateUrl
+                    }}</code>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Certificate actions -->
+            <div class="bg-indigo-soft p-4 d-flex justify-content-center gap-3">
+              <button
+                class="btn btn-indigo px-5 py-3 rounded-pill fw-bold shadow-sm"
+                (click)="printCertificate()"
+              >
+                <i class="bi bi-printer-fill me-1.5"></i> Print / Save
+                Certificate
+              </button>
+              <button
+                class="btn btn-outline-secondary px-4 py-3 rounded-pill fw-bold"
+                (click)="activeTab = 'resources'"
+              >
+                Back to Resources
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+  <!-- Enrollment modal overlay -->
+  <div
+    class="modal-backdrop-custom"
+    *ngIf="showEnrollModal"
+    (click)="closeEnrollModal()"
+  >
+    <div
+      class="modal-dialog-custom glass-panel shadow-3d"
+      (click)="$event.stopPropagation()"
+      style="max-width: 520px"
+    >
+      <button
+        class="modal-close-custom"
+        (click)="closeEnrollModal()"
+        aria-label="Close enroll modal"
+      >
+        &times;
+      </button>
+
+      <div class="p-4" *ngIf="courseDetails">
+        <h4 class="fw-extrabold text-indigo mb-3">
+          <i class="bi bi-person-plus-fill me-2 text-success"></i>Enroll in
+          Course
+        </h4>
+        <p class="text-muted small mb-4">
+          Choose your preferred learning format for
+          <strong>{{ courseDetails.title }}</strong> to customize your
+          accessibility views.
+        </p>
+
+        <div class="mb-4">
+          <label class="form-label fw-bold text-dark mb-3"
+            >Choose Your Preferred Learning Mode:</label
+          >
+          <div
+            class="d-flex flex-column gap-2"
+            style="max-height: 350px; overflow-y: auto; padding-right: 5px"
+          >
+            <div
+              *ngFor="let pref of preferencesList"
+              class="preference-option-card border rounded-3 p-3 d-flex align-items-center justify-content-between transition-all"
+              [class.active]="selectedPreferences[pref]"
+              [class.disabled-pref]="
+                !isFormatAvailable(pref) ||
+                (pref !== 'All Resources' &&
+                  selectedPreferences['All Resources'])
+              "
+              (click)="
+                isFormatAvailable(pref) &&
+                  !(
+                    pref !== 'All Resources' &&
+                    selectedPreferences['All Resources']
+                  ) &&
+                  togglePreference(pref)
+              "
+              style="
+                background: rgba(255, 255, 255, 0.7);
+                border-color: rgba(99, 102, 241, 0.1) !important;
+                cursor: pointer;
+              "
+            >
+              <div class="d-flex align-items-center gap-3">
+                <div
+                  class="pref-icon-circle rounded-circle p-2 bg-indigo-soft text-indigo d-grid place-items-center"
+                  style="width: 40px; height: 40px"
+                >
+                  <i
+                    class="bi"
+                    [ngClass]="{
+                      'bi-file-earmark-text-fill': pref === 'Text',
+                      'bi-play-circle-fill': pref === 'Video',
+                      'bi-volume-up-fill': pref === 'Audio',
+                      'bi-person-badge-fill': pref === 'Sign Language',
+                      'bi-grid-3x3-gap-fill': pref === 'Braille',
+                      'bi-collection-play-fill': pref === 'All Resources',
+                    }"
+                    style="font-size: 1.1rem"
+                  ></i>
+                </div>
+                <div class="text-start">
+                  <h6 class="fw-bold mb-0 text-dark" style="font-size: 0.95rem">
+                    {{ pref }}
+                    <span
+                      class="text-danger small ms-1"
+                      style="font-size: 0.7rem"
+                      *ngIf="
+                        pref !== 'All Resources' && !isFormatAvailable(pref)
+                      "
+                      >(Not available)</span
+                    >
+                  </h6>
+                  <span class="text-muted small" style="font-size: 0.75rem"
+                    >Study using {{ pref | lowercase }} materials</span
+                  >
+                </div>
+              </div>
+              <div
+                class="pref-check-circle rounded-3 border border-2 d-grid place-items-center"
+                [class.bg-indigo]="selectedPreferences[pref]"
+                [class.border-indigo]="selectedPreferences[pref]"
+                style="width: 22px; height: 22px"
+              >
+                <i
+                  class="bi bi-check-lg text-white"
+                  style="font-size: 0.8rem"
+                  *ngIf="selectedPreferences[pref]"
+                ></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex gap-2">
+          <button
+            class="btn btn-success flex-fill py-3 rounded-pill fw-bold"
+            (click)="submitEnrollment()"
+          >
+            Confirm Enrollment <i class="bi bi-check-circle-fill ms-1"></i>
+          </button>
+          <button
+            class="btn btn-outline-secondary px-4 py-3 rounded-pill fw-bold"
+            (click)="closeEnrollModal()"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Category Unlock Confirmation Modal -->
+  <div
+    class="modal-backdrop-custom"
+    *ngIf="showUnlockPromptModal"
+    (click)="closeUnlockPromptModal()"
+  >
+    <div
+      class="modal-dialog-custom glass-panel shadow-3d"
+      (click)="$event.stopPropagation()"
+      style="max-width: 460px"
+    >
+      <button
+        class="modal-close-custom"
+        (click)="closeUnlockPromptModal()"
+        aria-label="Close unlock modal"
+      >
+        &times;
+      </button>
+
+      <div class="p-4">
+        <div class="text-center mb-4">
+          <div
+            class="bg-indigo-soft text-indigo rounded-circle p-3.5 d-inline-flex mb-3"
+            style="font-size: 2rem"
+          >
+            <i class="bi bi-unlock-fill text-indigo"></i>
+          </div>
+          <h4 class="fw-extrabold text-indigo mb-2">Unlock Learning Mode?</h4>
+          <p class="text-muted small">
+            You didn't select
+            <strong>{{ getCategoryLabel(pendingUnlockCategory) }}</strong>
+            during enrollment. Would you like to enable this format and add it
+            to your study modes?
+          </p>
+        </div>
+
+        <div class="d-flex gap-2">
+          <button
+            class="btn btn-success flex-fill py-3 rounded-pill fw-bold text-white"
+            (click)="confirmUnlockCategory()"
+          >
+            Yes, Unlock <i class="bi bi-check-circle ms-1"></i>
+          </button>
+          <button
+            class="btn btn-outline-secondary px-4 py-3 rounded-pill fw-bold"
+            (click)="closeUnlockPromptModal()"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Unenroll Modal -->
+  <div
+    class="modal-backdrop-custom"
+    *ngIf="showUnenrollModal"
+    (click)="closeUnenrollModal()"
+  >
+    <div
+      class="modal-dialog-custom glass-panel shadow-3d"
+      (click)="$event.stopPropagation()"
+      style="max-width: 500px"
+    >
+      <button
+        class="modal-close-custom"
+        (click)="closeUnenrollModal()"
+        aria-label="Close unenroll modal"
+      >
+        &times;
+      </button>
+
+      <div class="p-4" *ngIf="courseDetails">
+        <div class="text-center mb-4">
+          <div
+            class="bg-danger bg-opacity-10 text-danger rounded-circle p-3 d-inline-flex mb-3"
+            style="font-size: 2rem"
+          >
+            <i class="bi bi-exclamation-triangle-fill text-danger"></i>
+          </div>
+          <h4 class="fw-extrabold text-indigo mb-2">Unenroll from Course?</h4>
+          <p class="text-muted small">
+            Are you sure you want to unenroll from
+            <strong>{{ courseDetails.title }}</strong
+            >? This will permanently delete all your progress for this course.
+          </p>
+        </div>
+
+        <div class="mb-4">
+          <label
+            for="unenrollReviewInput"
+            class="form-label fw-bold text-dark mb-2"
+            >Help us improve (Optional Review/Feedback):</label
+          >
+          <textarea
+            id="unenrollReviewInput"
+            class="form-control rounded-3 border-light p-3 small shadow-sm"
+            rows="3"
+            placeholder="Tell us why you are leaving or share your experience..."
+            [(ngModel)]="unenrollReview"
+          >
+          </textarea>
+        </div>
+
+        <div class="d-flex gap-2">
+          <button
+            class="btn btn-danger flex-fill py-3 rounded-pill fw-bold text-white"
+            (click)="submitUnenroll()"
+          >
+            Yes, Unenroll <i class="bi bi-box-arrow-right ms-1"></i>
+          </button>
+          <button
+            class="btn btn-outline-secondary px-4 py-3 rounded-pill fw-bold"
+            (click)="closeUnenrollModal()"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-braille-content-viewer
+  *ngIf="showTestBraille"
+  title="Test question and options"
+  [text]="currentTestBrailleText"
+  [contentArea]="'TEST'"
+  (closed)="closeTestBraille()"
+>
+</app-braille-content-viewer>
+
+<app-braille-content-viewer
+  *ngIf="showResourceBraille"
+  [title]="selectedResource?.title || 'Braille Mode'"
+  [resourceId]="selectedResource?.id"
+  [contentArea]="'LESSON_CONTENT'"
+  (closed)="closeResourceBraille()"
+>
+</app-braille-content-viewer>

@@ -1,36 +1,350 @@
-.card {
-  border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
+:host {
+  display: block;
+  padding: 0;
+  background: transparent;
 }
 
-.card-header {
-  background-color: #007bff;
+.student-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ===================== WELCOME BANNER ===================== */
+.student-welcome {
+  background: linear-gradient(135deg, rgba(64, 40, 127, 0.85) 0%, rgba(46, 16, 101, 0.95) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 2rem;
+  position: relative;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 20px 40px rgba(64, 40, 127, 0.2);
+  overflow: hidden;
   color: white;
-  font-size: 20px;
-  font-weight: bold;
+  border: 1px solid rgba(255,255,255,0.15);
+  padding: 3rem !important;
+  z-index: 1;
 }
 
-.btn-primary {
-  background-color: #007bff;
-  border: none;
+.student-welcome::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+  transform: rotate(45deg);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.text-indigo {
+  color: var(--primary-color);
+}
+
+/* ===================== OVERVIEW STAT CARDS ===================== */
+.overview-stat-icon {
+  transition: transform 0.3s ease;
+}
+.card:hover .overview-stat-icon {
+  transform: scale(1.1) rotate(-5deg);
+}
+
+/* ===================== ENROLLED COURSE CARD ===================== */
+.enrolled-course-card {
+  border-color: rgba(99, 102, 241, 0.12) !important;
+  transition: all 0.25s ease;
+}
+.enrolled-course-card:hover {
+  background: rgba(79, 70, 229, 0.05) !important;
+  border-color: rgba(79, 70, 229, 0.25) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.1);
+}
+
+/* ===================== ACTIVITY TRACKER - SCROLLABLE ===================== */
+.activity-scroll-container {
+  max-height: 340px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-soft) transparent;
+}
+.activity-scroll-container::-webkit-scrollbar {
+  width: 5px;
+}
+.activity-scroll-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+.activity-scroll-container::-webkit-scrollbar-thumb {
+  background: var(--primary-soft);
+  border-radius: 10px;
+}
+
+/* Activity Timeline */
+.timeline {
+  margin-top: 1rem;
+}
+.timeline .position-relative {
+  padding-bottom: 1.5rem;
+}
+.timeline .position-relative::after {
+  content: '';
+  position: absolute;
+  left: -1.5rem;
+  top: 2rem;
+  bottom: 0;
+  width: 2px;
+  background: var(--primary-soft);
+  z-index: 0;
+}
+.timeline .position-relative:last-child::after {
+  display: none;
+}
+.timeline span {
+  z-index: 1;
+  box-shadow: 0 0 0 4px var(--bg-white);
+}
+
+/* ===================== NOTIFICATIONS ===================== */
+.notif-scroll-box {
+  max-height: 420px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(99,102,241,0.2) transparent;
+}
+.notif-scroll-box::-webkit-scrollbar {
+  width: 4px;
+}
+.notif-scroll-box::-webkit-scrollbar-thumb {
+  background: rgba(99,102,241,0.2);
   border-radius: 8px;
-  transition: background-color 0.3s ease;
+}
+.notif-item {
+  transition: background 0.2s ease;
+}
+.notif-item:hover {
+  background: rgba(79, 70, 229, 0.03) !important;
+}
+.notif-unread {
+  background: rgba(99, 102, 241, 0.04) !important;
+  border-left: 3px solid var(--primary-color) !important;
+}
+.broadcast-item:hover {
+  background: rgba(245, 158, 11, 0.04) !important;
+}
+.broadcast-item.notif-unread {
+  background: rgba(245, 158, 11, 0.04) !important;
+  border-left: 3px solid #f59e0b !important;
 }
 
-.btn-primary:hover {
-  background-color: #0056b3;
+.scheme-item {
+  transition: background 0.2s ease;
+}
+.scheme-item:hover {
+  background: rgba(16, 185, 129, 0.04) !important;
+}
+.scheme-card {
+  transition: all 0.2s ease;
+  border-color: rgba(16, 185, 129, 0.15) !important;
+}
+.scheme-card:hover {
+  background: rgba(16, 185, 129, 0.06) !important;
+  border-color: rgba(16, 185, 129, 0.3) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
 }
 
-ul {
-  padding-left: 20px;
+
+/* ===================== NAV PILLS ===================== */
+.nav-pills .nav-link {
+  color: var(--text-muted);
+  background: transparent;
+  transition: all var(--transition-snappy);
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  border-radius: 1rem;
 }
 
-ul li {
-  margin-bottom: 10px;
+/* ===================== MODALS ===================== */
+.modal-backdrop-custom {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(8px);
+  z-index: 10050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-ul.list-unstyled li {
-  font-size: 16px;
-  padding: 5px 0;
+.modal-dialog-custom {
+  background: rgba(255, 255, 255, 0.98);
+  border-radius: 28px;
+  width: 90%;
+  max-width: 580px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  animation: slide-up-modal 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: var(--shadow-3d);
+}
+
+@keyframes slide-up-modal {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-close-custom {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  background: transparent;
+  border: none;
+  font-size: 2.2rem;
+  color: #64748b;
+  cursor: pointer;
+  z-index: 10060;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.modal-close-custom:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.nav-pills .nav-link:hover {
+  background: var(--primary-soft);
+  color: var(--primary-color);
+  transform: translateX(4px);
+}
+
+.nav-pills .nav-link.active {
+  background: var(--primary-color);
+  color: #fff;
+  box-shadow: 0 8px 16px var(--primary-glow);
+}
+
+/* ===================== COURSE CARDS ===================== */
+.course-card {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.course-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-float) !important;
+}
+
+.course-img-wrapper {
+  height: 180px;
+  overflow: hidden;
+}
+
+.course-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.course-card:hover .course-img {
+  transform: scale(1.06);
+}
+
+.course-overlay-gradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0) 50%, rgba(15, 23, 42, 0.45) 100%);
+}
+
+.course-badge {
+  position: absolute;
+  bottom: 15px;
+  left: 15px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+}
+
+.tts-quick-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: none;
+  color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: 10;
+}
+
+.tts-quick-btn:hover {
+  background: var(--primary-color);
+  color: #ffffff;
+  transform: scale(1.15);
+}
+
+/* Resource Icon */
+.resource-icon {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  border-radius: 1rem;
+  box-shadow: inset 0 2px 4px rgba(255,255,255,0.8);
+}
+
+/* ===================== RESPONSIVE ===================== */
+@media (max-width: 768px) {
+  .student-welcome {
+    border-radius: 1.5rem;
+    padding: 2rem !important;
+  }
+  .activity-scroll-container {
+    max-height: 260px;
+  }
+  
+  .modal-dialog-custom {
+    width: 95%;
+    border-radius: 20px;
+  }
+  
+  .modal-dialog-custom .p-4 {
+    padding: 1.25rem !important;
+  }
+
+  .modal-close-custom {
+    top: 10px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+    font-size: 1.8rem;
+  }
 }

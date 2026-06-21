@@ -1,125 +1,279 @@
-<div class="container mt-3">
-  <!-- Hero Section -->
-  <div class="hero-section text-center p-5 text-white bg-gradient bg-primary position-relative">
-    <h1 class="display-4 fw-bold mb-3">Empowering Your Educational Journey</h1>
-    <p class="fs-5 mb-4">Discover courses, track progress, and unlock endless learning opportunities.</p>
-    <button class="btn btn-warning btn-lg rounded-pill fw-semibold me-3" onclick="navigateToDashboard()">Get Started</button>
+<div class="main-container fade-in">
   
-    
-  </div>
-
-  <!-- Features Section -->
-  <div class="row text-center mb-5">
-    <div class="col-md-4 mb-4">
-      <div class="card shadow hover-effect">
-        <img src="download.jpeg" class="card-img-top" alt="Courses">
-        <div class="card-body">
-          <h3><i class="bi bi-journal-bookmark-fill me-2"></i> Courses</h3>
-          <p>Explore a wide range of curated courses designed for your success.</p>
-          <button class="btn btn-info" (click)="navigateToCourses()">View Courses</button>
-        </div>
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container animate-fade-up">
+      <div class="hero-badge">
+        <i class="bi bi-stars me-1"></i> Siksha Setu Platform
+      </div>
+      <h1 class="hero-title">
+        Education that adapts<br/>to every learner.
+      </h1>
+      <p class="hero-subtitle">
+        A premium, fully accessible learning platform engineered specifically for specially-abled students. Experience real-time voice commands, physical Braille display integration, synchronized sign language support, and interactive daily tracking all in one workspace.
+      </p>
+      <div class="d-flex justify-content-center gap-3 flex-wrap">
+        <button class="btn btn-primary rounded-pill px-5 py-3 fs-5" (click)="navigateToDashboard()">
+          Get Started <i class="bi bi-arrow-right ms-2"></i>
+        </button>
+        <button class="btn btn-light border rounded-pill px-5 py-3 fs-5 text-dark" onclick="document.getElementById('features').scrollIntoView({behavior: 'smooth'})">
+          Explore Features
+        </button>
       </div>
     </div>
+  </section>
 
-    <div class="col-md-4 mb-4">
-      <div class="card shadow hover-effect">
-        <img src="download (1).jpeg" class="card-img-top" alt="Study Resources">
-        <div class="card-body">
-          <h3><i class="bi bi-collection-play-fill me-2"></i> Study Resources</h3>
-          <p>Access text, audio, and video materials for effective learning.</p>
-          <button class="btn btn-warning" (click)="navigateToResources()">View Resources</button>
+  <div class="container">
+    <!-- Bento Box Features -->
+    <section id="features" class="pt-5 mt-4">
+      <h2 class="section-title text-center mb-5 animate-fade-up">Intelligently Designed for Accessibility.</h2>
+      
+      <div class="bento-grid">
+        
+        <!-- Large Card 1: Voice Commands -->
+        <div class="bento-card bento-card-large animate-fade-up delay-100">
+          <div class="bento-icon bg-primary bg-opacity-10 text-primary">
+            <i class="bi bi-mic-fill"></i>
+          </div>
+          <h3>Hands-Free Voice Navigation</h3>
+          <p class="mb-4">Navigate the entire platform using natural voice instructions. Simply say "Go to courses," "Open resources," or "Read page" and our built-in speech engine will guide you instantly. Zero mouse clicks required.</p>
+          <div class="streak-preview-box mt-auto d-flex align-items-center gap-3">
+            <div class="spinner-grow text-danger spinner-grow-sm" role="status"></div>
+            <span class="fw-bold text-dark">"Go to my student dashboard..."</span>
+          </div>
         </div>
-      </div>
-    </div>
 
-    <div class="col-md-4 mb-4">
-      <div class="card shadow hover-effect">
-        <img src="download (2).jpeg" class="card-img-top" alt="Analytics">
-        <div class="card-body">
-          <h3><i class="bi bi-bar-chart-fill me-2"></i> Analytics</h3>
-          <p>Monitor your learning progress with insightful analytics.</p>
-          <button class="btn btn-success" (click)="navigateToAnalytics()">View Analytics</button>
+        <!-- Small Card 1: Accessibility -->
+        <div class="bento-card bento-card-small animate-fade-up delay-200">
+          <div class="bento-icon bg-info bg-opacity-10 text-info">
+            <i class="bi bi-universal-access-circle"></i>
+          </div>
+          <h3>Full Sensory Adaptability</h3>
+          <p>High contrast modes, dyslexia-friendly typography (Lexend), large cursors, and custom text-spacing options built right into the platform core.</p>
         </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- Testimonials Section -->
-  <div class="testimonial-section bg-light p-4 rounded shadow mb-5">
-    <h2 class="text-center mb-4">What Our Learners Say</h2>
-    <div class="row">
-      <div class="col-md-4">
-        <div class="testimonial-card text-center p-3 shadow">
-          <p>"This platform has completely transformed my learning journey!"</p>
-          <h5>- Riya Sharma</h5>
+        <!-- Small Card 2: Streak Gamification -->
+        <div class="bento-card bento-card-small animate-fade-up delay-100">
+          <div class="bento-icon bg-warning bg-opacity-10 text-warning">
+            <i class="bi bi-fire"></i>
+          </div>
+          <h3>Daily Learning Streaks</h3>
+          <p>Build consistent study habits with our gamified progress tracker. Log in daily to build your streak, unlock achievement milestones, and earn visual accolades.</p>
+          <div class="mt-4 pt-2 border-top d-flex justify-content-between align-items-center">
+            <span class="fw-bold text-muted small text-uppercase">Active Streak</span>
+            <span class="fs-4 fw-bolder text-dark"><i class="bi bi-fire text-warning"></i> 12 Days</span>
+          </div>
         </div>
-      </div>
-      <div class="col-md-4">
-        <div class="testimonial-card text-center p-3 shadow">
-          <p>"The resources and support here are unmatched."</p>
-          <h5>- Aman Verma</h5>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="testimonial-card text-center p-3 shadow">
-          <p>"I achieved my goals faster thanks to the detailed courses."</p>
-          <h5>- Sneha Gupta</h5>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- Call to Action -->
-  <div class="cta-section text-center p-5 bg-primary text-white rounded mb-5">
-    <h2>Ready to Start Your Journey?</h2>
-    <p>Join thousands of learners today and unlock your full potential.</p>
-    <button class="btn btn-light px-4 py-2" (click)="navigateToDashboard()">Get Started Now</button>
+        <!-- Large Card 2: Resources -->
+        <div class="bento-card bento-card-large animate-fade-up delay-200">
+          <div class="bento-icon bg-success bg-opacity-10 text-success">
+            <i class="bi bi-journal-text"></i>
+          </div>
+          <h3>Multi-Format Academic Resources</h3>
+          <p>Access thousands of structured PDFs, localized audio recordings, tactile Braille documents, and video lessons tailored for your preferred method of comprehension.</p>
+          <div class="d-flex gap-2 mt-4 flex-wrap">
+            <span class="badge bg-light text-dark border px-3 py-2 rounded-pill"><i class="bi bi-file-earmark-pdf text-danger me-1"></i> Course Notes</span>
+            <span class="badge bg-light text-dark border px-3 py-2 rounded-pill"><i class="bi bi-play-circle text-primary me-1"></i> Video Lectures</span>
+            <span class="badge bg-light text-dark border px-3 py-2 rounded-pill"><i class="bi bi-volume-up text-success me-1"></i> Audio Guides</span>
+            <span class="badge bg-light text-dark border px-3 py-2 rounded-pill"><i class="bi bi-grid-3x3 text-dark me-1"></i> Braille Displays</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Cutting-Edge Accessibility Features -->
+    <section class="py-5 my-4">
+      <div class="text-center mb-5 animate-fade-up">
+        <h2 class="section-title">A Comprehensive Ecosystem</h2>
+        <p class="fs-5 text-muted">Leveraging assistive technologies so disability is never a barrier to quality education.</p>
+      </div>
+      <div class="row g-4">
+        <!-- Braille Support -->
+        <div class="col-md-6 col-lg-3 animate-fade-up delay-100">
+          <div class="card h-100 border-0 shadow-sm rounded-4 p-4 text-center hover-effect">
+            <div class="display-4 text-indigo mb-3"><i class="bi bi-grid-3x3-gap-fill"></i></div>
+            <h5 class="fw-bold">Braille Display Support</h5>
+            <p class="text-muted small mb-0">Integrate with refreshable physical or virtual Braille pins, translating text blocks to tactile cell layouts in real-time.</p>
+          </div>
+        </div>
+        <!-- Voice Navigation -->
+        <div class="col-md-6 col-lg-3 animate-fade-up delay-200">
+          <div class="card h-100 border-0 shadow-sm rounded-4 p-4 text-center hover-effect">
+            <div class="display-4 text-danger mb-3"><i class="bi bi-mic-fill"></i></div>
+            <h5 class="fw-bold">Voice Command Engine</h5>
+            <p class="text-muted small mb-0">Navigate screens, start chapters, and interact with menus using natural conversational voice control.</p>
+          </div>
+        </div>
+        <!-- Built-in Screen Reader -->
+        <div class="col-md-6 col-lg-3 animate-fade-up delay-300">
+          <div class="card h-100 border-0 shadow-sm rounded-4 p-4 text-center hover-effect">
+            <div class="display-4 text-success mb-3"><i class="bi bi-volume-up-fill"></i></div>
+            <h5 class="fw-bold">Interactive Audio Reading</h5>
+            <p class="text-muted small mb-0">No external screen reader required. Native context announcement reads course texts and options aloud.</p>
+          </div>
+        </div>
+        <!-- Accessibility Widget -->
+        <div class="col-md-6 col-lg-3 animate-fade-up delay-400">
+          <div class="card h-100 border-0 shadow-sm rounded-4 p-4 text-center hover-effect">
+            <div class="display-4 text-warning mb-3"><i class="bi bi-palette-fill"></i></div>
+            <h5 class="fw-bold">Dyslexia & Focus Tools</h5>
+            <p class="text-muted small mb-0">Instantly switch contrast profiles, dyslexia fonts, large pointers, and focus line overlays using our overlay widget.</p>
+          </div>
+        </div>
+
+        <!-- Row 2 of features to ensure all requirements are addressed -->
+        <!-- Sign Language Support -->
+        <div class="col-md-6 col-lg-3 animate-fade-up delay-100">
+          <div class="card h-100 border-0 shadow-sm rounded-4 p-4 text-center hover-effect">
+            <div class="display-4 text-primary mb-3"><i class="bi bi-body-text"></i></div>
+            <h5 class="fw-bold">Sign Language Sync</h5>
+            <p class="text-muted small mb-0">Video tutorials with side-by-side sign language translations and closed captions for deaf or hard-of-hearing learners.</p>
+          </div>
+        </div>
+        <!-- Government Schemes -->
+        <div class="col-md-6 col-lg-3 animate-fade-up delay-200">
+          <div class="card h-100 border-0 shadow-sm rounded-4 p-4 text-center hover-effect">
+            <div class="display-4 text-info mb-3"><i class="bi bi-shield-check"></i></div>
+            <h5 class="fw-bold">Government Scheme Helper</h5>
+            <p class="text-muted small mb-0">Access verification, detail tracking, and simplified application portals for active disabled education schemes.</p>
+          </div>
+        </div>
+        <!-- Course Management -->
+        <div class="col-md-6 col-lg-3 animate-fade-up delay-300">
+          <div class="card h-100 border-0 shadow-sm rounded-4 p-4 text-center hover-effect">
+            <div class="display-4 text-dark mb-3"><i class="bi bi-card-checklist"></i></div>
+            <h5 class="fw-bold">Course Management</h5>
+            <p class="text-muted small mb-0">Organized structures to manage enrolled classes, lesson updates, practice materials, and overall completion timelines.</p>
+          </div>
+        </div>
+        <!-- Certification System -->
+        <div class="col-md-6 col-lg-3 animate-fade-up delay-400">
+          <div class="card h-100 border-0 shadow-sm rounded-4 p-4 text-center hover-effect">
+            <div class="display-4 text-success mb-3"><i class="bi bi-patch-check-fill"></i></div>
+            <h5 class="fw-bold">Certification System</h5>
+            <p class="text-muted small mb-0">Earn verifiable completion certificates and accessibility achievements after passing integrated tests.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Why Us / Journey Section -->
+    <section class="py-5 my-5">
+      <div class="row align-items-center g-5">
+        <div class="col-lg-6 animate-fade-up delay-100">
+          <h2 class="section-title mb-4">Our Mission & Approach</h2>
+          <p class="fs-5 text-muted mb-4">Standard e-learning suites frequently fail to accommodate sensory differences. We engineered Siksha Setu to offer a barrier-free digital classroom using modern web standards.</p>
+          
+          <div class="journey-line mt-5">
+            <div class="journey-item">
+              <div class="journey-dot"></div>
+              <h5 class="fw-bold">The Challenge</h5>
+              <p class="text-muted">A lack of standardized assistive frameworks in modern e-learning ecosystems.</p>
+            </div>
+            <div class="journey-item">
+              <div class="journey-dot" style="background: var(--secondary);"></div>
+              <h5 class="fw-bold">The Innovation</h5>
+              <p class="text-muted">A unified platform combining text-to-speech, voice command listeners, Lexend fonts, and real-time tactile translator components.</p>
+            </div>
+            <div class="journey-item mb-0">
+              <div class="journey-dot" style="background: var(--success);"></div>
+              <h5 class="fw-bold">The Impact</h5>
+              <p class="text-muted">Enabling students of all sensory profiles to study, take tests, and track accomplishments independently.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6 animate-fade-up delay-200">
+          <div class="card border-0 shadow-lg rounded-4 overflow-hidden" style="background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%); color: white;">
+            <div class="card-body p-5">
+              <h3 class="fw-bold mb-4">Why Choose Siksha Setu?</h3>
+              <ul class="list-unstyled mb-0 fs-5">
+                <li class="mb-4 d-flex"><i class="bi bi-check-circle-fill text-warning me-3 mt-1"></i> Native Text-To-Speech engine without requiring external screen readers.</li>
+                <li class="mb-4 d-flex"><i class="bi bi-check-circle-fill text-warning me-3 mt-1"></i> Content format adaptations including Text, Audio descriptions, and Sign language.</li>
+                <li class="d-flex"><i class="bi bi-check-circle-fill text-warning me-3 mt-1"></i> Premium, distraction-free interface matching top modern SaaS standards.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Course Showcase -->
+    <section class="py-5 text-center">
+      <h2 class="section-title mb-3 animate-fade-up">Ready to start learning?</h2>
+      <p class="text-muted fs-5 mb-5 animate-fade-up delay-100">Explore our catalog of inclusive courses. Log in to enroll and track your streak.</p>
+      
+      <div class="row g-4 text-start">
+        <div class="col-md-6 col-lg-4 animate-fade-up" *ngFor="let course of courses; let i = index" [style.animationDelay]="(i * 100) + 'ms'">
+          <div class="card course-card hover-effect h-100 border-0 rounded-4 overflow-hidden position-relative d-flex flex-column">
+            <div class="course-img-wrapper position-relative">
+              <img [src]="course.image || 'assets/default-course.png'" class="card-img-top course-img" alt="{{ course.title }}">
+              <div class="course-overlay-gradient"></div>
+              <span class="badge course-badge bg-primary text-white text-uppercase fw-bold shadow">{{ course.category }}</span>
+            </div>
+
+            <div class="card-body p-4 d-flex flex-column flex-grow-1">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="text-muted small fw-bold"><i class="bi bi-clock me-1"></i>{{ course.duration || '2 Weeks' }}</span>
+                <span class="text-muted small fw-bold"><i class="bi bi-book me-1"></i>{{ course.lessons || 5 }} Chapters</span>
+              </div>
+
+              <h3 class="fw-extrabold text-indigo mb-2 fs-5">{{ course.title || course.name }}</h3>
+              <p class="text-muted small flex-grow-1 leading-relaxed">{{ course.description || 'Learn the fundamentals and advanced topics in this comprehensive course.' }}</p>
+
+              <div class="d-flex align-items-center gap-2 mt-3 pt-3 border-top border-light">
+                <button class="btn btn-success flex-fill py-2.5 rounded-pill fw-bold" (click)="promptLogin(course.id)">
+                  Enroll Now <i class="bi bi-person-check-fill ms-1"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div *ngIf="courses.length === 0" class="col-12 text-center py-5">
+          <div class="spinner-border text-primary" role="status"></div>
+          <p class="text-muted mt-3 fw-bold">Loading available courses...</p>
+        </div>
+      </div>
+    </section>
   </div>
 
   <!-- Footer -->
-  <footer class="bg-dark text-white text-center p-4 mt-5">
-    <div class="row">
-      <!-- Quick Links Section -->
-      <div class="col-md-4 mb-3">
-        <h5>Quick Links</h5>
-        <ul class="list-unstyled">
-          <li><a href="#" class="text-white text-decoration-none">Home</a></li>
-          <li><a href="#" class="text-white text-decoration-none">Courses</a></li>
-          <li><a href="#" class="text-white text-decoration-none">Contact Us</a></li>
-          <li><a href="#" class="text-white text-decoration-none">Privacy Policy</a></li>
-        </ul>
+  <footer class="modern-footer text-white">
+    <div class="container">
+      <div class="row g-5">
+        <div class="col-md-5">
+          <h4 class="fw-extrabold mb-3 text-white">Siksha Setu</h4>
+          <p class="text-white opacity-75 fw-semibold mb-4 pe-md-5 fs-5">
+            Empowering specially-abled learners through modern, accessible, and beautifully designed assistive technology. Bridging education for everyone.
+          </p>
+        </div>
+        <div class="col-md-3">
+          <h6 class="fw-bold text-white mb-4 text-uppercase tracking-wider">Contact Us</h6>
+          <a href="mailto:piyushagarwal352006@gmail.com" class="footer-link text-white fw-semibold mb-2 d-block text-decoration-none"><i class="bi bi-envelope me-2"></i>piyushagarwal352006&#64;gmail.com</a>
+          <a href="tel:+919897673276" class="footer-link text-white fw-semibold mb-2 d-block text-decoration-none"><i class="bi bi-telephone me-2"></i>+91 9897673276</a>
+          <p class="text-white opacity-75 fw-semibold mt-3"><i class="bi bi-geo-alt me-2"></i>Agra, UP, India</p>
+        </div>
+        <div class="col-md-3">
+          <h6 class="fw-bold text-white mb-4 text-uppercase tracking-wider">Quick Links</h6>
+          <a routerLink="/dashboard/about" class="footer-link text-white fw-semibold mb-2 d-block text-decoration-none">About Us</a>
+          <a routerLink="/dashboard/courses" class="footer-link text-white fw-semibold mb-2 d-block text-decoration-none">Available Courses</a>
+          <a routerLink="/dashboard/contact" class="footer-link text-white fw-semibold mb-2 d-block text-decoration-none">FAQ & Contact Support</a>
+          <a routerLink="/dashboard/contact" class="footer-link text-white fw-semibold mb-2 d-block text-decoration-none">Accessibility Statement</a>
+        </div>
+        <div class="col-md-2">
+          <h6 class="fw-bold text-white mb-4 text-uppercase tracking-wider">Follow Us</h6>
+          <div class="d-flex gap-3">
+            <a href="#" class="btn btn-light text-primary btn-sm rounded-circle"><i class="bi bi-twitter"></i></a>
+            <a href="https://www.linkedin.com/in/piyush-agarwal-930ba5327" target="_blank" class="btn btn-light text-primary btn-sm rounded-circle"><i class="bi bi-linkedin"></i></a>
+            <a href="https://www.instagram.com/agarwal_xx_path_?igsh=NDdlYmNuMGZrZXU1" target="_blank" class="btn btn-light text-primary btn-sm rounded-circle"><i class="bi bi-instagram"></i></a>
+          </div>
+        </div>
       </div>
-  
-      <!-- Contact Information Section -->
-      <div class="col-md-4 mb-3">
-        <h5>Contact Us</h5>
-        <p>Email: <a href="mailto:support@educativeplatform.com" class="text-white">piyushagarwal352006&#64;gmail.com</a></p>
-        <p>Phone: <a href="tel:+919876543210" class="text-white">+91 9897673276</a></p>
-        <p>Address: New Adarsh Nagar, Balkeshwar Agra, Uttar Pradesh – 282004, India</p>
+      <div class="text-center pt-4 mt-5 border-top border-light border-opacity-25 text-white opacity-75 fw-semibold">
+        &copy; 2026 Siksha Setu. Designed for accessibility and educational excellence. All rights reserved.
       </div>
-  
-      <!-- Social Media Links Section -->
-      <div class="col-md-4 mb-3">
-        <h5>Follow Us</h5>
-        <a href="https://www.facebook.com/share/1XdnA44ewf/" class="text-white me-3">
-          <i class="bi bi-facebook"></i> Facebook
-        </a><br>
-        <a href="#" class="text-white me-3">
-          <i class="bi bi-twitter"></i> Twitter
-        </a><br>
-        <a href="https://www.instagram.com/agarwal_xx_path_?igsh=NDdlYmNuMGZrZXU1" class="text-white me-3">
-          <i class="bi bi-instagram"></i> Instagram
-        </a><br>
-        <a href="https://www.linkedin.com/in/piyush-agarwal-930ba5327?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" class="text-white">
-          <i class="bi bi-linkedin"></i> LinkedIn
-        </a>
-      </div>
-    </div>
-  
-    <div class="text-center pt-3 border-top mt-3">
-      <p>&copy; 2025 Educative Platform. All Rights Reserved.</p>
     </div>
   </footer>
-
-  
 </div>

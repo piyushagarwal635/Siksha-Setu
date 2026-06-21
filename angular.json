@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "MY-Angular-App": {
+    "SikshaSetu": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/my-angular-app",
+            "outputPath": "dist/SikshaSetu",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -43,13 +43,13 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+                  "maximumWarning": "2MB",
+                  "maximumError": "3MB"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
-                  "maximumError": "8kB"
+                  "maximumWarning": "30kB",
+                  "maximumError": "50kB"
                 }
               ],
               "outputHashing": "all"
@@ -69,10 +69,10 @@
           },
           "configurations": {
             "production": {
-              "buildTarget": "MY-Angular-App:build:production"
+              "buildTarget": "SikshaSetu:build:production"
             },
             "development": {
-              "buildTarget": "MY-Angular-App:build:development"
+              "buildTarget": "SikshaSetu:build:development"
             }
           },
           "defaultConfiguration": "development"

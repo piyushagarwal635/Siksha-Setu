@@ -1,0 +1,52 @@
+<main class="testing-page">
+  <header>
+    <div>
+      <a routerLink="/dashboard/main" aria-label="Return to dashboard"><i class="bi bi-arrow-left"></i></a>
+      <div>
+        <p>Braille engineering lab</p>
+        <h1>Translation & hardware testing</h1>
+      </div>
+    </div>
+    <div class="dot-selector">
+      <button type="button" [class.active]="dotMode === 6" (click)="setDotMode(6)">6-dot</button>
+      <button type="button" [class.active]="dotMode === 8" (click)="setDotMode(8)">8-dot</button>
+    </div>
+  </header>
+
+  <section class="hardware-status" aria-live="polite">
+    <span [class.connected]="hardwareStatus.state === 'connected'"></span>
+    <div>
+      <strong>{{ hardwareStatus.state === 'connected' ? hardwareStatus.deviceName : 'Virtual emulator active' }}</strong>
+      <p>{{ hardwareStatus.message }}</p>
+    </div>
+    <button type="button" (click)="connectUsb()" *ngIf="hardwareStatus.state !== 'connected'">Test USB</button>
+    <button type="button" (click)="connectBluetooth()" *ngIf="hardwareStatus.state !== 'connected'">Test Bluetooth</button>
+  </section>
+
+  <section class="input-card">
+    <label for="braille-test-text">Educational text</label>
+    <textarea id="braille-test-text" [(ngModel)]="text" (ngModelChange)="translate()" rows="3"
+              maxlength="5000"></textarea>
+    <div class="examples" aria-label="Test examples">
+      <button type="button" *ngFor="let example of examples" (click)="useExample(example)">{{ example }}</button>
+    </div>
+  </section>
+
+  <div *ngIf="error" class="error" role="alert">{{ error }}</div>
+
+  <section class="results" [attr.aria-busy]="isTranslating">
+    <article>
+      <p>Original text</p>
+      <div class="original" tabindex="0">{{ text }}</div>
+    </article>
+    <article>
+      <p>Liblouis translation</p>
+      <div class="translation" tabindex="0">{{ translation?.braille || 'Waiting for translation…' }}</div>
+    </article>
+    <article class="pin-output">
+      <p>3D pin output</p>
+      <app-braille-3d-display [cells]="translation?.cells || []" [dotMode]="dotMode" [maxCells]="20">
+      </app-braille-3d-display>
+    </article>
+  </section>
+</main>

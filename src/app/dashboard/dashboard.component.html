@@ -1,64 +1,162 @@
+<div class="app-wrapper fade-in">
+<a href="#main-content" class="skip-to-content-btn" (click)="skipToContent($event)">Skip to main content</a>
 <nav class="navbar">
     <div class="nav-left">
-        <img src="WhatsApp Image 2025-02-01 at 13.33.00_14d0087d.jpg" alt="Profile Picture">
-        <span class=" fst-italic">&nbsp;&nbsp;Siksha Setu</span>
-    </div>
-    <div class="nav-center">
-      <a (click)="about()">About</a>
-      <a (click)="resources()">Resources</a>
-      <a (click)="cources()">Courses</a>
-      <a (click)="contact()">Contact</a>
+        <button class="mobile-toggle sidebar-toggle d-lg-none border-0 bg-transparent me-2" (click)="toggleSidebar()" aria-label="Toggle sidebar navigation" [attr.aria-expanded]="sidebarOpen">
+          <i class="bi bi-list fs-3 text-dark"></i>
+        </button>
+        <img src="WhatsApp Image 2025-02-01 at 13.33.00_14d0087d.jpg" alt="Siksha Setu Logo">
+        <span class="brand-text">Siksha Setu</span>
+        <!-- Navigation Links (Hidden for ADMIN) -->
+        <div class="nav-center d-none d-lg-flex" [class.open]="topMenuOpen" *ngIf="userRole !== 'ADMIN'">
+            <a routerLink="/dashboard/main" routerLinkActive="active" (click)="toggleTopMenu()">Home</a>
+            <a routerLink="/dashboard/courses" routerLinkActive="active" (click)="toggleTopMenu()">Courses</a>
+            <a routerLink="/dashboard/about" routerLinkActive="active" (click)="toggleTopMenu()">About</a>
+            <a routerLink="/dashboard/contact" routerLinkActive="active" (click)="toggleTopMenu()">Contact Support</a>
+        </div>
     </div>
     <div class="nav-right">
-      <div class="search">
-        <input type="text" placeholder="Search...">
-        <button><i class="bi bi-search"></i></button>
-      </div>
-      <div>
-        <div class="position-relative d-inline-block">
-          <div class="avatar-button" (click)="toggleMenu()">
-            <img
-              [src]="profileImage || defaultAvatar"
-              alt="User Avatar"
-              class="rounded-circle"
-              style="width: 40px; height: 40px; cursor: pointer;"
-            />
-          </div>
+      <div class="search position-relative">
+        <input type="text" placeholder="Search courses, resources, schemes..." [(ngModel)]="searchQuery" (input)="onSearchInput()" class="form-control rounded-pill" aria-label="Search courses, resources, and schemes">
+        <button class="border-0 bg-transparent position-absolute end-0 top-50 translate-middle-y me-2" style="z-index: 5;" aria-label="Submit search"><i class="bi bi-search text-muted"></i></button>
         
+        <!-- Premium Search Dropdown Suggestion Overlay -->
+        <div *ngIf="showSearchDropdown" class="search-dropdown-overlay glass-panel shadow-lg p-3 rounded-4 position-absolute mt-2 border" style="right: 0; min-width: 320px; z-index: 1050; max-height: 400px; overflow-y: auto; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); top: 100%;">
+          <div *ngIf="isSearchLoading" class="text-center py-3 text-muted">
+            <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+            <span class="ms-2 small">Searching...</span>
+          </div>
+          <div *ngIf="!isSearchLoading && isSearchResultsEmpty()" class="text-center py-3 text-muted small">
+            <i class="bi bi-search fs-4 mb-2 d-block text-secondary"></i>
+            No results found.
+          </div>
           
-          <div *ngIf="menuOpen" class="dropdown-menu show mt-2 position-absolute shadow p-3 bg-white rounded" style="min-width: 14rem; right: 0;">
-            <p class="fw-bold mb-1">User Name: {{ userName }}</p>
-            <p class="text-muted small mb-2">Disability Id: {{ disabilityId }}</p>
-            
-            
-            <hr/>
-            <label class="text-primary d-block mb-2 cursor-pointer">
-              <i class="bi bi-camera"></i> Change Profile Picture
-              <input type="file" (change)="onFileSelected($event)" hidden />
-            </label>
-            
-            <div *ngIf="profileImage" class="mb-2 text-center">
-              <img [src]="profileImage" alt="Profile Preview" class="rounded-circle border" width="80" height="80" />
-              <button class="btn btn-outline-danger btn-sm mt-2" (click)="removeProfileImage()">Remove</button>
+          <div *ngIf="!isSearchLoading && !isSearchResultsEmpty()">
+            <!-- Courses Matched -->
+            <div *ngIf="searchGroupedResults.courses?.length > 0" class="search-category-group mb-3">
+              <h6 class="text-uppercase text-primary fw-bold mb-2 small" style="font-size: 0.75rem;"><i class="bi bi-play-circle-fill me-1"></i> Courses</h6>
+              <div class="list-group list-group-flush">
+                <a *ngFor="let course of searchGroupedResults.courses" (click)="selectSearchItem('course', course)" (keyup.enter)="selectSearchItem('course', course)" tabindex="0" class="list-group-item list-group-item-action border-0 px-2 py-1.5 rounded-3 d-flex justify-content-between align-items-center cursor-pointer bg-transparent hover-light">
+                  <div class="text-start">
+                    <span class="fw-bold d-block text-dark small">{{ course.title }}</span>
+                    <span class="text-muted extra-small" style="font-size: 0.7rem;">{{ course.category }} | {{ course.difficulty }}</span>
+                  </div>
+                  <i class="bi bi-chevron-right text-muted small"></i>
+                </a>
+              </div>
             </div>
-            
-            <hr/>
-            <button class="btn btn-danger w-100" (click)="logout()">
-              <i class="bi bi-box-arrow-right"></i> Logout
-            </button>
+
+            <!-- Resources Matched -->
+            <div *ngIf="searchGroupedResults.resources?.length > 0" class="search-category-group mb-3">
+              <h6 class="text-uppercase text-info fw-bold mb-2 small" style="font-size: 0.75rem;"><i class="bi bi-file-earmark-text-fill me-1"></i> Resources</h6>
+              <div class="list-group list-group-flush">
+                <a *ngFor="let res of searchGroupedResults.resources" (click)="selectSearchItem('resource', res)" (keyup.enter)="selectSearchItem('resource', res)" tabindex="0" class="list-group-item list-group-item-action border-0 px-2 py-1.5 rounded-3 d-flex justify-content-between align-items-center cursor-pointer bg-transparent hover-light">
+                  <div class="text-start">
+                    <span class="fw-bold d-block text-dark small">{{ res.title }}</span>
+                    <span class="text-muted extra-small" style="font-size: 0.7rem;">{{ res.format }} format</span>
+                  </div>
+                  <i class="bi bi-chevron-right text-muted small"></i>
+                </a>
+              </div>
+            </div>
+
+            <!-- Schemes Matched -->
+            <div *ngIf="searchGroupedResults.schemes?.length > 0" class="search-category-group mb-3">
+              <h6 class="text-uppercase text-success fw-bold mb-2 small" style="font-size: 0.75rem;"><i class="bi bi-shield-fill-check me-1"></i> Govt Schemes</h6>
+              <div class="list-group list-group-flush">
+                <a *ngFor="let scheme of searchGroupedResults.schemes" (click)="selectSearchItem('scheme', scheme)" (keyup.enter)="selectSearchItem('scheme', scheme)" tabindex="0" class="list-group-item list-group-item-action border-0 px-2 py-1.5 rounded-3 d-flex justify-content-between align-items-center cursor-pointer bg-transparent hover-light">
+                  <div class="text-start">
+                    <span class="fw-bold d-block text-dark small">{{ scheme.title }}</span>
+                    <span class="text-muted extra-small" style="font-size: 0.7rem;">{{ scheme.summary | slice:0:40 }}...</span>
+                  </div>
+                  <i class="bi bi-box-arrow-up-right text-muted small"></i>
+                </a>
+              </div>
+            </div>
+
+            <!-- Notifications Matched -->
+            <div *ngIf="searchGroupedResults.notifications?.length > 0" class="search-category-group">
+              <h6 class="text-uppercase text-warning fw-bold mb-2 small" style="font-size: 0.75rem;"><i class="bi bi-bell-fill me-1"></i> Notifications</h6>
+              <div class="list-group list-group-flush">
+                <a *ngFor="let notif of searchGroupedResults.notifications" (click)="selectSearchItem('notification', notif)" (keyup.enter)="selectSearchItem('notification', notif)" tabindex="0" class="list-group-item list-group-item-action border-0 px-2 py-1.5 rounded-3 d-flex justify-content-between align-items-center cursor-pointer bg-transparent hover-light">
+                  <div class="text-start">
+                    <span class="fw-bold d-block text-dark small">{{ notif.message }}</span>
+                    <span class="text-muted extra-small" style="font-size: 0.7rem;">{{ notif.createdAt | date:'shortDate' }}</span>
+                  </div>
+                  <i class="bi bi-bell text-muted small"></i>
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div> 
+      <div class="d-flex align-items-center gap-3">
+        <button class="btn btn-light rounded-pill shadow-sm fw-bold px-3 d-flex align-items-center gap-1" *ngIf="isLoggedIn && userRole === 'STUDENT'" (click)="goToStreak()" title="My Streak" [attr.aria-label]="'My Streak, current count is ' + currentStreak + ' days'">
+          <i class="bi bi-fire text-warning fs-5"></i>
+          <span class="text-dark">{{ currentStreak }}</span>
+        </button>
+        <div class="position-relative d-inline-block" *ngIf="isLoggedIn">
+          <button class="avatar-button border-0 bg-transparent p-0 rounded-circle" (click)="toggleMenu()" title="My Profile" aria-label="Profile options dropdown" [attr.aria-expanded]="menuOpen">
+            <img
+              [src]="profileImage || defaultAvatar"
+              alt="User Avatar"
+              class="rounded-circle shadow-sm border border-2 border-primary"
+              style="width: 42px; height: 42px; cursor: pointer; object-fit: cover;"
+            />
+          </button>
+        
+          <div *ngIf="menuOpen" class="dropdown-menu show mt-3 position-absolute border-0" style="min-width: 16rem; right: 0; box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important; border-radius: 20px;">
+            <div class="px-3 py-2 text-center border-bottom mb-2">
+              <img [src]="profileImage || defaultAvatar" class="rounded-circle mb-2 border shadow-sm" style="width: 50px; height: 50px; object-fit: cover;" />
+              <h6 class="fw-bold mb-0 text-dark">{{ userName }}</h6>
+              <span class="badge bg-light text-secondary border mt-1">ID: {{ disabilityId }}</span>
+            </div>
+            
+            <div class="px-2">
+              <button class="btn btn-light w-100 text-start fw-semibold mb-2 py-2 px-3 border-0 rounded-3 text-dark d-flex align-items-center" (click)="goToProfile()">
+                <i class="bi bi-person-fill text-primary me-2 fs-5"></i> My Profile
+              </button>
+              
+              <label class="btn btn-light w-100 text-start fw-semibold mb-2 py-2 px-3 border-0 rounded-3 text-dark d-flex align-items-center cursor-pointer m-0">
+                <i class="bi bi-camera-fill text-info me-2 fs-5"></i> Update Photo
+                <input type="file" (change)="onFileSelected($event)" hidden />
+              </label>
+              
+              <div *ngIf="profileImage && profileImage !== defaultAvatar" class="d-flex gap-2 mb-2">
+                <button class="btn btn-light w-100 text-start fw-semibold py-2 px-3 border-0 rounded-3 text-danger d-flex align-items-center" (click)="removeProfileImage()">
+                  <i class="bi bi-trash-fill me-2 fs-5"></i> Remove Photo
+                </button>
+              </div>
+            </div>
+            
+            <hr class="my-2 border-light" />
+            
+            <div class="px-2 pb-1">
+              <button class="btn btn-danger w-100 text-center fw-bold py-2 rounded-pill shadow-sm mt-1" (click)="logout()">
+                <i class="bi bi-box-arrow-right me-1"></i> Sign Out
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="!isLoggedIn">
+          <button class="btn btn-primary text-white rounded-pill fw-bold px-4 shadow-sm" (click)="openLoginModal()">Login / Sign Up</button>
+        </div>
+      </div>
+        <button class="mobile-toggle nav-toggle d-lg-none border-0 bg-transparent ms-2" (click)="toggleTopMenu()" aria-label="Toggle main menu" [attr.aria-expanded]="topMenuOpen">
+          <i class="bi bi-three-dots-vertical fs-3 text-dark"></i>
+        </button>
+      </div>
 </nav>
 
 <div class="main-layout">
-  <div class="sidebar">
+  <!-- Mobile Overlay Mask -->
+  <div class="sidebar-overlay d-lg-none" *ngIf="sidebarOpen" (click)="toggleSidebar()"></div>
+  <div class="sidebar" [class.open]="sidebarOpen" *ngIf="isLoggedIn">
     <h2 class="sidebar-title">Navigation</h2>
-    <button routerLink="main" class="sidebar-btn">Home</button>
-    <button routerLink="/dashboard/studentdashboard" class="sidebar-btn" >Student Dashboard</button>
-    <button routerLink="/dashboard/admindashboard" class="sidebar-btn" >Admin Dashboard</button>
-    <button routerLink="/dashboard/educatordashboard" class="sidebar-btn" >Educator Dashboard</button>
+    <button routerLink="main" class="sidebar-btn" *ngIf="!isLoggedIn">Home</button>
+    <button routerLink="/dashboard/studentdashboard" class="sidebar-btn" *ngIf="isLoggedIn && userRole === 'STUDENT'">Student Dashboard</button>
+    <button routerLink="/dashboard/admindashboard" class="sidebar-btn" *ngIf="isLoggedIn && userRole === 'ADMIN'">Admin Dashboard</button>
 
     <mat-accordion class="info-accordion">
       <mat-expansion-panel>
@@ -74,19 +172,33 @@
         <mat-expansion-panel-header>
           <mat-panel-title><i class="bi bi-question-circle"></i>&nbsp;&nbsp;FAQs</mat-panel-title>
         </mat-expansion-panel-header>
-        <p>How to register for a course?</p>
-        <p>What are the upcoming events?</p>
+        <div class="small-faq-item mb-2" style="font-size: 0.8rem; line-height: 1.35;" tabindex="0" aria-label="FAQ. Question: How to register? Answer: Go to Login to Sign Up. Once registered, visit the Courses page to enroll.">
+          <strong class="text-dark d-block mb-0.5">How to register?</strong>
+          <span class="text-muted">Go to Login -> Sign Up. Once registered, visit the Courses page to enroll.</span>
+        </div>
+        <div class="small-faq-item mb-2" style="font-size: 0.8rem; line-height: 1.35;" tabindex="0" aria-label="FAQ. Question: How does Braille View work? Answer: In the course reader, toggle Braille View to display text translated to 6-dot tactile codes in real-time.">
+          <strong class="text-dark d-block mb-0.5">How does Braille View work?</strong>
+          <span class="text-muted">In the course reader, toggle "Braille View" to display text translated to 6-dot tactile codes in real-time.</span>
+        </div>
+        <div class="small-faq-item mb-2" style="font-size: 0.8rem; line-height: 1.35;" tabindex="0" aria-label="FAQ. Question: What is the Streak system? Answer: Log in daily to complete active lessons, build your streak, and unlock special achievements.">
+          <strong class="text-dark d-block mb-0.5">What is the Streak system?</strong>
+          <span class="text-muted">Log in daily to complete active lessons, build your streak, and unlock special achievements.</span>
+        </div>
+        <div class="small-faq-item mb-2" style="font-size: 0.8rem; line-height: 1.35;" tabindex="0" aria-label="FAQ. Question: Where are my certificates? Answer: Passing course evaluation tests with 60% plus automatically generates a download link under Certificates.">
+          <strong class="text-dark d-block mb-0.5">Where are my certificates?</strong>
+          <span class="text-muted">Passing course evaluation tests with 60%+ automatically generates a download link under Certificates.</span>
+        </div>
+        <p class="mt-2 pt-2 border-top text-center mb-0" style="font-size: 0.8rem;"><a routerLink="/dashboard/contact" class="text-indigo fw-bold text-decoration-none">View Full FAQ Support Desk <i class="bi bi-arrow-right"></i></a></p>
       </mat-expansion-panel>
     </mat-accordion>
   </div>
 
-  <div class="content">
+  <div class="content" id="main-content" tabindex="-1">
     <router-outlet></router-outlet>
   </div>
-  <div class="chatbot-icon" (click)="toggleChatbot()" title="Open Chatbot">
-    💬
-  </div>
-  <div class="chatbot-text">Ai Chat</div>
+  <button class="chatbot-icon border-0" (click)="toggleChatbot()" title="Open AI Assistant" aria-label="Open AI Assistant Chatbot" [attr.aria-expanded]="showChatbot">
+    <i class="bi bi-robot"></i>
+  </button>
   <div class="chatbot-popup" *ngIf="showChatbot">
     <iframe 
       src="https://cdn.botpress.cloud/webchat/v2.2/shareable.html?configUrl=https://files.bpcontent.cloud/2025/02/02/07/20250202073519-TKZMWKTW.json" 
@@ -97,8 +209,41 @@
       title="chatbot">
     </iframe>
   </div>
-
 </div>
+
 <div *ngIf="showWarning" class="warning-overlay">
   <p>Please open as a desktop site.</p>
+</div>
+
+<!-- Login Modal Overlay -->
+<div class="login-modal-backdrop" *ngIf="showLoginModal" (click)="closeLoginModal()"></div>
+<div class="login-modal shadow-3d" *ngIf="showLoginModal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <button class="login-modal-close" (click)="closeLoginModal()" aria-label="Close Login Modal">
+    <i class="bi bi-x-lg"></i>
+  </button>
+  <div class="login-modal-body">
+    <app-login [isModal]="true" (loginSuccess)="onLoginSuccess($event)"></app-login>
+  </div>
+</div>
+
+<!-- PREMIUM CONFIRMATION MODAL -->
+<div class="modal-overlay" *ngIf="showConfirmModal">
+  <div class="modal-container glass-panel shadow-3d confirm-modal" style="max-width: 450px;">
+    <div class="modal-header border-0 pb-0">
+      <h4 class="fw-extrabold text-indigo m-0 d-flex align-items-center gap-2">
+        <i class="bi bi-question-circle-fill text-warning fs-4"></i>
+        {{ confirmTitle }}
+      </h4>
+      <button class="close-btn" (click)="onConfirmCancel()">&times;</button>
+    </div>
+    <div class="modal-body py-3">
+      <p class="text-muted m-0" style="font-size: 0.95rem; line-height: 1.5;">{{ confirmMessage }}</p>
+    </div>
+    <div class="modal-footer border-0 pt-0 d-flex gap-2 justify-content-end">
+      <button class="btn btn-submit-3d py-2 px-4" (click)="onConfirmAccept()">Yes, Proceed</button>
+      <button class="btn btn-cancel-3d py-2 px-4" (click)="onConfirmCancel()">Cancel</button>
+    </div>
+  </div>
+</div>
+
 </div>

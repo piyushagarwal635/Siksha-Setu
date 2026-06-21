@@ -1,37 +1,1098 @@
-<div class="container mt-4">
-    <div class="row">
-      <!-- User Management Section -->
-      <div class="col-md-6 mb-4">
-        <div class="card">
-          <div class="card-header">
-            <h3><i class="bi bi-people-fill me-2"></i>User Management</h3>
+<div class="admin-container p-3 p-md-4 fade-in">
+  <!-- Modern Shell: 2 Column Layout -->
+  <div class="row g-4">
+    
+    <!-- Left Column: Navigation & Profile -->
+    <div class="col-lg-3">
+      <div class="sticky-top" style="top: 100px; z-index: 1020;">
+      <!-- Premium Profile Card -->
+      <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+        <div class="bg-primary-gradient position-relative" style="height: 80px;"></div>
+        <div class="card-body text-center pt-0 px-4 pb-4">
+          <div class="position-relative d-inline-block mx-auto mb-3" style="margin-top: -40px;">
+            <img [src]="profileImage || 'assets/default-avatar.png'" alt="Admin Avatar" class="rounded-circle border border-4 border-white shadow-sm bg-white" style="width: 80px; height: 80px; object-fit: cover;">
+            <span class="position-absolute bottom-0 end-0 bg-success border border-2 border-white rounded-circle" style="width: 16px; height: 16px; transform: translate(-5px, -5px);" title="Online"></span>
           </div>
-          <div class="card-body">
-            <p>Manage users by viewing, updating, or deleting their profiles.</p>
-            <button class="btn btn-primary me-2" (click)="viewUsers()">
-              <i class="bi bi-eye-fill me-1"></i> View Users
-            </button>
-            <button class="btn btn-success" (click)="addUser()">
-              <i class="bi bi-person-plus-fill me-1"></i> Add User
-            </button>
+          <h5 class="fw-bolder text-dark mb-0">{{ adminUsername || 'Administrator' }}</h5>
+          <p class="text-muted small mb-3">Role: System Admin</p>
+          
+          <div class="d-flex justify-content-center gap-2">
+            <div class="bg-light text-dark border px-3 py-2 rounded-3 flex-grow-1 text-start">
+              <small class="d-block fw-bold text-muted" style="font-size: 0.65rem; text-transform: uppercase;">Pending Edits</small>
+              <span class="fw-bolder fs-5"><i class="bi bi-pencil-square text-warning me-1"></i>{{ pendingEditsCount }}</span>
+            </div>
           </div>
         </div>
       </div>
-  
-      <!-- Reports Section -->
-      <div class="col-md-6 mb-4">
-        <div class="card">
-          <div class="card-header">
-            <h3><i class="bi bi-graph-up-arrow me-2"></i>Reports</h3>
+
+      <!-- Vertical Nav Pills -->
+      <div class="card border-0 shadow-sm rounded-4 p-3">
+        <h6 class="fw-bold text-muted mb-3 px-2 text-uppercase" style="font-size: 0.75rem;">Menu</h6>
+        <div class="nav flex-column nav-pills gap-2">
+          <button class="nav-link text-start rounded-pill fw-bold" [class.active]="activeSection === 'overview'" (click)="setSection('overview')">
+            <i class="bi bi-speedometer2 me-2"></i> Overview
+          </button>
+          <button class="nav-link text-start rounded-pill fw-bold" [class.active]="activeSection === 'courses'" (click)="setSection('courses')">
+            <i class="bi bi-journal-text me-2"></i> Courses
+          </button>
+          <button class="nav-link text-start rounded-pill fw-bold" [class.active]="activeSection === 'notifications'" (click)="setSection('notifications')">
+            <i class="bi bi-bell-fill me-2"></i> Notifications
+          </button>
+          <button class="nav-link text-start rounded-pill fw-bold" [class.active]="activeSection === 'student-directory'" (click)="setSection('student-directory')">
+            <i class="bi bi-people-fill me-2"></i> Students
+          </button>
+          <button class="nav-link text-start rounded-pill fw-bold d-flex justify-content-between align-items-center" [class.active]="activeSection === 'edit-requests'" (click)="setSection('edit-requests')">
+            <span><i class="bi bi-pencil-square me-2"></i> Approvals</span>
+            <span class="badge bg-danger rounded-pill" *ngIf="pendingEditsCount > 0">{{ pendingEditsCount }}</span>
+          </button>
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Main Content -->
+    <div class="col-lg-9" id="activeSectionContainer">
+      
+      <!-- Welcome Greeting Banner -->
+      <div class="admin-welcome mb-4 p-4 p-md-5 rounded-4 position-relative text-white" style="background: var(--primary-gradient);">
+        <h2 class="fw-extrabold display-6 mb-2">Administrator Portal</h2>
+        <p class="fs-5 text-white-50 mb-0">Manage courses, resources, students, and broadcasts across the entire platform.</p>
+      </div>
+
+      <!-- Overview Section -->
+      <div *ngIf="activeSection === 'overview'" class="row g-4 fade-in">
+        <!-- Summary Cards Grid -->
+        <div class="col-12">
+          <div class="row g-3">
+            <!-- Total Students -->
+            <div class="col-sm-6 col-md-3">
+              <div class="card border-0 shadow-sm rounded-4 h-100 transition-hover">
+                <div class="card-body p-3 d-flex align-items-center gap-3">
+                  <div class="bg-primary bg-opacity-10 text-primary rounded-3 p-3 fs-3" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-people-fill"></i>
+                  </div>
+                  <div>
+                    <p class="text-muted fw-bold mb-0 text-uppercase" style="font-size: 0.65rem;">Total Students</p>
+                    <h3 class="fw-extrabold text-dark mb-0 fs-5">{{ totalStudentsCount }}</h3>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Active Students -->
+            <div class="col-sm-6 col-md-3">
+              <div class="card border-0 shadow-sm rounded-4 h-100 transition-hover">
+                <div class="card-body p-3 d-flex align-items-center gap-3">
+                  <div class="bg-success bg-opacity-10 text-success rounded-3 p-3 fs-3" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-person-check-fill"></i>
+                  </div>
+                  <div>
+                    <p class="text-muted fw-bold mb-0 text-uppercase" style="font-size: 0.65rem;">Active (7d)</p>
+                    <h3 class="fw-extrabold text-dark mb-0 fs-5">{{ activeStudentsCount }}</h3>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Total Courses -->
+            <div class="col-sm-6 col-md-3">
+              <div class="card border-0 shadow-sm rounded-4 h-100 transition-hover">
+                <div class="card-body p-3 d-flex align-items-center gap-3">
+                  <div class="bg-info bg-opacity-10 text-info rounded-3 p-3 fs-3" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-journal-album"></i>
+                  </div>
+                  <div>
+                    <p class="text-muted fw-bold mb-0 text-uppercase" style="font-size: 0.65rem;">Total Courses</p>
+                    <h3 class="fw-extrabold text-dark mb-0 fs-5">{{ totalCoursesCount }}</h3>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Enrollments -->
+            <div class="col-sm-6 col-md-3">
+              <div class="card border-0 shadow-sm rounded-4 h-100 transition-hover">
+                <div class="card-body p-3 d-flex align-items-center gap-3">
+                  <div class="bg-secondary bg-opacity-10 text-secondary rounded-3 p-3 fs-3" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-journal-bookmark-fill"></i>
+                  </div>
+                  <div>
+                    <p class="text-muted fw-bold mb-0 text-uppercase" style="font-size: 0.65rem;">Enrollments</p>
+                    <h3 class="fw-extrabold text-dark mb-0 fs-5">{{ totalEnrollmentsCount }}</h3>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Certificates -->
+            <div class="col-sm-6 col-md-3">
+              <div class="card border-0 shadow-sm rounded-4 h-100 transition-hover">
+                <div class="card-body p-3 d-flex align-items-center gap-3">
+                  <div class="bg-warning bg-opacity-10 text-warning rounded-3 p-3 fs-3" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-patch-check-fill"></i>
+                  </div>
+                  <div>
+                    <p class="text-muted fw-bold mb-0 text-uppercase" style="font-size: 0.65rem;">Certificates</p>
+                    <h3 class="fw-extrabold text-dark mb-0 fs-5">{{ certificatesIssuedCount }}</h3>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Total Tests -->
+            <div class="col-sm-6 col-md-3">
+              <div class="card border-0 shadow-sm rounded-4 h-100 transition-hover">
+                <div class="card-body p-3 d-flex align-items-center gap-3">
+                  <div class="bg-indigo bg-opacity-10 text-indigo rounded-3 p-3 fs-3" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-file-earmark-check-fill"></i>
+                  </div>
+                  <div>
+                    <p class="text-muted fw-bold mb-0 text-uppercase" style="font-size: 0.65rem;">Tests Taken</p>
+                    <h3 class="fw-extrabold text-dark mb-0 fs-5">{{ totalTestsTakenCount }}</h3>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Average Test Score -->
+            <div class="col-sm-6 col-md-3">
+              <div class="card border-0 shadow-sm rounded-4 h-100 transition-hover">
+                <div class="card-body p-3 d-flex align-items-center gap-3">
+                  <div class="bg-danger bg-opacity-10 text-danger rounded-3 p-3 fs-3" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-award-fill"></i>
+                  </div>
+                  <div>
+                    <p class="text-muted fw-bold mb-0 text-uppercase" style="font-size: 0.65rem;">Avg Score</p>
+                    <h3 class="fw-extrabold text-dark mb-0 fs-5">{{ averageTestScore }}%</h3>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pending Approvals -->
+            <div class="col-sm-6 col-md-3">
+              <div class="card border-0 shadow-sm rounded-4 h-100 cursor-pointer transition-hover" (click)="setSection('edit-requests')">
+                <div class="card-body p-3 d-flex align-items-center gap-3">
+                  <div class="bg-danger bg-opacity-10 text-danger rounded-3 p-3 fs-3" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-pencil-square"></i>
+                  </div>
+                  <div>
+                    <p class="text-muted fw-bold mb-0 text-uppercase" style="font-size: 0.65rem;">Pending Edits</p>
+                    <h3 class="fw-extrabold text-dark mb-0 fs-5">{{ pendingEditsCount }}</h3>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="card-body">
-            <p>View and analyze reports related to system activities and user engagement.</p>
-            <button class="btn btn-info" (click)="generateReport()">
-              <i class="bi bi-bar-chart-fill me-1"></i> Generate Reports
-            </button>
+        </div>
+
+        <!-- Visual Analytics Charts -->
+        <div class="col-lg-8">
+          <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-header bg-transparent border-0 pt-4 pb-0 px-4">
+              <h5 class="fw-bold text-indigo mb-0"><i class="bi bi-graph-up me-2 text-primary"></i> 7-Day Resource Usage Trends</h5>
+            </div>
+            <div class="card-body p-4" style="height: 300px; position: relative;">
+              <canvas id="resourceTrendChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-header bg-transparent border-0 pt-4 pb-0 px-4">
+              <h5 class="fw-bold text-indigo mb-0"><i class="bi bi-pie-chart-fill me-2 text-pink"></i> Accessibility Preferences</h5>
+            </div>
+            <div class="card-body p-4" style="height: 300px; position: relative;">
+              <canvas id="accessibilityChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-transparent border-0 pt-4 pb-0 px-4">
+              <h5 class="fw-bold text-indigo mb-0"><i class="bi bi-bar-chart-fill me-2 text-indigo"></i> Resource Opens by Format</h5>
+            </div>
+            <div class="card-body p-4" style="height: 250px; position: relative;">
+              <canvas id="resourceBarChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Telemetry & Insights Section -->
+        <div class="col-lg-6">
+          <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-header bg-transparent border-0 pt-4 pb-0 px-4">
+              <h5 class="fw-bold text-indigo mb-0"><i class="bi bi-lightning-charge-fill text-warning me-2"></i> Telemetry & Insights</h5>
+            </div>
+            <div class="card-body p-4">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <h6 class="fw-bold text-muted small border-bottom pb-1 mb-2">Top Searched Keywords</h6>
+                  <ul class="list-unstyled mb-0" *ngIf="mostSearchedKeywords.length > 0">
+                    <li *ngFor="let kw of mostSearchedKeywords; let i = index" class="d-flex justify-content-between align-items-center py-1 border-bottom border-light">
+                      <span class="small fw-semibold text-dark">{{ i+1 }}. "{{ kw.keyword }}"</span>
+                      <span class="badge bg-light text-secondary border rounded-pill">{{ kw.count }} searches</span>
+                    </li>
+                  </ul>
+                  <p class="text-muted small" *ngIf="mostSearchedKeywords.length === 0">No search logs yet.</p>
+                </div>
+
+                <div class="col-md-6">
+                  <h6 class="fw-bold text-muted small border-bottom pb-1 mb-2">Most Popular Courses</h6>
+                  <ul class="list-unstyled mb-0" *ngIf="mostSearchedCourses.length > 0">
+                    <li *ngFor="let c of mostSearchedCourses; let i = index" class="d-flex justify-content-between align-items-center py-1 border-bottom border-light">
+                      <span class="small fw-semibold text-dark">{{ i+1 }}. {{ c.title | slice:0:15 }}...</span>
+                      <span class="badge bg-light text-secondary border rounded-pill">{{ c.count }} views</span>
+                    </li>
+                  </ul>
+                  <p class="text-muted small" *ngIf="mostSearchedCourses.length === 0">No views logged.</p>
+                </div>
+
+                <div class="col-md-6 mt-3">
+                  <h6 class="fw-bold text-muted small border-bottom pb-1 mb-2">Most Opened Resources</h6>
+                  <ul class="list-unstyled mb-0" *ngIf="mostViewedResources.length > 0">
+                    <li *ngFor="let r of mostViewedResources; let i = index" class="d-flex justify-content-between align-items-center py-1 border-bottom border-light">
+                      <span class="small fw-semibold text-dark">{{ i+1 }}. {{ r.title | slice:0:15 }}...</span>
+                      <span class="badge bg-light text-secondary border rounded-pill">{{ r.count }} opens</span>
+                    </li>
+                  </ul>
+                  <p class="text-muted small" *ngIf="mostViewedResources.length === 0">No views logged.</p>
+                </div>
+
+                <div class="col-md-6 mt-3">
+                  <h6 class="fw-bold text-muted small border-bottom pb-1 mb-2">Top Accessibility Options</h6>
+                  <ul class="list-unstyled mb-0" *ngIf="mostUsedAccessibilityFeatures.length > 0">
+                    <li *ngFor="let ac of mostUsedAccessibilityFeatures; let i = index" class="d-flex justify-content-between align-items-center py-1 border-bottom border-light">
+                      <span class="small fw-semibold text-dark" style="font-size: 0.75rem;">{{ i+1 }}. {{ ac.feature | slice:0:18 }}</span>
+                      <span class="badge bg-light text-secondary border rounded-pill">{{ ac.count }} times</span>
+                    </li>
+                  </ul>
+                  <p class="text-muted small" *ngIf="mostUsedAccessibilityFeatures.length === 0">No logs yet.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detailed Course Analytics -->
+        <div class="col-12 mt-4">
+          <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-transparent border-0 pt-4 pb-0 px-4">
+              <h5 class="fw-bold text-indigo mb-0"><i class="bi bi-journal-bookmark me-2 text-primary"></i> Course Enrollments & Progress Analytics</h5>
+            </div>
+            <div class="card-body p-0 mt-3">
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th class="px-4 py-3 border-0">Popularity Rank</th>
+                      <th class="py-3 border-0">Course Title</th>
+                      <th class="py-3 border-0">Total Enrolled</th>
+                      <th class="py-3 border-0">Completed</th>
+                      <th class="py-3 border-0">In Progress</th>
+                      <th class="py-3 border-0">Not Started</th>
+                      <th class="py-3 border-0 text-end px-4">Completion %</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let ca of courseAnalytics">
+                      <td class="px-4 py-3"><span class="badge bg-primary rounded-pill">#{{ ca.popularityRanking }}</span></td>
+                      <td class="py-3 fw-bold text-dark">{{ ca.title }}</td>
+                      <td class="py-3 text-muted">{{ ca.totalStudents }}</td>
+                      <td class="py-3 text-success fw-bold">{{ ca.completed }}</td>
+                      <td class="py-3 text-warning fw-semibold">{{ ca.inProgress }}</td>
+                      <td class="py-3 text-secondary">{{ ca.notStarted }}</td>
+                      <td class="py-3 text-end px-4 fw-extrabold text-indigo">{{ ca.completionPercentage }}%</td>
+                    </tr>
+                    <tr *ngIf="courseAnalytics.length === 0">
+                      <td colspan="7" class="text-center py-4 text-muted">
+                        No courses progress analytics recorded.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Courses Section -->
+      <!-- Courses Section -->
+      <div *ngIf="activeSection === 'courses'" class="row g-4 fade-in">
+        <div class="col-12 mb-2 d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <h4 class="fw-extrabold text-indigo mb-0"><i class="bi bi-journal-text me-2"></i>Manage Courses</h4>
+        </div>
+        
+        <div class="col-12 mb-2 d-flex flex-wrap gap-2 justify-content-between align-items-center bg-light p-3 rounded-4 border">
+          <div class="d-flex flex-wrap gap-2 flex-grow-1">
+            <div class="input-group shadow-sm rounded-pill overflow-hidden bg-white" style="width: 250px; border: 1px solid #dee2e6;">
+              <span class="input-group-text bg-white border-0"><i class="bi bi-search text-muted"></i></span>
+              <input type="text" class="form-control bg-white border-0 shadow-none" placeholder="Search courses..." [(ngModel)]="courseSearchQuery">
+            </div>
+            
+            <select class="form-select rounded-pill border px-3 bg-white" style="width: 175px; box-shadow: none;" [(ngModel)]="courseCategoryFilter">
+              <option value="">All Categories</option>
+              <option *ngFor="let cat of getDynamicCategories()" [value]="cat">{{ cat }}</option>
+            </select>
+
+            <select class="form-select rounded-pill border px-3 bg-white" style="width: 175px; box-shadow: none;" [(ngModel)]="courseDifficultyFilter">
+              <option value="">All Difficulties</option>
+              <option value="Beginner">Beginner</option>
+              <option value="Intermediate">Intermediate</option>
+              <option value="All Levels">All Levels</option>
+            </select>
+          </div>
+          <button type="button" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" (click)="openCreateCourseModal()">
+            <i class="bi bi-plus-circle-fill me-2"></i>Create New Course
+          </button>
+        </div>
+        
+        <div class="col-12">
+          <div class="row g-3">
+            <div class="col-md-4 col-lg-4" *ngFor="let course of getFilteredCourses()">
+              <div class="card course-card hover-effect h-100 border-0 rounded-4 overflow-hidden position-relative d-flex flex-column">
+                <div class="course-img-wrapper position-relative">
+                  <img [src]="course.image || 'assets/default-course.png'" class="card-img-top course-img" alt="{{ course.title }}">
+                  <div class="course-overlay-gradient"></div>
+                  <span class="badge course-badge bg-primary text-white text-uppercase fw-bold shadow">{{ course.category }}</span>
+                  <button class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2 shadow-sm" (click)="deleteCourse(course.id)" title="Delete Course" style="z-index: 10;">
+                    <i class="bi bi-trash-fill"></i>
+                  </button>
+                </div>
+
+                <div class="card-body p-4 d-flex flex-column flex-grow-1">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-muted small fw-bold"><i class="bi bi-clock me-1"></i>{{ course.duration || '2 Weeks' }}</span>
+                    <span class="text-muted small fw-bold"><i class="bi bi-book me-1"></i>{{ course.lessons || 0 }} Chapters</span>
+                  </div>
+
+                  <h3 class="fw-extrabold text-indigo mb-2 fs-5">{{ course.title || course.name }}</h3>
+                  <p class="text-muted small flex-grow-1 leading-relaxed">{{ course.description || 'Learn the fundamentals and advanced topics in this comprehensive course.' }}</p>
+
+                  <div class="d-flex align-items-center gap-2 mt-3 pt-3 border-top border-light flex-wrap">
+                    <button type="button" class="btn btn-outline-primary py-2 rounded-pill fw-bold flex-fill" (click)="openManageResourcesModal(course)">
+                      <i class="bi bi-folder-fill me-1"></i> Resources
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary py-2 rounded-pill fw-bold flex-fill" (click)="openManageTestsModal(course)">
+                      <i class="bi bi-card-checklist me-1"></i> Tests
+                    </button>
+                    <button type="button" class="btn btn-primary py-2 rounded-pill fw-bold flex-fill text-white" (click)="openEditCourseModal(course)">
+                      <i class="bi bi-pencil-square me-1"></i> Edit
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="courses.length === 0" class="col-12 text-center py-5 text-muted bg-white rounded-4 shadow-sm">
+              <i class="bi bi-journal-x fs-1 mb-2 d-block"></i>
+              <p class="fw-bold text-dark">No courses created yet.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notifications & Schemes Section -->
+      <div *ngIf="activeSection === 'notifications'" class="row g-4 fade-in">
+        <!-- Left Column: Broadcast Notifications -->
+        <div class="col-lg-6">
+          <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-header bg-transparent border-0 pt-4 pb-0 px-4">
+              <h5 class="fw-bold text-indigo"><i class="bi bi-broadcast me-2 text-primary"></i> Push Notifications</h5>
+            </div>
+            <div class="card-body p-4">
+              <form (ngSubmit)="submitBroadcast()" class="mb-4 bg-light p-3 rounded-4 border">
+                <div class="mb-2">
+                  <label class="form-label fw-bold text-muted small">Notification Type</label>
+                  <select class="form-select border shadow-none" [(ngModel)]="broadcastType" name="type">
+                    <option value="INFO">Information</option>
+                    <option value="WARNING">Important Alert</option>
+                    <option value="SUCCESS">Good News</option>
+                  </select>
+                </div>
+                <div class="mb-2">
+                  <label class="form-label fw-bold text-muted small">Message</label>
+                  <textarea class="form-control border shadow-none" rows="2" placeholder="Message to broadcast to all students..." [(ngModel)]="broadcastMessage" name="msg" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 fw-bold shadow-sm rounded-pill mt-2" [disabled]="isLoading || !broadcastMessage">
+                  <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+                  <i *ngIf="!isLoading" class="bi bi-send-fill me-1"></i> Broadcast
+                </button>
+              </form>
+              
+              <h6 class="fw-bold text-muted mb-3 mt-4 border-bottom pb-2">Broadcast History</h6>
+              <div class="list-group list-group-flush">
+                <div *ngFor="let msg of broadcastHistory" class="list-group-item px-0 py-3 d-flex align-items-start border-light bg-transparent">
+                  <div class="me-3 fs-3" [ngClass]="{
+                    'text-info': msg.type?.includes('INFO'),
+                    'text-warning': msg.type?.includes('WARNING'),
+                    'text-success': msg.type?.includes('SUCCESS')
+                  }">
+                    <i class="bi" [ngClass]="{
+                      'bi-info-circle-fill': msg.type?.includes('INFO'),
+                      'bi-exclamation-triangle-fill': msg.type?.includes('WARNING'),
+                      'bi-check-circle-fill': msg.type?.includes('SUCCESS')
+                    }"></i>
+                  </div>
+                  <div class="flex-grow-1">
+                    <p class="mb-1 fw-bold text-dark">{{ msg.message }}</p>
+                    <small class="text-muted">{{ msg.createdAt | date:'short' }}</small>
+                  </div>
+                  <button class="btn btn-sm btn-light border shadow-sm text-danger ms-2" (click)="deleteBroadcast(msg.message)">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+                <div *ngIf="broadcastHistory.length === 0" class="text-center text-muted py-3">
+                  No previous broadcasts found.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Government Schemes -->
+        <div class="col-lg-6" id="government-schemes">
+          <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-header bg-transparent border-0 pt-4 pb-0 px-4">
+              <h5 class="fw-bold text-indigo"><i class="bi bi-shield-check me-2 text-success"></i> Government Schemes</h5>
+            </div>
+            <div class="card-body p-4">
+              <form (ngSubmit)="publishScheme()" class="mb-4 bg-light p-3 rounded-4 border">
+                <div class="mb-2">
+                  <label class="form-label fw-bold text-muted small">Scheme Title</label>
+                  <input type="text" class="form-control border shadow-none" [(ngModel)]="schemeTitle" name="stitle" required placeholder="Title of the scheme">
+                </div>
+                <div class="mb-2">
+                  <label class="form-label fw-bold text-muted small">Link / URL (Optional)</label>
+                  <input type="url" class="form-control border shadow-none" [(ngModel)]="schemeLink" name="slink" placeholder="https://...">
+                </div>
+                <div class="mb-2">
+                  <label class="form-label fw-bold text-muted small">Summary</label>
+                  <textarea class="form-control border shadow-none" rows="2" [(ngModel)]="schemeSummary" name="ssummary" placeholder="Short description..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-success w-100 fw-bold shadow-sm rounded-pill mt-2" [disabled]="isLoading || !schemeTitle">
+                  <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+                  <i *ngIf="!isLoading" class="bi bi-cloud-arrow-up-fill me-1"></i> Publish Scheme
+                </button>
+              </form>
+
+              <div class="d-flex justify-content-between align-items-center mb-3 mt-4 border-bottom pb-2">
+                <h6 class="fw-bold text-muted mb-0">Published Schemes</h6>
+                <input type="text" class="form-control form-control-sm border shadow-none rounded-pill" style="width: 180px;" placeholder="Filter schemes..." [(ngModel)]="schemeSearchQuery">
+              </div>
+              <div class="list-group list-group-flush">
+                <div *ngFor="let scheme of getFilteredSchemes()" class="list-group-item px-0 py-3 bg-transparent border-light">
+                  <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                      <h6 class="fw-bold text-dark mb-1">{{ scheme.title }}</h6>
+                      <p class="small text-muted mb-1">{{ scheme.summary }}</p>
+                      <a *ngIf="scheme.link" [href]="scheme.link" target="_blank" class="small fw-bold text-success text-decoration-none">View Link</a>
+                    </div>
+                    <button class="btn btn-sm btn-light border shadow-sm text-danger ms-2" (click)="deleteScheme(scheme.id)">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
+                </div>
+                <div *ngIf="publishedSchemes.length === 0" class="text-center text-muted py-3">
+                  No schemes published yet.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Student Directory Section -->
+      <div *ngIf="activeSection === 'student-directory'" class="row g-4 fade-in">
+        <div class="col-12">
+          <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-transparent border-0 pt-4 pb-0 px-4 d-flex flex-wrap gap-2 justify-content-between align-items-center">
+              <h5 class="fw-bold text-indigo mb-0"><i class="bi bi-people-fill me-2 text-primary"></i> Registered Students</h5>
+              <div class="d-flex gap-2">
+                <select class="form-select rounded-pill border px-3 text-muted small" style="width: 150px; box-shadow: none;" [(ngModel)]="studentStatusFilter">
+                  <option value="">All Statuses</option>
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Completed">Completed</option>
+                </select>
+                <div class="input-group shadow-sm rounded-pill overflow-hidden bg-white" style="width: 240px; border: 1px solid #dee2e6;">
+                  <span class="input-group-text bg-white border-0"><i class="bi bi-search text-muted"></i></span>
+                  <input type="text" class="form-control bg-white border-0 shadow-none" placeholder="Search students..." [(ngModel)]="studentSearchQuery">
+                </div>
+              </div>
+            </div>
+            <div class="card-body p-0 mt-3">
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th class="px-4 py-3 border-0">Student Profile</th>
+                      <th class="py-3 border-0">Disability ID</th>
+                      <th class="py-3 border-0">Course</th>
+                      <th class="py-3 border-0">Contact</th>
+                      <th class="py-3 border-0 text-end px-4">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let student of getFilteredStudents()">
+                      <td class="px-4 py-3">
+                        <div class="d-flex align-items-center">
+                          <img [src]="student.profileImage || 'assets/default-avatar.png'" alt="Avatar" class="rounded-circle me-3 border border-2 border-light shadow-sm" style="width: 45px; height: 45px; object-fit: cover;">
+                          <span class="fw-bold text-dark">{{ student.name || student.user }}</span>
+                        </div>
+                      </td>
+                      <td class="py-3"><span class="badge bg-light text-dark border">{{ student.disabilityId }}</span></td>
+                      <td class="py-3 text-muted">{{ student.course || 'Not Enrolled' }}</td>
+                      <td class="py-3 text-muted">
+                        <div class="small"><i class="bi bi-envelope me-1"></i>{{ student.email || 'N/A' }}</div>
+                        <div class="small"><i class="bi bi-telephone me-1"></i>{{ student.phone || 'N/A' }}</div>
+                      </td>
+                      <td class="py-3 text-end px-4">
+                        <button class="btn btn-sm btn-primary rounded-pill px-3 shadow-sm fw-bold text-white" (click)="viewStudentDetails(student.disabilityId)">View Details</button>
+                      </td>
+                    </tr>
+                    <tr *ngIf="getFilteredStudents().length === 0">
+                      <td colspan="5" class="text-center py-5 text-muted">
+                        <i class="bi bi-search fs-1 mb-2 d-block"></i>
+                        No students found.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Approvals Section -->
+      <div *ngIf="activeSection === 'edit-requests'" class="row g-4 fade-in">
+        <div class="col-12">
+          <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-transparent border-0 pt-4 pb-0 px-4 d-flex justify-content-between align-items-center">
+              <h5 class="fw-bold text-indigo mb-0"><i class="bi bi-person-lines-fill text-warning me-2"></i> Profile Edit Requests</h5>
+              <div class="input-group shadow-sm rounded-pill overflow-hidden bg-white" style="width: 250px; border: 1px solid #dee2e6;">
+                <span class="input-group-text bg-white border-0"><i class="bi bi-search text-muted"></i></span>
+                <input type="text" class="form-control bg-white border-0 shadow-none" placeholder="Search approvals..." [(ngModel)]="approvalSearchQuery">
+              </div>
+            </div>
+            <div class="card-body p-0 mt-3">
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th class="px-4 py-3 border-0">Student ID</th>
+                      <th class="py-3 border-0">Field to Edit</th>
+                      <th class="py-3 border-0">Requested Value</th>
+                      <th class="py-3 border-0 text-end px-4">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let req of getFilteredEditRequests()">
+                      <td class="px-4 py-3 text-muted">{{ req.userId }}</td>
+                      <td class="py-3 fw-bold text-dark">{{ req.fieldName }}</td>
+                      <td class="py-3 text-primary fw-semibold">
+                        <span *ngIf="req.fieldName === 'incomeCertificate' || req.fieldName === 'profileImage'">[File Uploaded]</span>
+                        <span *ngIf="req.fieldName !== 'incomeCertificate' && req.fieldName !== 'profileImage'">{{ req.newValue }}</span>
+                      </td>
+                      <td class="py-3 text-end px-4">
+                        <button class="btn btn-sm btn-primary rounded-pill px-3 shadow-sm fw-bold text-white" (click)="viewEditRequestDetails(req)">Review Request</button>
+                      </td>
+                    </tr>
+                    <tr *ngIf="pendingEditRequests.length === 0">
+                      <td colspan="4" class="text-center py-5 text-muted">
+                        <i class="bi bi-check-circle fs-1 d-block mb-2 text-success opacity-50"></i>
+                        All caught up! No pending edit requests.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Modals -->
+  <!-- Reject Request Modal -->
+  <div class="modal fade show d-block" tabindex="-1" *ngIf="showRejectModal" style="background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content rounded-4 border-0 shadow-lg">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title fw-bold text-danger"><i class="bi bi-x-circle-fill me-2"></i> Reject Request</h5>
+          <button type="button" class="btn-close" (click)="closeRejectModal()"></button>
+        </div>
+        <div class="modal-body p-4">
+          <label class="form-label fw-bold text-muted">Reason for rejection (Optional)</label>
+          <textarea class="form-control border shadow-none" rows="3" [(ngModel)]="rejectReason" placeholder="Tell the student why this was rejected..."></textarea>
+        </div>
+        <div class="modal-footer border-0 pt-0">
+          <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" (click)="closeRejectModal()">Cancel</button>
+          <button type="button" class="btn btn-danger rounded-pill px-4 shadow-sm fw-bold" (click)="confirmReject()">Reject Request</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Student Details Modal -->
+  <div class="modal fade show d-block" tabindex="-1" *ngIf="showStudentDetailsModal" style="background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+      <div class="modal-content rounded-4 border-0 shadow-lg" *ngIf="selectedStudentUser">
+        <div class="modal-header bg-light border-0">
+          <div class="d-flex align-items-center">
+            <img [src]="selectedStudentUser.profileImage || 'assets/default-avatar.png'" alt="Avatar" class="rounded-circle me-3 shadow-sm" style="width: 60px; height: 60px; object-fit: cover;">
+            <div>
+              <h5 class="modal-title fw-bolder mb-0 text-dark">{{ selectedStudentUser.name || selectedStudentUser.user }}</h5>
+              <span class="badge bg-primary rounded-pill">{{ selectedStudentUser.disabilityId }}</span>
+            </div>
+          </div>
+          <button type="button" class="btn-close" (click)="closeStudentDetailsModal()"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div class="row g-4">
+            <div class="col-md-6">
+              <h6 class="fw-bold text-muted mb-3 text-uppercase small border-bottom pb-2">Profile Information</h6>
+              <p class="mb-2"><i class="bi bi-envelope text-primary me-2"></i> <strong>Email:</strong> {{ selectedStudentUser.email || 'N/A' }}</p>
+              <p class="mb-2"><i class="bi bi-telephone text-primary me-2"></i> <strong>Phone:</strong> {{ selectedStudentUser.phone || 'N/A' }}</p>
+              <p class="mb-2"><i class="bi bi-geo-alt text-primary me-2"></i> <strong>Address:</strong> {{ selectedStudentUser.address || 'N/A' }}</p>
+              <p class="mb-2"><i class="bi bi-journal-text text-primary me-2"></i> <strong>Course:</strong> {{ selectedStudentUser.course || 'Not Enrolled' }}</p>
+            </div>
+            <div class="col-md-6">
+              <h6 class="fw-bold text-muted mb-3 text-uppercase small border-bottom pb-2">Activity Tracker & Preferences</h6>
+              <div class="d-flex justify-content-between text-center bg-light rounded-3 p-3 mb-3 border">
+                <div>
+                  <h4 class="fw-bolder text-warning mb-0"><i class="bi bi-fire"></i> {{ selectedStudentAnalytics?.progress?.currentStreak || 0 }}</h4>
+                  <small class="text-muted fw-bold">Current Streak</small>
+                </div>
+                <div>
+                  <h4 class="fw-bolder text-success mb-0"><i class="bi bi-trophy-fill"></i> {{ selectedStudentAnalytics?.progress?.longestStreak || 0 }}</h4>
+                  <small class="text-muted fw-bold">Longest Streak</small>
+                </div>
+              </div>
+              <p class="mb-1 small"><i class="bi bi-star-fill text-info me-2"></i> <strong>Preferred Format:</strong> {{ selectedStudentAnalytics?.progress?.resourcePreference || 'General' }}</p>
+              <p class="mb-1 small"><i class="bi bi-gear-fill text-info me-2"></i> <strong>Accessibility Toggles:</strong> 
+                <span *ngFor="let pref of selectedStudentAnalytics?.accessPreferences" class="badge bg-light text-dark border me-1">{{ pref }}</span>
+                <span *ngIf="!selectedStudentAnalytics?.accessPreferences || selectedStudentAnalytics?.accessPreferences.length === 0" class="text-muted">None logged</span>
+              </p>
+              <p class="mb-0 small"><i class="bi bi-calendar-check text-info me-2"></i> <strong>Total Activities Logged:</strong> {{ selectedStudentAnalytics?.activityTracker?.length || 0 }}</p>
+            </div>
+          </div>
+          
+          <h6 class="fw-bold text-muted mt-4 mb-3 text-uppercase small border-bottom pb-2">Course Progress & Test Certificates</h6>
+          <div class="table-responsive" *ngIf="selectedStudentAnalytics?.enrollments?.length > 0">
+            <table class="table table-sm table-hover align-middle">
+              <thead>
+                <tr>
+                  <th>Course</th>
+                  <th>Date Enrolled</th>
+                  <th>Preference</th>
+                  <th>Progress</th>
+                  <th>Test Score</th>
+                  <th>Certificate</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let en of selectedStudentAnalytics.enrollments">
+                  <td class="fw-bold">{{ en.course?.title || en.course?.id }}</td>
+                  <td>{{ en.enrolledAt | date:'mediumDate' }}</td>
+                  <td><span class="badge bg-light text-dark border">{{ en.resourcePreference }}</span></td>
+                  <td>
+                    <div class="progress" style="height: 6px; width: 80px;">
+                      <div class="progress-bar bg-primary" role="progressbar" [style.width.%]="en.progressPercent"></div>
+                    </div>
+                    <small class="text-muted">{{ en.progressPercent | number:'1.0-0' }}%</small>
+                  </td>
+                  <td>
+                    <span *ngIf="en.testPassed" class="text-success fw-bold">{{ en.testPercentage }}% (Pass)</span>
+                    <span *ngIf="!en.testPassed && en.testPercentage > 0" class="text-danger fw-bold">{{ en.testPercentage }}% (Fail)</span>
+                    <span *ngIf="en.testPercentage === 0" class="text-muted">Not Taken</span>
+                  </td>
+                  <td>
+                    <span *ngIf="en.certificateUrl" class="badge bg-success"><i class="bi bi-patch-check-fill"></i> Issued</span>
+                    <span *ngIf="!en.certificateUrl" class="text-muted small">Not Issued</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="text-muted small" *ngIf="!selectedStudentAnalytics?.enrollments || selectedStudentAnalytics.enrollments.length === 0">No course enrollments found.</p>
+        </div>
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-secondary rounded-pill px-4 fw-bold" (click)="closeStudentDetailsModal()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create / Edit Course Modal -->
+  <div class="modal fade show d-block" tabindex="-1" *ngIf="showCourseModal" style="background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); z-index: 1050;">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+      <div class="modal-content rounded-4 border-0 shadow-lg" style="background: #ffffff; max-height: 90vh;">
+        <div class="modal-header border-0 pb-0 px-4 pt-4 d-flex justify-content-between align-items-center">
+          <h5 class="modal-title fw-bold text-indigo mb-0">
+            <i class="bi" [ngClass]="isEditMode ? 'bi-pencil-square text-warning' : 'bi-plus-circle-fill text-primary'"></i>
+            {{ isEditMode ? 'Edit Course' : 'Create New Course' }}
+          </h5>
+          <button type="button" class="btn-close" (click)="closeCourseModal()"></button>
+        </div>
+        <div class="modal-body p-4" style="overflow-y: auto;">
+          <form (ngSubmit)="createCourse()">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label fw-bold small text-muted">Course Title</label>
+                <input type="text" class="form-control border shadow-none" [(ngModel)]="newCourse.title" name="title" required placeholder="e.g. Advanced Mathematics">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold small text-muted">Category</label>
+                <input type="text" class="form-control border shadow-none" [(ngModel)]="newCourse.category" name="cat" placeholder="e.g. Science">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold small text-muted">Course ID</label>
+                <input type="text" class="form-control border shadow-none" [(ngModel)]="newCourse.id" name="id" placeholder="e.g. CS101" [disabled]="isEditMode" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold small text-muted">Course Cover Image</label>
+                <input type="file" class="form-control border shadow-none" (change)="onCourseImageSelected($event)" accept="image/*">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold small text-muted">Difficulty</label>
+                <select class="form-select border shadow-none" [(ngModel)]="newCourse.difficulty" name="diff">
+                  <option value="Beginner">Beginner</option>
+                  <option value="Intermediate">Intermediate</option>
+                  <option value="All Levels">All Levels</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold small text-muted">Duration</label>
+                <input type="text" class="form-control border shadow-none" [(ngModel)]="newCourse.duration" name="dur" placeholder="e.g. 2 Weeks">
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-bold small text-muted">Description</label>
+                <textarea class="form-control border shadow-none" rows="2" [(ngModel)]="newCourse.description" name="desc" placeholder="Brief description of the course..."></textarea>
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-bold small text-muted">What You Will Learn (comma-separated)</label>
+                <textarea class="form-control border shadow-none" rows="2" [(ngModel)]="newCourse.whatYouWillLearn" name="learn" placeholder="Topic A, Topic B, Topic C..."></textarea>
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-bold small text-muted">Learning Outcomes (comma-separated)</label>
+                <textarea class="form-control border shadow-none" rows="2" [(ngModel)]="newCourse.learningOutcomes" name="outcomes" placeholder="Outcome A, Outcome B..."></textarea>
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-bold small text-muted">Accessibility Features</label>
+                <textarea class="form-control border shadow-none" rows="2" [(ngModel)]="newCourse.accessibilityFeatures" name="acc" placeholder="e.g. Real-time Braille translation, Voice commands"></textarea>
+              </div>
+            </div>
+            
+            <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+              <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" (click)="closeCourseModal()">Cancel</button>
+              <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" [disabled]="isLoading || !newCourse.title || (!isEditMode && !newCourse.id)">
+                <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+                {{ isEditMode ? 'Save Changes' : 'Create Course' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <!-- Manage Tests Modal -->
+  <div class="modal fade show d-block" tabindex="-1" *ngIf="selectedCourseForTests" style="background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); z-index: 1050;">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+      <div class="modal-content rounded-4 border-0 shadow-lg" style="background: #ffffff;">
+        <div class="modal-header border-0 pb-0 d-flex justify-content-between align-items-center p-4">
+          <div>
+            <h4 class="modal-title fw-bold text-dark mb-0">Manage Test</h4>
+            <p class="text-muted small mb-0">{{ selectedCourseForTests.title }}</p>
+          </div>
+          <button type="button" class="btn-close shadow-none bg-light rounded-circle p-2" (click)="closeManageTestsModal()"></button>
+        </div>
+        <div class="modal-body p-4">
+          <!-- List of Questions -->
+          <div *ngIf="!showTestForm">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="fw-bold mb-0">Questions ({{ courseTestQuestions.length }})</h5>
+              <button class="btn btn-primary rounded-pill fw-bold" (click)="openTestForm()"><i class="bi bi-plus-lg"></i> Add Question</button>
+            </div>
+            
+            <div *ngIf="courseTestQuestions.length === 0" class="text-center text-muted p-5 bg-light rounded-4 border border-dashed">
+              <i class="bi bi-card-checklist fs-1 d-block mb-2 text-secondary"></i>
+              No questions found for this test.
+            </div>
+
+            <div class="list-group">
+              <div *ngFor="let q of courseTestQuestions; let i = index" class="list-group-item list-group-item-action p-3 rounded-4 border mb-2 shadow-sm">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div>
+                    <h6 class="fw-bold mb-2">Q{{ i + 1 }}. {{ q.question }}</h6>
+                    <ul class="list-unstyled mb-0 small text-muted">
+                      <li *ngFor="let opt of q.options; let optIdx = index" [class.text-success]="optIdx === q.correctIndex" [class.fw-bold]="optIdx === q.correctIndex">
+                        <i class="bi" [ngClass]="{'bi-check-circle-fill': optIdx === q.correctIndex, 'bi-circle': optIdx !== q.correctIndex}"></i> {{ opt }}
+                      </li>
+                    </ul>
+                  </div>
+                  <div class="d-flex gap-2">
+                    <button class="btn btn-sm btn-outline-secondary" (click)="openTestForm(q)"><i class="bi bi-pencil"></i></button>
+                    <button class="btn btn-sm btn-outline-danger" (click)="deleteTestQuestion(q.id)"><i class="bi bi-trash"></i></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Add/Edit Form -->
+          <div *ngIf="showTestForm">
+            <h5 class="fw-bold mb-3"><i class="bi bi-pencil-square me-2 text-primary"></i> {{ isEditingTest ? 'Edit Question' : 'New Question' }}</h5>
+            
+            <div class="mb-3">
+              <label class="form-label fw-bold small text-muted">Question Text</label>
+              <textarea class="form-control border shadow-none" rows="2" [(ngModel)]="newTestQuestion.question" placeholder="e.g. What does HTML stand for?"></textarea>
+            </div>
+            
+            <div class="mb-3">
+              <label class="form-label fw-bold small text-muted">Options (At least 2)</label>
+              <div class="input-group mb-2" *ngFor="let opt of newTestQuestion.options; let idx = index; trackBy: trackByIndex">
+                <div class="input-group-text bg-white border">
+                  <input class="form-check-input mt-0" type="radio" name="correctIndex" [value]="idx" [(ngModel)]="newTestQuestion.correctIndex">
+                </div>
+                <input type="text" class="form-control border shadow-none" [(ngModel)]="newTestQuestion.options[idx]" placeholder="Option {{ idx + 1 }}">
+              </div>
+              <small class="text-muted">Select the radio button next to the correct option.</small>
+            </div>
+            
+            <div class="d-flex gap-2 justify-content-end mt-4">
+              <button class="btn btn-light rounded-pill px-4 fw-bold" (click)="cancelTestForm()">Cancel</button>
+              <button class="btn btn-primary rounded-pill px-4 fw-bold text-white shadow-sm" (click)="saveTestQuestion()">Save Question</button>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-  
+
+  <!-- Manage Resources Modal -->
+  <div class="modal fade show d-block" tabindex="-1" *ngIf="selectedCourseForResources" style="background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); z-index: 1050;">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+      <div class="modal-content rounded-4 border-0 shadow-lg" style="background: #ffffff;">
+        <div class="modal-header border-0 pb-0 d-flex justify-content-between align-items-center p-4">
+          <div>
+            <h5 class="modal-title fw-bold text-indigo mb-0">
+              <i class="bi bi-folder2-open text-primary me-2"></i>
+              Resources: {{ selectedCourseForResources.title || selectedCourseForResources.name }}
+            </h5>
+            <small class="text-muted">Course ID: {{ selectedCourseForResources.id }}</small>
+          </div>
+          <button type="button" class="btn-close" (click)="closeManageResourcesModal()"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div class="row g-4">
+            <!-- Upload Resource Form -->
+            <div class="col-md-5 border-end border-light">
+              <h6 class="fw-bold text-dark mb-3"><i class="bi bi-cloud-upload text-primary me-2"></i>Upload Resource</h6>
+              <form (ngSubmit)="uploadResource()">
+                <div class="mb-3">
+                  <label class="form-label fw-bold small text-muted">Resource Type</label>
+                  <select class="form-select border shadow-none" [(ngModel)]="newResource.type" name="rtype">
+                    <option value="txt">Document (.pdf)</option>
+                    <option value="braille">Braille file (.txt / .brf)</option>
+                    <option value="audio">Audio</option>
+                    <option value="video">Video</option>
+                    <option value="signlanguage video">Sign Language Video</option>
+                  </select>
+                </div>
+                <div class="mb-3" *ngIf="newResource.type !== 'braille'">
+                  <label class="form-label fw-bold small text-muted">Description (Optional)</label>
+                  <textarea class="form-control border shadow-none" rows="2" [(ngModel)]="newResource.description" name="rdesc" placeholder="e.g. Chapter 1 readings"></textarea>
+                </div>
+                <div class="mb-4">
+                  <label class="form-label fw-bold small text-muted">File Upload</label>
+                  <input type="file" class="form-control border shadow-none" (change)="onFileSelected($event)"
+                         [accept]="newResource.type === 'audio' ? 'audio/*' : 
+                                   (newResource.type === 'video' || newResource.type === 'signlanguage video') ? 'video/*' : 
+                                   newResource.type === 'txt' ? '.pdf,application/pdf' : 
+                                   newResource.type === 'braille' ? '.txt,text/plain,.brf' : '*/*'">
+                </div>
+                <button type="submit" class="btn btn-primary w-100 fw-bold shadow-sm rounded-pill" [disabled]="isLoading || !resourceFile">
+                  <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+                  <i class="bi bi-cloud-upload-fill me-1"></i> Upload
+                </button>
+              </form>
+            </div>
+
+            <!-- Resources List -->
+            <div class="col-md-7">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="fw-bold text-dark mb-0"><i class="bi bi-list-task text-primary me-2"></i>Existing Resources</h6>
+                <input type="text" class="form-control form-control-sm border shadow-none rounded-pill" style="width: 170px;" placeholder="Filter resources..." [(ngModel)]="resourceSearchQuery">
+              </div>
+              <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                <table class="table table-hover align-middle mb-0">
+                  <thead class="table-light sticky-top" style="top: 0; z-index: 1;">
+                    <tr>
+                      <th class="py-2 border-0">Title</th>
+                      <th class="py-2 border-0">Type</th>
+                      <th class="py-2 border-0 text-end">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let res of getFilteredCourseResources()">
+                      <td class="py-2 fw-bold text-dark">{{ res.title }}</td>
+                      <td class="py-2">
+                        <span class="badge bg-light text-dark border">{{ res.type }}</span>
+                      </td>
+                      <td class="py-2 text-end">
+                        <button type="button" class="btn btn-sm btn-light border shadow-sm text-danger" (click)="deleteResource(res.id)" title="Delete Resource">
+                          <i class="bi bi-trash"></i>
+                        </button>
+                      </td>
+                    </tr>
+                    <tr *ngIf="courseResources.length === 0">
+                      <td colspan="3" class="text-center py-4 text-muted">
+                        No resources uploaded for this course.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer border-0 pt-0 p-4">
+          <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" (click)="closeManageResourcesModal()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PREMIUM EDIT REQUEST REVIEW DETAILS MODAL -->
+<div class="modal-backdrop-custom" *ngIf="showEditRequestDetailsModal" (click)="closeEditRequestDetailsModal()"></div>
+<div class="modal-dialog-custom shadow-lg" *ngIf="showEditRequestDetailsModal" style="max-width: 650px; z-index: 10060;" role="dialog" aria-modal="true">
+  <button class="modal-close-custom" (click)="closeEditRequestDetailsModal()">&times;</button>
+  <div class="modal-content border-0 p-4">
+    <div class="modal-header border-0 pb-0">
+      <h4 class="fw-extrabold text-indigo m-0 d-flex align-items-center gap-2">
+        <i class="bi bi-shield-check text-warning fs-3"></i>
+        Review Profile Update Request
+      </h4>
+    </div>
+    
+    <div class="modal-body py-3">
+      <!-- Loading student details -->
+      <div *ngIf="!selectedRequestStudentDetails" class="text-center py-4">
+        <div class="spinner-border text-primary spinner-border-sm" role="status"></div>
+        <p class="text-muted mt-2 small">Loading student details...</p>
+      </div>
+
+      <div *ngIf="selectedRequestStudentDetails && selectedEditRequest" class="row g-3">
+        <!-- Student Info Header -->
+        <div class="col-12 bg-light p-3 rounded-4 border d-flex align-items-center gap-3">
+          <img [src]="selectedRequestStudentDetails.profileImage || 'assets/default-avatar.png'" alt="Student avatar" class="rounded-circle border border-2 border-primary" style="width: 55px; height: 55px; object-fit: cover;">
+          <div>
+            <h6 class="fw-bold mb-0 text-dark">{{ selectedRequestStudentDetails.name }}</h6>
+            <span class="badge bg-light text-secondary border mt-1">Disability ID: {{ selectedRequestStudentDetails.disabilityId }}</span>
+            <div class="small text-muted mt-1">
+              <i class="bi bi-envelope me-1"></i>{{ selectedRequestStudentDetails.email }} | 
+              <i class="bi bi-telephone me-1"></i>{{ selectedRequestStudentDetails.phone }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Field Info -->
+        <div class="col-12">
+          <div class="row">
+            <div class="col-6">
+              <span class="d-block small fw-bold text-muted text-uppercase">Field Requested:</span>
+              <span class="badge bg-primary-gradient px-3 py-2 mt-1 text-uppercase fw-extrabold">{{ selectedEditRequest.fieldName }}</span>
+            </div>
+            <div class="col-6">
+              <span class="d-block small fw-bold text-muted text-uppercase">Status:</span>
+              <span class="badge bg-warning text-dark px-3 py-2 mt-1 text-uppercase fw-extrabold">{{ selectedEditRequest.status }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Comparison side-by-side or value displays -->
+        <div class="col-12">
+          <label class="form-label fw-bold text-muted small">Current Profile Value:</label>
+          <!-- Current value display -->
+          <div class="p-3 bg-light rounded-3 border">
+            <!-- If incomeCertificate -->
+            <div *ngIf="selectedEditRequest.fieldName === 'incomeCertificate'">
+              <span *ngIf="!selectedRequestStudentDetails.incomeCertificate" class="text-muted small">No income certificate uploaded.</span>
+              <div *ngIf="selectedRequestStudentDetails.incomeCertificate">
+                <button type="button" class="btn btn-outline-primary btn-sm py-1 px-3" (click)="openImageInNewTab(selectedRequestStudentDetails.incomeCertificate)">
+                  <i class="bi bi-eye-fill"></i> View Current Certificate
+                </button>
+              </div>
+            </div>
+            <!-- If profileImage -->
+            <div *ngIf="selectedEditRequest.fieldName === 'profileImage'">
+              <span *ngIf="!selectedRequestStudentDetails.profileImage" class="text-muted small">No profile image uploaded.</span>
+              <img *ngIf="selectedRequestStudentDetails.profileImage" [src]="selectedRequestStudentDetails.profileImage" class="rounded-circle border" style="width: 80px; height: 80px; object-fit: cover;">
+            </div>
+            <!-- Other text fields -->
+            <div *ngIf="selectedEditRequest.fieldName !== 'incomeCertificate' && selectedEditRequest.fieldName !== 'profileImage'">
+              <span class="text-dark fw-bold">{{ selectedRequestStudentDetails[selectedEditRequest.fieldName] || 'N/A' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <label class="form-label fw-bold text-muted small">Proposed New Value:</label>
+          <!-- Proposed value display -->
+          <div class="p-3 bg-light rounded-3 border">
+            <!-- If incomeCertificate -->
+            <div *ngIf="selectedEditRequest.fieldName === 'incomeCertificate'">
+              <button type="button" class="btn btn-primary btn-sm py-1 px-3" (click)="openImageInNewTab(selectedEditRequest.newValue)">
+                <i class="bi bi-file-earmark-pdf-fill"></i> View Proposed Certificate File
+              </button>
+            </div>
+            <!-- If profileImage -->
+            <div *ngIf="selectedEditRequest.fieldName === 'profileImage'">
+              <img [src]="selectedEditRequest.newValue" class="rounded-circle border" style="width: 80px; height: 80px; object-fit: cover;">
+            </div>
+            <!-- Other text fields -->
+            <div *ngIf="selectedEditRequest.fieldName !== 'incomeCertificate' && selectedEditRequest.fieldName !== 'profileImage'">
+              <span class="text-indigo fw-bold">{{ selectedEditRequest.newValue }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Student's Reason -->
+        <div class="col-12">
+          <label class="form-label fw-bold text-muted small">Student's Stated Reason / Issue:</label>
+          <div class="p-3 bg-light rounded-3 border text-dark font-italic small" style="background-color: #fffbeb !important; border-color: #fef08a !important;">
+            {{ selectedEditRequest.reason || 'No reason specified by student.' }}
+          </div>
+        </div>
+
+        <!-- Attached Proof (if any and not same as newValue) -->
+        <div class="col-12" *ngIf="selectedEditRequest.proofDocument && selectedEditRequest.proofDocument !== selectedEditRequest.newValue">
+          <label class="form-label fw-bold text-muted small">Additional Proof Document Attached:</label>
+          <div class="p-2 bg-light rounded-3 border">
+            <button type="button" class="btn btn-outline-secondary btn-sm py-1 px-3" (click)="openImageInNewTab(selectedEditRequest.proofDocument)">
+              <i class="bi bi-paperclip"></i> View Proof Document
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    
+    <div class="modal-footer border-0 pt-0 d-flex gap-2 justify-content-end">
+      <button class="btn btn-success py-2 px-4 rounded-pill fw-bold text-white" (click)="approveEditRequestFromModal()"><i class="bi bi-check-circle-fill me-1"></i> Approve & Apply</button>
+      <button class="btn btn-danger py-2 px-4 rounded-pill fw-bold text-white" (click)="rejectEditRequestFromModal()"><i class="bi bi-x-circle-fill me-1"></i> Reject</button>
+      <button class="btn btn-light py-2 px-4 rounded-pill fw-bold border" (click)="closeEditRequestDetailsModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+</div>
