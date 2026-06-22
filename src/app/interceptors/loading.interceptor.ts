@@ -5,11 +5,26 @@ import { finalize } from 'rxjs';
 
 export const loadingInterceptor: HttpInterceptorFn = (req, next) => {
   const loadingService = inject(LoadingService);
-  loadingService.show();
+  
+  // Skip showing the loader for background polling requests
+  const skipUrls = [
+    '/analytics',
+    '/notifications',
+    '/edit-requests',
+    '/broadcast-history'
+  ];
+  
+  const shouldSkipLoader = skipUrls.some(url => req.url.includes(url));
+  
+  if (!shouldSkipLoader) {
+    loadingService.show();
+  }
 
   return next(req).pipe(
     finalize(() => {
-      loadingService.hide();
+      if (!shouldSkipLoader) {
+        loadingService.hide();
+      }
     })
   );
 };
