@@ -1,8 +1,15 @@
 import { inject } from '@angular/core';
 import { HttpInterceptorFn } from '@angular/common/http';
 import { SecureStorageService } from '../services/secure-storage.service';
+import { environment } from '../../environments/environment';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
+  const isApiRequest = req.url.startsWith(environment.apiUrl);
+
+  if (!isApiRequest) {
+    return next(req);
+  }
+
   const secureStorage = inject(SecureStorageService);
   const token = secureStorage.getItem('token');
   const authUserStr = secureStorage.getItem('authUser');

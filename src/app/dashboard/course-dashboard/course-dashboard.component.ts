@@ -11,6 +11,8 @@ import { getRandomTest, TestQuestion } from '../../shared/test-pool';
 import { BrailleContentViewerComponent } from '../../braille/braille-content-viewer/braille-content-viewer.component';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { SearchTelemetryService } from '../../services/search-telemetry.service';
+import { timeout, catchError } from 'rxjs/operators';
+import { throwError, of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 
@@ -358,9 +360,12 @@ export class CourseDashboardComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     
     // Fetch all courses and filter
-    this.userService.getAllCourses().subscribe({
+    this.userService.getAllCourses().pipe(
+      timeout(10000),
+      catchError(err => throwError(() => err))
+    ).subscribe({
       next: (courses) => {
-        this.courseDetails = courses.find((c: any) => c.id === this.courseId);
+        this.courseDetails = courses.find((c: any) => c.id === this.courseId || String(c.id) === String(this.courseId));
         if (!this.courseDetails) {
           this.toastService.error('Course not found');
           this.router.navigate(['/dashboard/studentdashboard']);
@@ -368,21 +373,28 @@ export class CourseDashboardComponent implements OnInit, OnDestroy {
         }
 
         // Fetch resources for this course
-        this.userService.getResourcesByCourse(this.courseId!).subscribe({
+        this.userService.getResourcesByCourse(this.courseId!).pipe(
+          timeout(10000),
+          catchError(err => throwError(() => err))
+        ).subscribe({
           next: (res) => {
             this.resources = res || [];
             this.groupResources();
             this.checkEnrollmentStatus();
           },
           error: (err: any) => {
-            console.error(err);
-            this.isLoading = false;
+            console.error('Error fetching resources or timeout:', err);
+            this.resources = [];
+            this.groupResources();
+            // Proceed to check enrollment even if resources fail/timeout, so user isn't stuck on spinner
+            this.checkEnrollmentStatus();
           }
         });
       },
       error: (err: any) => {
-        console.error(err);
+        console.error('Error fetching courses or timeout:', err);
         this.isLoading = false;
+        this.toastService.error('Failed to load course details. Please try again.');
       }
     });
   }
@@ -391,12 +403,14 @@ export class CourseDashboardComponent implements OnInit, OnDestroy {
     const currentUser = this.userService.getCurrentUser();
     if (currentUser && this.courseId) {
       const userId = currentUser.disabilityId || currentUser.adminId || '';
-      this.userService.getEnrollment(userId, this.courseId).subscribe({
+      this.userService.getEnrollment(userId, this.courseId).pipe(
+        timeout(10000),
+        catchError(err => throwError(() => err))
+      ).subscribe({
         next: (data: any) => {
           if (data && data.id) {
             this.enrollment = data;
             this.isEnrolled = true;
-            // DO NOT auto-select first resource upon page load, start with null
             this.selectedResource = null;
             this.safeFileUrl = null;
           } else {
@@ -409,7 +423,7 @@ export class CourseDashboardComponent implements OnInit, OnDestroy {
           }
         },
         error: (err: any) => {
-          console.error(err);
+          console.error('Error fetching enrollment or timeout:', err);
           this.isEnrolled = false;
           this.isLoading = false;
           if (this.isBrowser) {
