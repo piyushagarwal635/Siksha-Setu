@@ -619,10 +619,11 @@
 
     </div>
   </div>
+</div>
 
   <!-- Modals -->
   <!-- Reject Request Modal -->
-  <div class="modal fade show d-block" tabindex="-1" *ngIf="showRejectModal" style="background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);">
+  <div class="modal fade show d-block" tabindex="-1" *ngIf="showRejectModal" style="background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); z-index: 10080;">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
       <div class="modal-content rounded-4 border-0 shadow-lg">
         <div class="modal-header border-0 pb-0">
@@ -642,7 +643,7 @@
   </div>
 
   <!-- Student Details Modal -->
-  <div class="modal fade show d-block" tabindex="-1" *ngIf="showStudentDetailsModal" style="background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);">
+  <div class="modal fade show d-block" tabindex="-1" *ngIf="showStudentDetailsModal" style="background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); z-index: 10080;">
     <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
       <div class="modal-content rounded-4 border-0 shadow-lg" *ngIf="selectedStudentUser">
         <div class="modal-header bg-light border-0">
@@ -732,7 +733,7 @@
   </div>
 
   <!-- Create / Edit Course Modal -->
-  <div class="modal fade show d-block" tabindex="-1" *ngIf="showCourseModal" style="background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); z-index: 1050;">
+  <div class="modal fade show d-block" tabindex="-1" *ngIf="showCourseModal" style="background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); z-index: 10080;">
     <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
       <div class="modal-content rounded-4 border-0 shadow-lg" style="background: #ffffff; max-height: 90vh;">
         <div class="modal-header border-0 pb-0 px-4 pt-4 d-flex justify-content-between align-items-center">
@@ -805,7 +806,7 @@
   </div>
 
     <!-- Manage Tests Modal -->
-  <div class="modal fade show d-block" tabindex="-1" *ngIf="selectedCourseForTests" style="background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); z-index: 1050;">
+  <div class="modal fade show d-block" tabindex="-1" *ngIf="selectedCourseForTests" style="background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); z-index: 10080;">
     <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
       <div class="modal-content rounded-4 border-0 shadow-lg" style="background: #ffffff;">
         <div class="modal-header border-0 pb-0 d-flex justify-content-between align-items-center p-4">
@@ -879,7 +880,7 @@
   </div>
 
   <!-- Manage Resources Modal -->
-  <div class="modal fade show d-block" tabindex="-1" *ngIf="selectedCourseForResources" style="background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); z-index: 1050;">
+  <div class="modal fade show d-block" tabindex="-1" *ngIf="selectedCourseForResources" style="background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); z-index: 10080;">
     <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
       <div class="modal-content rounded-4 border-0 shadow-lg" style="background: #ffffff;">
         <div class="modal-header border-0 pb-0 d-flex justify-content-between align-items-center p-4">
@@ -1093,6 +1094,4 @@
       <button class="btn btn-light py-2 px-4 rounded-pill fw-bold border" (click)="closeEditRequestDetailsModal()">Cancel</button>
     </div>
   </div>
-</div>
-
 </div>

@@ -225,3 +225,9 @@
   transform: translateY(-2px);
   box-shadow: var(--shadow-md) !important;
 }
+
+/* Ensure modal overlays appear above the sticky navbar (z-index 1050) */
+.modal {
+  z-index: 10080 !important;
+}
+
