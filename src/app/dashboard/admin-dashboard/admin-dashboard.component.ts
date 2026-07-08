@@ -28,6 +28,32 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   totalStudentsCount = 0;
   pendingEditsCount = 0;
 
+  // Date Filters
+  private getStoredFilter(key: string, defaultValue: number): number {
+    try {
+      const stored = localStorage.getItem(key);
+      return stored !== null ? Number(stored) : defaultValue;
+    } catch {
+      return defaultValue;
+    }
+  }
+
+  globalDateFilter = this.getStoredFilter('admin_globalDateFilter', 7);
+  summaryDateFilter = this.getStoredFilter('admin_summaryDateFilter', 7);
+  courseDateFilter = this.getStoredFilter('admin_courseDateFilter', 7);
+  resourceDateFilter = this.getStoredFilter('admin_resourceDateFilter', 7);
+  telemetryDateFilter = this.getStoredFilter('admin_telemetryDateFilter', 7);
+
+  filterOptions = [
+    { label: '7 Days', value: 7 },
+    { label: '30 Days', value: 30 },
+    { label: '60 Days', value: 60 },
+    { label: '90 Days', value: 90 },
+    { label: '1 Year', value: 365 },
+    { label: '2 Years', value: 730 },
+    { label: 'All Time', value: 0 }
+  ];
+
   // New Summary Stats
   activeStudentsCount = 0;
   totalCoursesCount = 0;
@@ -303,25 +329,30 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
         this.setSection(section);
       }
     });
-    const currentUser = this.userService.getCurrentUser();
-    if (currentUser) {
-      this.adminId = currentUser.adminId || currentUser.disabilityId || '';
-      this.adminUsername = currentUser.user || 'Admin';
-      this.profileImage = currentUser.profileImage || '';
-      this.loadStats();
-      this.loadAnalytics();
-
-      // Poll for updates every 10 seconds
-      this.refreshInterval = setInterval(() => {
-        if (this.adminId) {
+    this.userService.currentUser$.subscribe(user => {
+      if (user) {
+        this.adminId = user.adminId || user.disabilityId || '';
+        this.adminUsername = user.user || 'Admin';
+        if (user.profileImage !== undefined) {
+          this.profileImage = user.profileImage;
+        }
+        
+        if (!this.refreshInterval) {
           this.loadStats();
           this.loadAnalytics();
-          if (this.activeSection === 'edit-requests') this.loadEditRequests();
-          if (this.activeSection === 'notifications')
-            this.loadBroadcastHistory();
+          
+          this.refreshInterval = setInterval(() => {
+            if (this.adminId) {
+              this.loadStats();
+              this.loadAnalytics();
+              if (this.activeSection === 'edit-requests') this.loadEditRequests();
+              if (this.activeSection === 'notifications')
+                this.loadBroadcastHistory();
+            }
+          }, 10000);
         }
-      }, 10000);
-    }
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -992,7 +1023,52 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
 
   // Analytics Loading & Rendering Methods
   loadAnalytics(): void {
-    this.telemetryService.getAdminSummary().subscribe({
+    this.loadAdminSummary();
+    this.loadCourseAnalytics();
+    this.loadResourceAnalytics();
+    this.loadTelemetryStats();
+  }
+
+  onGlobalDateFilterChange(event: any): void {
+    const val = Number(event.target.value);
+    this.globalDateFilter = val;
+    this.summaryDateFilter = val;
+    this.courseDateFilter = val;
+    this.resourceDateFilter = val;
+    this.telemetryDateFilter = val;
+
+    localStorage.setItem('admin_globalDateFilter', val.toString());
+    localStorage.setItem('admin_summaryDateFilter', val.toString());
+    localStorage.setItem('admin_courseDateFilter', val.toString());
+    localStorage.setItem('admin_resourceDateFilter', val.toString());
+    localStorage.setItem('admin_telemetryDateFilter', val.toString());
+
+    this.loadAnalytics();
+  }
+
+  onLocalDateFilterChange(section: string, event: any): void {
+    const val = Number(event.target.value);
+    if (section === 'summary') {
+      this.summaryDateFilter = val;
+      localStorage.setItem('admin_summaryDateFilter', val.toString());
+      this.loadAdminSummary();
+    } else if (section === 'course') {
+      this.courseDateFilter = val;
+      localStorage.setItem('admin_courseDateFilter', val.toString());
+      this.loadCourseAnalytics();
+    } else if (section === 'resource') {
+      this.resourceDateFilter = val;
+      localStorage.setItem('admin_resourceDateFilter', val.toString());
+      this.loadResourceAnalytics();
+    } else if (section === 'telemetry') {
+      this.telemetryDateFilter = val;
+      localStorage.setItem('admin_telemetryDateFilter', val.toString());
+      this.loadTelemetryStats();
+    }
+  }
+
+  loadAdminSummary(): void {
+    this.telemetryService.getAdminSummary(this.summaryDateFilter).subscribe({
       next: (summary) => {
         this.totalStudentsCount = summary.totalStudents || 0;
         this.activeStudentsCount = summary.activeStudents || 0;
@@ -1012,15 +1088,19 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       },
       error: (err) => console.error('Error loading admin summary', err)
     });
+  }
 
-    this.telemetryService.getCourseAnalytics().subscribe({
+  loadCourseAnalytics(): void {
+    this.telemetryService.getCourseAnalytics(this.courseDateFilter).subscribe({
       next: (data) => {
         this.courseAnalytics = data || [];
       },
       error: (err) => console.error('Error loading course analytics', err)
     });
+  }
 
-    this.telemetryService.getResourceAnalytics().subscribe({
+  loadResourceAnalytics(): void {
+    this.telemetryService.getResourceAnalytics(this.resourceDateFilter).subscribe({
       next: (data) => {
         setTimeout(() => {
           this.renderResourceCharts(data || {});
@@ -1028,8 +1108,10 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       },
       error: (err) => console.error('Error loading resource analytics', err)
     });
+  }
 
-    this.telemetryService.getTelemetryStats().subscribe({
+  loadTelemetryStats(): void {
+    this.telemetryService.getTelemetryStats(this.telemetryDateFilter).subscribe({
       next: (stats) => {
         this.mostSearchedKeywords = stats.mostSearchedKeywords || [];
         this.mostSearchedCourses = stats.mostSearchedCourses || [];
@@ -1050,11 +1132,6 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
 
     const labels = Object.keys(data);
     const values = Object.values(data);
-
-    if (labels.length === 0) {
-      labels.push('No usage yet');
-      values.push(0);
-    }
 
     this.accessibilityChart = new Chart(canvas, {
       type: 'doughnut',
@@ -1078,7 +1155,29 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
             }
           }
         }
-      }
+      },
+      plugins: [{
+        id: 'emptyDoughnut',
+        afterDraw(chart: any) {
+          const { datasets } = chart.data;
+          const hasData = datasets[0].data.some((val: any) => Number(val) > 0);
+          if (!hasData) {
+            const { ctx, chartArea: { left, top, right, bottom } } = chart;
+            const centerX = (left + right) / 2;
+            const centerY = (top + bottom) / 2;
+            const outerRadius = Math.min(right - left, bottom - top) / 2;
+            const meta = chart.getDatasetMeta(0);
+            const innerRadius = (meta.controller as any).innerRadius || (outerRadius * 0.8);
+            const thickness = outerRadius - innerRadius;
+
+            ctx.beginPath();
+            ctx.lineWidth = thickness;
+            ctx.strokeStyle = '#e2e8f0';
+            ctx.arc(centerX, centerY, innerRadius + thickness / 2, 0, 2 * Math.PI);
+            ctx.stroke();
+          }
+        }
+      }]
     });
   }
 

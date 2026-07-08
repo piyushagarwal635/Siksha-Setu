@@ -220,23 +220,27 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
         this.setSection(section);
       }
     });
-    const currentUser = this.userService.getCurrentUser();
-    if (currentUser) {
-      this.userId = currentUser.disabilityId || '';
-      this.studentInfo.disabilityId = this.userId;
-      this.studentInfo.name = currentUser.user || '';
-      
-      this.loadAllData();
-
-      // Auto-refresh polling every 10 seconds (for notifications, activity, etc.)
-      this.refreshInterval = setInterval(() => {
-        if (this.userId) {
-          this.fetchAnalyticsData();
-          this.loadNotifications();
-          this.loadEditRequests();
+    this.userService.currentUser$.subscribe(user => {
+      if (user) {
+        this.userId = user.disabilityId || '';
+        this.studentInfo.disabilityId = this.userId;
+        this.studentInfo.name = user.user || '';
+        if (user.profileImage !== undefined) {
+          this.studentInfo.profileImage = user.profileImage;
         }
-      }, 10000);
-    }
+        
+        if (!this.refreshInterval) {
+          this.loadAllData();
+          this.refreshInterval = setInterval(() => {
+            if (this.userId) {
+              this.fetchAnalyticsData();
+              this.loadNotifications();
+              this.loadEditRequests();
+            }
+          }, 10000);
+        }
+      }
+    });
   }
 
   ngOnDestroy(): void {

@@ -1,5 +1,6 @@
 import { Injectable, Inject, PLATFORM_ID, EventEmitter } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { Subject } from 'rxjs';
 import { UserService } from './user.service';
 import { SearchTelemetryService } from './search-telemetry.service';
 
@@ -13,13 +14,17 @@ export type LineHeightMode = 'normal' | 'double';
 export class AccessibilityService {
   private isBrowser: boolean;
 
+  // Toggle Subject
+  public toggleWidget$ = new Subject<void>();
+
   // Settings State
   public contrastMode: ContrastMode = 'normal';
   public fontSize: number = 16;
   public letterSpacing: LetterSpacingMode = 'normal';
   public lineHeight: LineHeightMode = 'normal';
   public dyslexiaFont: boolean = false;
-  public largeCursor: boolean = false;
+  public cursorType: string = 'default';
+  public cursorColor: string = '#ef4444';
   public focusRuler: boolean = false;
   public soundsEnabled: boolean = true;
   public ttsEnabled: boolean = false;
@@ -78,7 +83,24 @@ export class AccessibilityService {
         this.letterSpacing = settings.letterSpacing || 'normal';
         this.lineHeight = settings.lineHeight || 'normal';
         this.dyslexiaFont = !!settings.dyslexiaFont;
-        this.largeCursor = !!settings.largeCursor;
+        
+        // Migration from old cursorStyle to new cursorType/cursorColor
+        if (settings.cursorStyle === 'large-red') {
+          this.cursorType = 'pointer'; this.cursorColor = '#ef4444';
+        } else if (settings.cursorStyle === 'large-yellow') {
+          this.cursorType = 'pointer'; this.cursorColor = '#eab308';
+        } else if (settings.cursorStyle === 'circle-dot') {
+          this.cursorType = 'circle-dot'; this.cursorColor = '#ef4444';
+        } else if (settings.cursorStyle === 'crosshair') {
+          this.cursorType = 'crosshair'; this.cursorColor = '#ef4444';
+        } else {
+          this.cursorType = settings.cursorType || 'system';
+          this.cursorColor = settings.cursorColor || '#ef4444';
+          if (!this.cursorColor) {
+            this.cursorColor = '#ef4444';
+          }
+        }
+
         this.focusRuler = !!settings.focusRuler;
         this.soundsEnabled = settings.soundsEnabled !== false;
         this.ttsEnabled = !!settings.ttsEnabled;
@@ -89,7 +111,8 @@ export class AccessibilityService {
         this.letterSpacing = 'normal';
         this.lineHeight = 'normal';
         this.dyslexiaFont = false;
-        this.largeCursor = false;
+        this.cursorType = 'system';
+        this.cursorColor = '#ef4444';
         this.focusRuler = false;
         this.soundsEnabled = true;
         this.ttsEnabled = false;
@@ -112,7 +135,8 @@ export class AccessibilityService {
         letterSpacing: this.letterSpacing,
         lineHeight: this.lineHeight,
         dyslexiaFont: this.dyslexiaFont,
-        largeCursor: this.largeCursor,
+        cursorType: this.cursorType,
+        cursorColor: this.cursorColor,
         focusRuler: this.focusRuler,
         soundsEnabled: this.soundsEnabled,
         ttsEnabled: this.ttsEnabled
@@ -135,8 +159,8 @@ export class AccessibilityService {
         if (this.dyslexiaFont) {
           this.telemetryService.logTelemetry('ACCESSIBILITY_USE', 'Dyslexia Friendly Font', 'User enabled dyslexia font', userId).subscribe();
         }
-        if (this.largeCursor) {
-          this.telemetryService.logTelemetry('ACCESSIBILITY_USE', 'Large Cursor', 'User enabled large helper mouse cursor', userId).subscribe();
+        if (this.cursorType !== 'system') {
+          this.telemetryService.logTelemetry('ACCESSIBILITY_USE', 'Cursor: ' + this.cursorType + ' (' + this.cursorColor + ')', 'User changed mouse cursor', userId).subscribe();
         }
         if (this.focusRuler) {
           this.telemetryService.logTelemetry('ACCESSIBILITY_USE', 'Focus Ruler Reading Bar', 'User enabled focus ruler bar', userId).subscribe();
@@ -192,10 +216,54 @@ export class AccessibilityService {
       body.classList.add('font-dyslexia');
     }
 
-    // Large Cursor
-    body.classList.remove('cursor-large');
-    if (this.largeCursor) {
-      body.classList.add('cursor-large');
+    this.updateDynamicCursor();
+  }
+
+  // Dynamic Cursor Injection
+  private updateDynamicCursor() {
+    if (!this.isBrowser) return;
+    const styleId = 'dynamic-a11y-cursor';
+    let styleEl = document.getElementById(styleId);
+
+    if (this.cursorType === 'system') {
+      if (styleEl) styleEl.remove();
+      return;
+    }
+
+    if (!styleEl) {
+      styleEl = document.createElement('style');
+      styleEl.id = styleId;
+      document.head.appendChild(styleEl);
+    }
+
+    const c = this.cursorColor.replace('#', '%23');
+    let svg = '';
+    let hotspot = ', auto !important';
+
+    if (this.cursorType === 'default') {
+      svg = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="${c}" stroke="%23ffffff" stroke-width="1.5"><path d="M5.5 3.21V20.8c0 .45.54.67.85.35l4.86-4.86a.5.5 0 0 1 .35-.15h6.87c.45 0 .67-.54.35-.85L6.35 2.86a.5.5 0 0 0-.85.35z"/></svg>`;
+    } else if (this.cursorType === 'pointer') {
+      svg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="${c}" stroke="%23ffffff" stroke-width="2"><path d="M5.5 3.21V20.8c0 .45.54.67.85.35l4.86-4.86a.5.5 0 0 1 .35-.15h6.87c.45 0 .67-.54.35-.85L6.35 2.86a.5.5 0 0 0-.85.35z"/></svg>`;
+    } else if (this.cursorType === 'circle-dot') {
+      svg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="14" fill="none" stroke="${c}" stroke-width="2"/><circle cx="16" cy="16" r="3" fill="${c}"/></svg>`;
+      hotspot = ' 16 16, auto !important';
+    } else if (this.cursorType === 'focus-ring') {
+      svg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="14" fill="none" stroke="${c}" stroke-width="3"/></svg>`;
+      hotspot = ' 16 16, auto !important';
+    } else if (this.cursorType === 'high-viz-arrow') {
+      svg = `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="${c}" stroke="%23000000" stroke-width="3"><path d="M5.5 3.21V20.8c0 .45.54.67.85.35l4.86-4.86a.5.5 0 0 1 .35-.15h6.87c.45 0 .67-.54.35-.85L6.35 2.86a.5.5 0 0 0-.85.35z"/></svg>`;
+    } else if (this.cursorType === 'crosshair') {
+      svg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><line x1="16" y1="2" x2="16" y2="30" stroke="${c}" stroke-width="3"/><line x1="2" y1="16" x2="30" y2="16" stroke="${c}" stroke-width="3"/><circle cx="16" cy="16" r="10" fill="none" stroke="${c}" stroke-width="2"/></svg>`;
+      hotspot = ' 16 16, auto !important';
+    }
+
+    if (svg) {
+      const dataUri = `url('data:image/svg+xml;utf8,${svg}') ${hotspot}`;
+      styleEl.innerHTML = `
+        body, body * {
+          cursor: ${dataUri};
+        }
+      `;
     }
   }
 

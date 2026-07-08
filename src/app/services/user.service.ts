@@ -56,6 +56,14 @@ export class UserService {
     return this.http.post(`${this.apiUrl}/forgot-password`, resetData);
   }
 
+  updatePassword(disabilityId: string, passwordData: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/update-password/${disabilityId}`, passwordData, { responseType: 'text' });
+  }
+
+  updateNotificationPreferences(disabilityId: string, preferences: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/update-notifications/${disabilityId}`, preferences, { responseType: 'text' });
+  }
+
   submitContactForm(contactData: any): Observable<any> {
     return this.http.post(`${environment.apiUrl}/api/contact`, contactData, { responseType: 'text' });
   }

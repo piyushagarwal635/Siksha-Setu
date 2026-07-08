@@ -105,7 +105,7 @@
             />
           </button>
         
-          <div *ngIf="menuOpen" class="dropdown-menu show mt-3 position-absolute border-0" style="min-width: 16rem; right: 0; box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important; border-radius: 20px;">
+          <div [class.d-none]="!menuOpen" class="dropdown-menu show mt-3 position-absolute border-0" style="min-width: 16rem; right: 0; box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important; border-radius: 20px;">
             <div class="px-3 py-2 text-center border-bottom mb-2">
               <img [src]="profileImage || defaultAvatar" class="rounded-circle mb-2 border shadow-sm" style="width: 50px; height: 50px; object-fit: cover;" />
               <h6 class="fw-bold mb-0 text-dark">{{ userName }}</h6>
@@ -113,9 +113,29 @@
             </div>
             
             <div class="px-2">
-              <button class="btn btn-light w-100 text-start fw-semibold mb-2 py-2 px-3 border-0 rounded-3 text-dark d-flex align-items-center" (click)="goToProfile()">
-                <i class="bi bi-person-fill text-primary me-2 fs-5"></i> My Profile
-              </button>
+                <button class="btn btn-light w-100 text-start fw-semibold mb-2 py-2 px-3 border-0 rounded-3 text-dark d-flex align-items-center" (click)="goToSettings()">
+                  <i class="bi bi-gear-fill text-primary me-2 fs-5"></i> Settings
+                </button>
+                
+                <div class="w-100 text-start fw-semibold mb-2 py-2 px-3 border-0 rounded-3 text-dark d-flex flex-column" style="background-color: #f8f9fa;" (click)="$event.stopPropagation()">
+                  <div class="d-flex align-items-center mb-1">
+                    <i class="bi bi-translate text-success me-2 fs-5"></i> Language Translator
+                  </div>
+                  <select class="form-select form-select-sm border-0 shadow-sm mt-1 fw-bold text-secondary cursor-pointer" (change)="changeLanguage($event)">
+                    <option value="">Select Language</option>
+                    <option value="en">English</option>
+                    <option value="hi">Hindi</option>
+                    <option value="mr">Marathi</option>
+                    <option value="bn">Bengali</option>
+                    <option value="gu">Gujarati</option>
+                    <option value="ta">Tamil</option>
+                    <option value="te">Telugu</option>
+                    <option value="ur">Urdu</option>
+                    <option value="ml">Malayalam</option>
+                  </select>
+                  <!-- Hide the default Google Translate UI completely -->
+                  <div id="google_translate_element" style="display: none;"></div>
+                </div>
               
               <label class="btn btn-light w-100 text-start fw-semibold mb-2 py-2 px-3 border-0 rounded-3 text-dark d-flex align-items-center cursor-pointer m-0">
                 <i class="bi bi-camera-fill text-info me-2 fs-5"></i> Update Photo

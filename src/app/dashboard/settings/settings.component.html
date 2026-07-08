@@ -1,0 +1,168 @@
+<div class="container-fluid py-4">
+  <div class="row mb-4">
+    <div class="col-12">
+      <h2 class="fw-bold mb-1">Account Settings</h2>
+      <p class="text-muted">Manage your profile, security, and notification preferences.</p>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Left Sidebar Settings Navigation -->
+    <div class="col-md-3 mb-4">
+      <div class="list-group list-group-flush rounded-3 shadow-sm border-0" style="background-color: white;">
+        <button class="list-group-item list-group-item-action py-3 border-bottom d-flex align-items-center"
+                [class.active]="activeTab === 'account'" [class.fw-bold]="activeTab === 'account'"
+                (click)="setTab('account')">
+          <i class="bi bi-person-circle fs-5 me-3" [class.text-primary]="activeTab !== 'account'"></i>
+          Account Profile
+        </button>
+
+        <button class="list-group-item list-group-item-action py-3 border-bottom d-flex align-items-center"
+                [class.active]="activeTab === 'security'" [class.fw-bold]="activeTab === 'security'"
+                (click)="setTab('security')">
+          <i class="bi bi-shield-lock-fill fs-5 me-3" [class.text-primary]="activeTab !== 'security'"></i>
+          Security & Password
+        </button>
+
+        <button *ngIf="userRole !== 'ADMIN' && userRole !== 'admin'" class="list-group-item list-group-item-action py-3 border-bottom d-flex align-items-center"
+                [class.active]="activeTab === 'notifications'" [class.fw-bold]="activeTab === 'notifications'"
+                (click)="setTab('notifications')">
+          <i class="bi bi-bell-fill fs-5 me-3" [class.text-primary]="activeTab !== 'notifications'"></i>
+          Notifications
+        </button>
+
+        <button class="list-group-item list-group-item-action py-3 d-flex align-items-center"
+                [class.active]="activeTab === 'appearance'" [class.fw-bold]="activeTab === 'appearance'"
+                (click)="setTab('appearance')">
+          <i class="bi bi-palette-fill fs-5 me-3" [class.text-primary]="activeTab !== 'appearance'"></i>
+          Appearance & Accessibility
+        </button>
+      </div>
+    </div>
+
+    <!-- Right Column Main Content -->
+    <div class="col-md-9">
+      <!-- Account Tab (Uses existing FormComponent) -->
+      <div *ngIf="activeTab === 'account'" class="fade-in">
+        <app-form></app-form>
+      </div>
+
+      <!-- Security Tab -->
+      <div *ngIf="activeTab === 'security'" class="fade-in bg-white p-4 rounded-4 shadow-sm border-0">
+        <h4 class="fw-bold mb-3">Update Password</h4>
+        <p class="text-muted mb-4">Ensure your account is using a long, random password to stay secure.</p>
+        
+        <form (ngSubmit)="updatePassword()">
+          <div class="alert alert-success" *ngIf="passwordSuccess">{{ passwordSuccess }}</div>
+          <div class="alert alert-danger" *ngIf="passwordError">{{ passwordError }}</div>
+          
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Current Password</label>
+            <input type="password" class="form-control" name="currentPassword" [(ngModel)]="currentPassword" placeholder="Enter current password">
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">New Password</label>
+            <input type="password" class="form-control" name="newPassword" [(ngModel)]="newPassword" placeholder="Enter new password">
+          </div>
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Confirm New Password</label>
+            <input type="password" class="form-control" name="confirmPassword" [(ngModel)]="confirmPassword" placeholder="Confirm new password">
+          </div>
+          <button type="submit" class="btn btn-primary px-4 py-2 fw-bold">Update Password</button>
+        </form>
+
+        <hr class="my-5">
+        <h4 class="fw-bold text-danger mb-3">Danger Zone</h4>
+        <div class="border border-danger rounded-3 p-3 d-flex justify-content-between align-items-center">
+          <div>
+            <h6 class="fw-bold mb-1">Delete Account</h6>
+            <p class="text-muted mb-0 small">Once you delete your account, there is no going back. Please be certain.</p>
+          </div>
+          <button class="btn btn-outline-danger fw-bold">Delete Account</button>
+        </div>
+      </div>
+
+      <!-- Notifications Tab -->
+      <div *ngIf="activeTab === 'notifications' && userRole !== 'ADMIN' && userRole !== 'admin'" class="fade-in bg-white p-4 rounded-4 shadow-sm border-0">
+        <h4 class="fw-bold mb-3">Email Notifications</h4>
+        <p class="text-muted mb-4">Get emails to find out what's going on when you're not online.</p>
+
+        <div class="alert alert-success" *ngIf="notifSuccess">{{ notifSuccess }}</div>
+        <div class="alert alert-danger" *ngIf="notifError">{{ notifError }}</div>
+
+        <div class="list-group list-group-flush">
+          <div class="list-group-item px-0 py-3 d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="fw-bold mb-1">New Courses & Updates</h6>
+              <p class="text-muted mb-0 small">Receive an email whenever Admin adds a new course or study material.</p>
+            </div>
+            <div class="form-check form-switch fs-4">
+              <input class="form-check-input" type="checkbox" role="switch" [(ngModel)]="courseUpdates">
+            </div>
+          </div>
+
+          <div class="list-group-item px-0 py-3 d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="fw-bold mb-1">Weekly Streak Reminders</h6>
+              <p class="text-muted mb-0 small">Get reminded to keep your learning streak alive.</p>
+            </div>
+            <div class="form-check form-switch fs-4">
+              <input class="form-check-input" type="checkbox" role="switch" [(ngModel)]="streakReminders">
+            </div>
+          </div>
+          
+          <div class="list-group-item px-0 py-3 d-flex justify-content-between align-items-center border-bottom-0">
+            <div>
+              <h6 class="fw-bold mb-1">Security Alerts</h6>
+              <p class="text-muted mb-0 small">Get notified if there is a new login to your account.</p>
+            </div>
+            <div class="form-check form-switch fs-4">
+              <input class="form-check-input" type="checkbox" role="switch" checked disabled>
+              <span class="d-block small text-primary mt-1">Required</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mt-4">
+          <button class="btn btn-primary px-4 py-2 fw-bold" (click)="saveNotificationPreferences()">Save Preferences</button>
+        </div>
+      </div>
+
+      <!-- Appearance Tab -->
+      <div *ngIf="activeTab === 'appearance'" class="fade-in bg-white p-4 rounded-4 shadow-sm border-0">
+        <h4 class="fw-bold mb-3">Appearance & Accessibility</h4>
+        <p class="text-muted mb-4">Customize the platform to fit your learning needs.</p>
+        
+        <div class="row g-4">
+          <div class="col-md-6">
+            <div class="card h-100 border-0 shadow-sm bg-light">
+              <div class="card-body text-center py-4">
+                <i class="bi bi-universal-access-circle fs-1 text-primary mb-3"></i>
+                <h5 class="fw-bold">Accessibility Widget</h5>
+                <p class="text-muted small mb-4">Open the accessibility toolbar to change themes, cursors, font sizes, and text-to-speech options.</p>
+                <!-- This will just trigger the global accessibility widget from the header -->
+                <button class="btn btn-outline-primary fw-bold w-100" (click)="openWidget()">
+                  <i class="bi bi-person-wheelchair me-2"></i> Open Widget
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-md-6">
+            <div class="card h-100 border-0 shadow-sm bg-light">
+              <div class="card-body text-center py-4">
+                <i class="bi bi-translate fs-1 text-success mb-3"></i>
+                <h5 class="fw-bold">Global Language</h5>
+                <p class="text-muted small mb-4">Use the language translator in the top menu bar to change the display language of the app instantly.</p>
+                <div class="badge bg-success bg-opacity-10 text-success border border-success p-2 w-100">
+                  <i class="bi bi-check-circle-fill me-1"></i> Translator Enabled
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

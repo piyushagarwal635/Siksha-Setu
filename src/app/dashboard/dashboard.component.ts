@@ -392,6 +392,8 @@ export class DashboardComponent implements OnInit {
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
   
+  private googleTranslateLoaded = false;
+  
   toggleMenu() {
     if (!this.menuOpen) {
       this.previousActiveElement = document.activeElement as HTMLElement;
@@ -399,6 +401,22 @@ export class DashboardComponent implements OnInit {
     this.menuOpen = !this.menuOpen;
     if (this.menuOpen) {
       this.focusModal();
+            if (!this.googleTranslateLoaded) {
+          setTimeout(() => {
+            this.googleTranslateLoaded = true;
+            (window as any).googleTranslateElementInit = () => {
+              new (window as any).google.translate.TranslateElement(
+                { pageLanguage: 'en', includedLanguages: 'en,hi,mr,bn,gu,ta,te,ur,ml', autoDisplay: false },
+                'google_translate_element'
+              );
+            };
+            const script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+            document.body.appendChild(script);
+          }, 100);
+        }
+      
     } else {
       this.restorePreviousFocus();
     }
@@ -408,8 +426,21 @@ export class DashboardComponent implements OnInit {
     this.previousActiveElement = document.activeElement as HTMLElement;
     this.showLoginModal = true;
     this.sidebarOpen = false;
+    this.menuOpen = false;
     this.topMenuOpen = false;
     this.focusModal();
+  }
+
+  changeLanguage(event: Event) {
+    const select = event.target as HTMLSelectElement;
+    const lang = select.value;
+    
+    // Find the Google Translate select element
+    const gtSelect = document.querySelector('.goog-te-combo') as HTMLSelectElement;
+    if (gtSelect) {
+      gtSelect.value = lang;
+      gtSelect.dispatchEvent(new Event('change'));
+    }
   }
 
   closeLoginModal() {
@@ -563,7 +594,12 @@ export class DashboardComponent implements OnInit {
   @HostListener('document:click', ['$event'])
   closeMenu(event: MouseEvent) {
     const target = event.target as HTMLElement;
-    if (!target.closest('.position-relative') && !target.closest('.avatar-button')) {
+    // Also check if clicked inside Google Translate iframe or popup
+    const isTranslate = target.closest('.goog-te-menu-frame') || target.closest('iframe.goog-te-menu-frame') || 
+                        target.classList.contains('goog-te-menu-value') || 
+                        target.closest('[class^="goog-"]') || target.closest('[id^="goog"]');
+                        
+    if (!target.closest('.position-relative') && !target.closest('.avatar-button') && !isTranslate) {
       this.menuOpen = false;
     }
     if (!target.closest('.search')) {
@@ -603,10 +639,10 @@ export class DashboardComponent implements OnInit {
     this.router.navigate(['/dashboard/streak']);
   }
 
-  goToProfile() {
+  goToSettings() {
     this.sidebarOpen = false;
     this.menuOpen = false;
-    this.router.navigate(['/dashboard/profile']);
+    this.router.navigate(['/dashboard/settings']);
   }
 
 }

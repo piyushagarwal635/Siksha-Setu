@@ -55,7 +55,8 @@ export const routes: Routes = [
             canActivate: [AuthGuard, RoleGuard],
             data: { role: 'ADMIN' }
           },
-          { path: 'profile', component: FormComponent, canActivate: [AuthGuard] }
+          { path: 'profile', redirectTo: 'settings', pathMatch: 'full' },
+          { path: 'settings', loadComponent: () => import('./dashboard/settings/settings.component').then(m => m.SettingsComponent), canActivate: [AuthGuard] }
       ]
     },
     { path: '**', redirectTo: '/dashboard/main' }

@@ -51,22 +51,30 @@ export class SearchTelemetryService {
   }
 
   // Admin Analytics - summary stats
-  getAdminSummary(): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/analytics/admin-summary`);
+  getAdminSummary(days?: number): Observable<any> {
+    let params: any = {};
+    if (days !== undefined) params.days = days;
+    return this.http.get<any>(`${this.apiUrl}/analytics/admin-summary`, { params });
   }
 
   // Admin Analytics - detailed course stats
-  getCourseAnalytics(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/analytics/courses`);
+  getCourseAnalytics(days?: number): Observable<any[]> {
+    let params: any = {};
+    if (days !== undefined) params.days = days;
+    return this.http.get<any[]>(`${this.apiUrl}/analytics/courses`, { params });
   }
 
   // Admin Analytics - detailed resource stats
-  getResourceAnalytics(): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/analytics/resources`);
+  getResourceAnalytics(days?: number): Observable<any> {
+    let params: any = {};
+    if (days !== undefined) params.days = days;
+    return this.http.get<any>(`${this.apiUrl}/analytics/resources`, { params });
   }
 
   // Admin Analytics - telemetry insights
-  getTelemetryStats(): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/telemetry/stats`);
+  getTelemetryStats(days?: number): Observable<any> {
+    let params: any = {};
+    if (days !== undefined) params.days = days;
+    return this.http.get<any>(`${this.apiUrl}/telemetry/stats`, { params });
   }
 }

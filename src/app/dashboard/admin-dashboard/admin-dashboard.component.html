@@ -61,6 +61,19 @@
 
       <!-- Overview Section -->
       <div *ngIf="activeSection === 'overview'" class="row g-4 fade-in">
+        
+        <!-- Global Date Filter for Overview -->
+        <div class="col-12 d-flex justify-content-between align-items-center mb-0 mt-2">
+          <h4 class="mb-0 fw-bolder text-dark">Platform Overview</h4>
+          <div class="d-flex align-items-center gap-2 bg-white px-3 py-2 rounded-pill shadow-sm border">
+            <i class="bi bi-calendar3 text-primary"></i>
+            <span class="fw-bold text-muted small text-nowrap">Global Filter:</span>
+            <select class="form-select form-select-sm border-0 shadow-none fw-semibold text-dark bg-transparent py-0" style="width: auto; cursor: pointer;" [(ngModel)]="globalDateFilter" (change)="onGlobalDateFilterChange($event)">
+              <option *ngFor="let opt of filterOptions" [value]="opt.value">{{ opt.label }}</option>
+            </select>
+          </div>
+        </div>
+
         <!-- Summary Cards Grid -->
         <div class="col-12">
           <div class="row g-3">
@@ -188,10 +201,13 @@
 
         <!-- Visual Analytics Charts -->
         <div class="col-lg-8">
-          <div class="card border-0 shadow-sm rounded-4 h-100">
-            <div class="card-header bg-transparent border-0 pt-4 pb-0 px-4">
-              <h5 class="fw-bold text-indigo mb-0"><i class="bi bi-graph-up me-2 text-primary"></i> 7-Day Resource Usage Trends</h5>
-            </div>
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+              <div class="card-header bg-transparent border-0 pt-4 pb-0 px-4 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold text-indigo mb-0"><i class="bi bi-graph-up me-2 text-primary"></i> Resource Usage Trends</h5>
+                <select class="form-select form-select-sm rounded-pill shadow-none border bg-light text-muted fw-semibold" style="width: auto;" [(ngModel)]="resourceDateFilter" (change)="onLocalDateFilterChange('resource', $event)">
+                  <option *ngFor="let opt of filterOptions" [value]="opt.value">{{ opt.label }}</option>
+                </select>
+              </div>
             <div class="card-body p-4" style="height: 300px; position: relative;">
               <canvas id="resourceTrendChart"></canvas>
             </div>
@@ -200,8 +216,11 @@
 
         <div class="col-lg-4">
           <div class="card border-0 shadow-sm rounded-4 h-100">
-            <div class="card-header bg-transparent border-0 pt-4 pb-0 px-4">
+            <div class="card-header bg-transparent border-0 pt-4 pb-0 px-4 d-flex justify-content-between align-items-center">
               <h5 class="fw-bold text-indigo mb-0"><i class="bi bi-pie-chart-fill me-2 text-pink"></i> Accessibility Preferences</h5>
+              <select class="form-select form-select-sm rounded-pill shadow-none border bg-light text-muted fw-semibold" style="width: auto;" [(ngModel)]="summaryDateFilter" (change)="onLocalDateFilterChange('summary', $event)">
+                <option *ngFor="let opt of filterOptions" [value]="opt.value">{{ opt.label }}</option>
+              </select>
             </div>
             <div class="card-body p-4" style="height: 300px; position: relative;">
               <canvas id="accessibilityChart"></canvas>
@@ -223,8 +242,11 @@
         <!-- Telemetry & Insights Section -->
         <div class="col-lg-6">
           <div class="card border-0 shadow-sm rounded-4 h-100">
-            <div class="card-header bg-transparent border-0 pt-4 pb-0 px-4">
+            <div class="card-header bg-transparent border-0 pt-4 pb-0 px-4 d-flex justify-content-between align-items-center">
               <h5 class="fw-bold text-indigo mb-0"><i class="bi bi-lightning-charge-fill text-warning me-2"></i> Telemetry & Insights</h5>
+              <select class="form-select form-select-sm rounded-pill shadow-none border bg-light text-muted fw-semibold" style="width: auto;" [(ngModel)]="telemetryDateFilter" (change)="onLocalDateFilterChange('telemetry', $event)">
+                <option *ngFor="let opt of filterOptions" [value]="opt.value">{{ opt.label }}</option>
+              </select>
             </div>
             <div class="card-body p-4">
               <div class="row g-3">
@@ -279,8 +301,11 @@
         <!-- Detailed Course Analytics -->
         <div class="col-12 mt-4">
           <div class="card border-0 shadow-sm rounded-4">
-            <div class="card-header bg-transparent border-0 pt-4 pb-0 px-4">
-              <h5 class="fw-bold text-indigo mb-0"><i class="bi bi-journal-bookmark me-2 text-primary"></i> Course Enrollments & Progress Analytics</h5>
+            <div class="card-header bg-transparent border-0 pt-4 pb-0 px-4 d-flex justify-content-between align-items-center">
+              <h5 class="fw-bold text-indigo mb-0"><i class="bi bi-journal-bookmark me-2 text-primary"></i> Course Enrollments Analytics</h5>
+              <select class="form-select form-select-sm rounded-pill shadow-none border bg-light text-muted fw-semibold" style="width: auto;" [(ngModel)]="courseDateFilter" (change)="onLocalDateFilterChange('course', $event)">
+                <option *ngFor="let opt of filterOptions" [value]="opt.value">{{ opt.label }}</option>
+              </select>
             </div>
             <div class="card-body p-0 mt-3">
               <div class="table-responsive">

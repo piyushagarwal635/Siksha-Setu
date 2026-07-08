@@ -11,7 +11,9 @@ export const loadingInterceptor: HttpInterceptorFn = (req, next) => {
     '/analytics',
     '/notifications',
     '/edit-requests',
-    '/broadcast-history'
+    '/broadcast-history',
+    '/users/all-users',
+    '/schemes'
   ];
   
   const shouldSkipLoader = skipUrls.some(url => req.url.includes(url));

@@ -20,6 +20,17 @@ export class AccessibilityWidgetComponent implements OnInit, OnDestroy {
   public showVoiceModal: boolean = false;
   public recognizedText: string = '';
   public lastExecutedCommand: string = '';
+
+  public cursorColors = [
+    { name: 'Red', value: '#ef4444' },
+    { name: 'Yellow', value: '#eab308' },
+    { name: 'Green', value: '#22c55e' },
+    { name: 'Blue', value: '#3b82f6' },
+    { name: 'Purple', value: '#a855f7' },
+    { name: 'Black', value: '#000000' },
+    { name: 'White', value: '#ffffff' }
+  ];
+
   private isBrowser: boolean;
   private voiceSubscription: any = null;
   private boundGlobalMouseOver = this.onGlobalMouseOver.bind(this);
@@ -40,6 +51,10 @@ export class AccessibilityWidgetComponent implements OnInit, OnDestroy {
       // Listen to voice commands
       this.voiceSubscription = this.accService.voiceCommandDetected.subscribe((command: string) => {
         this.handleVoiceCommand(command);
+      });
+
+      this.accService.toggleWidget$.subscribe(() => {
+        this.togglePanel();
       });
 
       // Global hover speaker listener
@@ -150,11 +165,26 @@ export class AccessibilityWidgetComponent implements OnInit, OnDestroy {
     this.accService.speakText(`Dyslexia font ${this.accService.dyslexiaFont ? 'enabled' : 'disabled'}`);
   }
 
-  public toggleCursor() {
-    this.accService.largeCursor = !this.accService.largeCursor;
+  public setCursorType(type: string) {
+    this.accService.cursorType = type;
     this.accService.saveSettings();
     this.accService.playClickSound();
-    this.accService.speakText(`Large cursor ${this.accService.largeCursor ? 'enabled' : 'disabled'}`);
+    
+    let name = 'default';
+    if (type === 'system') name = 'system default (off)';
+    if (type === 'default') name = 'standard pointer';
+    if (type === 'pointer') name = 'large pointer';
+    if (type === 'circle-dot') name = 'circle dot pointer';
+    if (type === 'focus-ring') name = 'focus ring pointer';
+    if (type === 'high-viz-arrow') name = 'high visibility pointer';
+    if (type === 'crosshair') name = 'crosshair pointer';
+    this.accService.speakText(`Cursor set to ${name}`);
+  }
+
+  public setCursorColor(color: string) {
+    this.accService.cursorColor = color;
+    this.accService.saveSettings();
+    this.accService.playClickSound();
   }
 
   public toggleRuler() {
@@ -188,7 +218,8 @@ export class AccessibilityWidgetComponent implements OnInit, OnDestroy {
     this.accService.letterSpacing = 'normal';
     this.accService.lineHeight = 'normal';
     this.accService.dyslexiaFont = false;
-    this.accService.largeCursor = false;
+    this.accService.cursorType = 'default';
+    this.accService.cursorColor = '#ef4444';
     this.accService.focusRuler = false;
     this.accService.soundsEnabled = true;
     this.accService.ttsEnabled = false;
@@ -446,8 +477,20 @@ export class AccessibilityWidgetComponent implements OnInit, OnDestroy {
       return;
     }
     if (normalizedCmd.includes('cursor') || normalizedCmd.includes('pointer') || normalizedCmd.includes('mouse') || normalizedCmd.includes('big pointer')) {
-      this.toggleCursor();
-      this.speakAndReply(cmd, `Large helper cursor ${this.accService.largeCursor ? 'enabled' : 'disabled'}.`);
+      if (normalizedCmd.includes('circle')) {
+        this.setCursorType('circle-dot');
+        this.speakAndReply(cmd, `Circle dot pointer enabled.`);
+      } else if (normalizedCmd.includes('crosshair')) {
+        this.setCursorType('crosshair');
+        this.speakAndReply(cmd, `Crosshair pointer enabled.`);
+      } else if (normalizedCmd.includes('default') || normalizedCmd.includes('normal')) {
+        this.setCursorType('default');
+        this.speakAndReply(cmd, `Default cursor restored.`);
+      } else {
+        const newStyle = this.accService.cursorType === 'default' ? 'pointer' : 'default';
+        this.setCursorType(newStyle);
+        this.speakAndReply(cmd, `Cursor ${newStyle !== 'default' ? 'enabled' : 'disabled'}.`);
+      }
       return;
     }
     if (normalizedCmd.includes('ruler') || normalizedCmd.includes('guide') || normalizedCmd.includes('focus line') || normalizedCmd.includes('reading line')) {
