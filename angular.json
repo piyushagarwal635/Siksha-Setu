@@ -31,13 +31,7 @@
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
               "node_modules/@angular/material/prebuilt-themes/indigo-pink.css"
             ],
-            "scripts": [],
-            "server": "src/main.server.ts",
-            "outputMode": "server",
-            "ssr": {
-              "entry": "src/server.ts"
-            },
-            "prerender": false
+            "scripts": []
           },
           "configurations": {
             "production": {
