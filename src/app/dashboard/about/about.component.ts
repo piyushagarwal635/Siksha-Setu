@@ -19,34 +19,34 @@ interface Milestone {
 export class AboutComponent {
   public milestones: Milestone[] = [
     {
-      year: '2023',
-      title: 'Foundation Laid',
-      desc: 'Siksha Setu was conceptualized to bridge the access gap in digital learning tools for specially-abled students across India.',
+      year: 'Inception',
+      title: 'The Spark',
+      desc: 'Piyush recognized the massive gap in digital education for specially-abled students and began conceptualizing Siksha Setu as a unified platform.',
       icon: 'bi-lightbulb-fill'
     },
     {
-      year: '2024',
-      title: 'Voice Navigation Engine',
-      desc: 'Released hands-free voice control navigation allowing visually and physically impaired learners to explore courses independently.',
-      icon: 'bi-mic-fill'
+      year: 'Development',
+      title: 'Building the Core',
+      desc: 'Started developing the main LMS (Learning Management System) features, including gamified courses, streak tracking, and secure testing environments.',
+      icon: 'bi-code-slash'
     },
     {
-      year: '2025',
-      title: 'Adaptive Learning Core',
-      desc: 'Launched gamified course environments, daily streak counters, and acoustic celebrations for successful completions.',
-      icon: 'bi-fire'
+      year: 'Integration',
+      title: 'Accessibility First',
+      desc: 'Implemented deep accessibility features: voice navigation, text-to-speech, high contrast modes, and custom cursor profiles for visually impaired users.',
+      icon: 'bi-universal-access'
     },
     {
-      year: '2026',
-      title: 'AI Roadmaps & Multi-Sensory Sync',
-      desc: 'Implementing generative AI summaries, dynamic screen readers, and side-by-side sign language sync interpretations.',
-      icon: 'bi-robot'
+      year: 'Innovation',
+      title: 'Virtual Braille Display',
+      desc: 'Developed a cutting-edge 3D virtual Braille display and liblouis integration, allowing real-time translation of study materials into readable Braille cells.',
+      icon: 'bi-grid-3x3-gap-fill'
     },
     {
-      year: '2027 (Future)',
-      title: 'Tactile Braille Hardware Sync',
-      desc: 'Developing integration protocols for physical refreshable 3D Braille displays and hardware haptic controllers.',
-      icon: 'bi-cpu-fill'
+      year: 'Future',
+      title: 'Hardware & AI',
+      desc: 'Working towards physical refreshable Braille hardware synchronization and AI-driven adaptive learning paths for personalized education.',
+      icon: 'bi-rocket-takeoff-fill'
     }
   ];
 
