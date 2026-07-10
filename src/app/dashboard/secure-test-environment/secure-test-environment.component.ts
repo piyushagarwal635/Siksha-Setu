@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UserService } from '../../services/user.service';
 import { AccessibilityService } from '../../services/accessibility.service';
-import { getRandomTest, TestQuestion } from '../../shared/test-pool';
+export interface TestQuestion { question: string; options: string[]; correctIndex: number; }
 
 @Component({
   selector: 'app-secure-test-environment',

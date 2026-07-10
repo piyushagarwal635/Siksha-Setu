@@ -7,7 +7,7 @@ import { ToastService } from '../../services/toast.service';
 import { BrailleService } from '../../services/braille.service';
 import { BrailleHardwareService } from '../../services/braille-hardware.service';
 import { AccessibilityService } from '../../services/accessibility.service';
-import { getRandomTest, TestQuestion } from '../../shared/test-pool';
+export interface TestQuestion { question: string; options: string[]; correctIndex: number; }
 import { BrailleContentViewerComponent } from '../../braille/braille-content-viewer/braille-content-viewer.component';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { SearchTelemetryService } from '../../services/search-telemetry.service';
