@@ -228,9 +228,22 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
         if (user.profileImage !== undefined) {
           this.studentInfo.profileImage = user.profileImage;
         }
-        this.loadAllData();
+        if (!this.refreshInterval) {
+          this.loadAllData();
+          this.refreshInterval = setInterval(() => {
+            if (this.userId) {
+              this.fetchAnalyticsData();
+              this.loadNotifications();
+              this.loadEditRequests();
+            }
+          }, 10000);
+        }
       }
     });
+  }
+
+  trackById(index: number, item: any): any {
+    return item.id || item._id || item.courseId || item.notificationId || index;
   }
 
   ngOnDestroy(): void {

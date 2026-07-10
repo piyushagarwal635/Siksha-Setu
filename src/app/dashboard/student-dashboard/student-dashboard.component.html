@@ -122,7 +122,7 @@
             </div>
             <div class="card-body p-4">
               <div *ngIf="enrolledCourses.length > 0" class="row g-3">
-                <div class="col-md-6" *ngFor="let enrollment of enrolledCourses">
+                <div class="col-md-6" *ngFor="let enrollment of enrolledCourses; trackBy: trackById">
                   <div 
                     class="enrolled-course-card p-3 rounded-3 border d-flex gap-3 align-items-start" 
                     style="background: rgba(79, 70, 229, 0.02);"
@@ -238,7 +238,7 @@
               <!-- Scrollable Activity Timeline -->
               <div class="activity-scroll-container">
                 <div class="timeline position-relative border-start border-2 border-primary ms-3 ps-4 pt-2">
-                  <div *ngFor="let item of activityFeed" class="mb-4 position-relative">
+                  <div *ngFor="let item of activityFeed; trackBy: trackById" class="mb-4 position-relative">
                     <span class="position-absolute top-0 start-0 translate-middle bg-white rounded-circle p-1" style="left: -1.5rem !important;">
                       <i class="bi fs-5" [ngClass]="item.icon"></i>
                     </span>
@@ -264,7 +264,7 @@
           <h2 class="h4 fw-extrabold text-indigo mb-1"><i class="bi bi-journal-text me-2 text-primary"></i> Available Courses</h2>
         </div>
         
-        <div *ngFor="let course of availableCourses" class="col-md-6">
+        <div *ngFor="let course of availableCourses; trackBy: trackById" class="col-md-6">
           <div 
             class="card course-card hover-effect h-100 border-0 rounded-4 overflow-hidden position-relative d-flex flex-column"
             tabindex="0"
@@ -367,7 +367,7 @@
             </div>
             <div class="card-body p-0 notif-scroll-box">
               <div class="list-group list-group-flush">
-                <div *ngFor="let notif of getFilteredPersonalNotifications()"
+                <div *ngFor="let notif of getFilteredPersonalNotifications(); trackBy: trackById"
                      class="list-group-item px-4 py-3 border-bottom border-light d-flex align-items-start gap-3 bg-transparent notif-item"
                      [class.notif-unread]="!notif.isRead && !notif.read"
                      tabindex="0"
@@ -408,7 +408,7 @@
             </div>
             <div class="card-body p-0 notif-scroll-box">
               <div class="list-group list-group-flush">
-                <div *ngFor="let notif of getFilteredBroadcastNotifications()"
+                <div *ngFor="let notif of getFilteredBroadcastNotifications(); trackBy: trackById"
                      class="list-group-item px-4 py-3 border-bottom border-light d-flex align-items-start gap-3 bg-transparent notif-item broadcast-item"
                      [class.notif-unread]="!notif.isRead && !notif.read"
                      tabindex="0"
@@ -453,7 +453,7 @@
             </div>
             <div class="card-body p-4">
               <div *ngIf="getFilteredSchemes().length > 0" class="row g-3">
-                <div class="col-md-4" *ngFor="let scheme of getFilteredSchemes()">
+                <div class="col-md-4" *ngFor="let scheme of getFilteredSchemes(); trackBy: trackById">
                   <div class="p-3 rounded-3 border scheme-card" style="background: rgba(16, 185, 129, 0.02); height: 100%; display: flex; flex-direction: column;">
                     <h3 class="h6 fw-bold text-dark mb-1">{{ scheme.title }}</h3>
                     <p class="small text-muted mb-3 flex-grow-1" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ scheme.summary }}</p>
@@ -489,7 +489,7 @@
           <h3 class="h5 fw-bold text-indigo mb-4 border-bottom pb-2">Certificates</h3>
           <div class="row g-4">
             <!-- Iterate over enrolled courses that have a certificate generated -->
-            <ng-container *ngFor="let enrollment of enrolledCourses; let i = index">
+            <ng-container *ngFor="let enrollment of enrolledCourses; let i = index; trackBy: trackById">
               <div class="col-md-6" *ngIf="enrollment.certificateUrl">
                 <div [id]="'certificate-card-' + i" class="certificate-card position-relative rounded-4 p-4 text-center overflow-hidden shadow-sm" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); border: 2px solid #cbd5e1;">
                   <div class="position-absolute top-0 start-0 w-100 h-100" style="background: url('assets/cert-pattern.png') center/cover opacity-5;"></div>
@@ -565,7 +565,7 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr *ngFor="let req of myEditRequests"
+                    <tr *ngFor="let req of myEditRequests; trackBy: trackById"
                         tabindex="0"
                         [attr.aria-label]="'Request for ' + (req.fieldName || req.field) + '. Requested value: ' + (req.fieldName === 'incomeCertificate' || req.fieldName === 'profileImage' ? 'File' : (req.newValue || req.requestedValue)) + '. Status: ' + req.status + '. Reason: ' + (req.reason || req.rejectionReason || 'None')">
                       <td class="px-4 py-3 fw-semibold">{{ req.fieldName || req.field }}</td>

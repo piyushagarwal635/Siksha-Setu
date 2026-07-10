@@ -69,7 +69,7 @@
             <i class="bi bi-calendar3 text-primary"></i>
             <span class="fw-bold text-muted small text-nowrap">Global Filter:</span>
             <select class="form-select form-select-sm border-0 shadow-none fw-semibold text-dark bg-transparent py-0" style="width: auto; cursor: pointer;" [(ngModel)]="globalDateFilter" (change)="onGlobalDateFilterChange($event)">
-              <option *ngFor="let opt of filterOptions" [value]="opt.value">{{ opt.label }}</option>
+              <option *ngFor="let opt of filterOptions; trackBy: trackById" [value]="opt.value">{{ opt.label }}</option>
             </select>
           </div>
         </div>
@@ -205,7 +205,7 @@
               <div class="card-header bg-transparent border-0 pt-4 pb-0 px-4 d-flex justify-content-between align-items-center">
                 <h5 class="fw-bold text-indigo mb-0"><i class="bi bi-graph-up me-2 text-primary"></i> Resource Usage Trends</h5>
                 <select class="form-select form-select-sm rounded-pill shadow-none border bg-light text-muted fw-semibold" style="width: auto;" [(ngModel)]="resourceDateFilter" (change)="onLocalDateFilterChange('resource', $event)">
-                  <option *ngFor="let opt of filterOptions" [value]="opt.value">{{ opt.label }}</option>
+                  <option *ngFor="let opt of filterOptions; trackBy: trackById" [value]="opt.value">{{ opt.label }}</option>
                 </select>
               </div>
             <div class="card-body p-4" style="height: 300px; position: relative;">
@@ -219,7 +219,7 @@
             <div class="card-header bg-transparent border-0 pt-4 pb-0 px-4 d-flex justify-content-between align-items-center">
               <h5 class="fw-bold text-indigo mb-0"><i class="bi bi-pie-chart-fill me-2 text-pink"></i> Accessibility Preferences</h5>
               <select class="form-select form-select-sm rounded-pill shadow-none border bg-light text-muted fw-semibold" style="width: auto;" [(ngModel)]="summaryDateFilter" (change)="onLocalDateFilterChange('summary', $event)">
-                <option *ngFor="let opt of filterOptions" [value]="opt.value">{{ opt.label }}</option>
+                <option *ngFor="let opt of filterOptions; trackBy: trackById" [value]="opt.value">{{ opt.label }}</option>
               </select>
             </div>
             <div class="card-body p-4" style="height: 300px; position: relative;">
@@ -245,7 +245,7 @@
             <div class="card-header bg-transparent border-0 pt-4 pb-0 px-4 d-flex justify-content-between align-items-center">
               <h5 class="fw-bold text-indigo mb-0"><i class="bi bi-lightning-charge-fill text-warning me-2"></i> Telemetry & Insights</h5>
               <select class="form-select form-select-sm rounded-pill shadow-none border bg-light text-muted fw-semibold" style="width: auto;" [(ngModel)]="telemetryDateFilter" (change)="onLocalDateFilterChange('telemetry', $event)">
-                <option *ngFor="let opt of filterOptions" [value]="opt.value">{{ opt.label }}</option>
+                <option *ngFor="let opt of filterOptions; trackBy: trackById" [value]="opt.value">{{ opt.label }}</option>
               </select>
             </div>
             <div class="card-body p-4">
@@ -253,7 +253,7 @@
                 <div class="col-md-6">
                   <h6 class="fw-bold text-muted small border-bottom pb-1 mb-2">Top Searched Keywords</h6>
                   <ul class="list-unstyled mb-0" *ngIf="mostSearchedKeywords.length > 0">
-                    <li *ngFor="let kw of mostSearchedKeywords; let i = index" class="d-flex justify-content-between align-items-center py-1 border-bottom border-light">
+                    <li *ngFor="let kw of mostSearchedKeywords; let i = index; trackBy: trackById" class="d-flex justify-content-between align-items-center py-1 border-bottom border-light">
                       <span class="small fw-semibold text-dark">{{ i+1 }}. "{{ kw.keyword }}"</span>
                       <span class="badge bg-light text-secondary border rounded-pill">{{ kw.count }} searches</span>
                     </li>
@@ -264,7 +264,7 @@
                 <div class="col-md-6">
                   <h6 class="fw-bold text-muted small border-bottom pb-1 mb-2">Most Popular Courses</h6>
                   <ul class="list-unstyled mb-0" *ngIf="mostSearchedCourses.length > 0">
-                    <li *ngFor="let c of mostSearchedCourses; let i = index" class="d-flex justify-content-between align-items-center py-1 border-bottom border-light">
+                    <li *ngFor="let c of mostSearchedCourses; let i = index; trackBy: trackById" class="d-flex justify-content-between align-items-center py-1 border-bottom border-light">
                       <span class="small fw-semibold text-dark">{{ i+1 }}. {{ c.title | slice:0:15 }}...</span>
                       <span class="badge bg-light text-secondary border rounded-pill">{{ c.count }} views</span>
                     </li>
@@ -275,7 +275,7 @@
                 <div class="col-md-6 mt-3">
                   <h6 class="fw-bold text-muted small border-bottom pb-1 mb-2">Most Opened Resources</h6>
                   <ul class="list-unstyled mb-0" *ngIf="mostViewedResources.length > 0">
-                    <li *ngFor="let r of mostViewedResources; let i = index" class="d-flex justify-content-between align-items-center py-1 border-bottom border-light">
+                    <li *ngFor="let r of mostViewedResources; let i = index; trackBy: trackById" class="d-flex justify-content-between align-items-center py-1 border-bottom border-light">
                       <span class="small fw-semibold text-dark">{{ i+1 }}. {{ r.title | slice:0:15 }}...</span>
                       <span class="badge bg-light text-secondary border rounded-pill">{{ r.count }} opens</span>
                     </li>
@@ -286,7 +286,7 @@
                 <div class="col-md-6 mt-3">
                   <h6 class="fw-bold text-muted small border-bottom pb-1 mb-2">Top Accessibility Options</h6>
                   <ul class="list-unstyled mb-0" *ngIf="mostUsedAccessibilityFeatures.length > 0">
-                    <li *ngFor="let ac of mostUsedAccessibilityFeatures; let i = index" class="d-flex justify-content-between align-items-center py-1 border-bottom border-light">
+                    <li *ngFor="let ac of mostUsedAccessibilityFeatures; let i = index; trackBy: trackById" class="d-flex justify-content-between align-items-center py-1 border-bottom border-light">
                       <span class="small fw-semibold text-dark" style="font-size: 0.75rem;">{{ i+1 }}. {{ ac.feature | slice:0:18 }}</span>
                       <span class="badge bg-light text-secondary border rounded-pill">{{ ac.count }} times</span>
                     </li>
@@ -304,7 +304,7 @@
             <div class="card-header bg-transparent border-0 pt-4 pb-0 px-4 d-flex justify-content-between align-items-center">
               <h5 class="fw-bold text-indigo mb-0"><i class="bi bi-journal-bookmark me-2 text-primary"></i> Course Enrollments Analytics</h5>
               <select class="form-select form-select-sm rounded-pill shadow-none border bg-light text-muted fw-semibold" style="width: auto;" [(ngModel)]="courseDateFilter" (change)="onLocalDateFilterChange('course', $event)">
-                <option *ngFor="let opt of filterOptions" [value]="opt.value">{{ opt.label }}</option>
+                <option *ngFor="let opt of filterOptions; trackBy: trackById" [value]="opt.value">{{ opt.label }}</option>
               </select>
             </div>
             <div class="card-body p-0 mt-3">
@@ -322,7 +322,7 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr *ngFor="let ca of courseAnalytics">
+                    <tr *ngFor="let ca of courseAnalytics; trackBy: trackById">
                       <td class="px-4 py-3"><span class="badge bg-primary rounded-pill">#{{ ca.popularityRanking }}</span></td>
                       <td class="py-3 fw-bold text-dark">{{ ca.title }}</td>
                       <td class="py-3 text-muted">{{ ca.totalStudents }}</td>
@@ -361,7 +361,7 @@
             
             <select class="form-select rounded-pill border px-3 bg-white" style="width: 175px; box-shadow: none;" [(ngModel)]="courseCategoryFilter">
               <option value="">All Categories</option>
-              <option *ngFor="let cat of getDynamicCategories()" [value]="cat">{{ cat }}</option>
+              <option *ngFor="let cat of getDynamicCategories(); trackBy: trackById" [value]="cat">{{ cat }}</option>
             </select>
 
             <select class="form-select rounded-pill border px-3 bg-white" style="width: 175px; box-shadow: none;" [(ngModel)]="courseDifficultyFilter">
@@ -378,7 +378,7 @@
         
         <div class="col-12">
           <div class="row g-3">
-            <div class="col-md-4 col-lg-4" *ngFor="let course of getFilteredCourses()">
+            <div class="col-md-4 col-lg-4" *ngFor="let course of getFilteredCourses(); trackBy: trackById">
               <div class="card course-card hover-effect h-100 border-0 rounded-4 overflow-hidden position-relative d-flex flex-column">
                 <div class="course-img-wrapper position-relative">
                   <img [src]="course.image || 'assets/default-course.png'" class="card-img-top course-img" alt="{{ course.title }}">
@@ -450,7 +450,7 @@
               
               <h6 class="fw-bold text-muted mb-3 mt-4 border-bottom pb-2">Broadcast History</h6>
               <div class="list-group list-group-flush">
-                <div *ngFor="let msg of broadcastHistory" class="list-group-item px-0 py-3 d-flex align-items-start border-light bg-transparent">
+                <div *ngFor="let msg of broadcastHistory; trackBy: trackById" class="list-group-item px-0 py-3 d-flex align-items-start border-light bg-transparent">
                   <div class="me-3 fs-3" [ngClass]="{
                     'text-info': msg.type?.includes('INFO'),
                     'text-warning': msg.type?.includes('WARNING'),
@@ -509,7 +509,7 @@
                 <input type="text" class="form-control form-control-sm border shadow-none rounded-pill" style="width: 180px;" placeholder="Filter schemes..." [(ngModel)]="schemeSearchQuery">
               </div>
               <div class="list-group list-group-flush">
-                <div *ngFor="let scheme of getFilteredSchemes()" class="list-group-item px-0 py-3 bg-transparent border-light">
+                <div *ngFor="let scheme of getFilteredSchemes(); trackBy: trackById" class="list-group-item px-0 py-3 bg-transparent border-light">
                   <div class="d-flex justify-content-between align-items-start">
                     <div>
                       <h6 class="fw-bold text-dark mb-1">{{ scheme.title }}</h6>
@@ -563,7 +563,7 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr *ngFor="let student of getFilteredStudents()">
+                    <tr *ngFor="let student of getFilteredStudents(); trackBy: trackById">
                       <td class="px-4 py-3">
                         <div class="d-flex align-items-center">
                           <img [src]="student.profileImage || 'assets/default-avatar.png'" alt="Avatar" class="rounded-circle me-3 border border-2 border-light shadow-sm" style="width: 45px; height: 45px; object-fit: cover;">
@@ -617,7 +617,7 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr *ngFor="let req of getFilteredEditRequests()">
+                    <tr *ngFor="let req of getFilteredEditRequests(); trackBy: trackById">
                       <td class="px-4 py-3 text-muted">{{ req.userId }}</td>
                       <td class="py-3 fw-bold text-dark">{{ req.fieldName }}</td>
                       <td class="py-3 text-primary fw-semibold">
@@ -704,7 +704,7 @@
               </div>
               <p class="mb-1 small"><i class="bi bi-star-fill text-info me-2"></i> <strong>Preferred Format:</strong> {{ selectedStudentAnalytics?.progress?.resourcePreference || 'General' }}</p>
               <p class="mb-1 small"><i class="bi bi-gear-fill text-info me-2"></i> <strong>Accessibility Toggles:</strong> 
-                <span *ngFor="let pref of selectedStudentAnalytics?.accessPreferences" class="badge bg-light text-dark border me-1">{{ pref }}</span>
+                <span *ngFor="let pref of selectedStudentAnalytics?.accessPreferences; trackBy: trackById" class="badge bg-light text-dark border me-1">{{ pref }}</span>
                 <span *ngIf="!selectedStudentAnalytics?.accessPreferences || selectedStudentAnalytics?.accessPreferences.length === 0" class="text-muted">None logged</span>
               </p>
               <p class="mb-0 small"><i class="bi bi-calendar-check text-info me-2"></i> <strong>Total Activities Logged:</strong> {{ selectedStudentAnalytics?.activityTracker?.length || 0 }}</p>
@@ -725,7 +725,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let en of selectedStudentAnalytics.enrollments">
+                <tr *ngFor="let en of selectedStudentAnalytics.enrollments; trackBy: trackById">
                   <td class="fw-bold">{{ en.course?.title || en.course?.id }}</td>
                   <td>{{ en.enrolledAt | date:'mediumDate' }}</td>
                   <td><span class="badge bg-light text-dark border">{{ en.resourcePreference }}</span></td>
@@ -855,12 +855,12 @@
             </div>
 
             <div class="list-group">
-              <div *ngFor="let q of courseTestQuestions; let i = index" class="list-group-item list-group-item-action p-3 rounded-4 border mb-2 shadow-sm">
+              <div *ngFor="let q of courseTestQuestions; let i = index; trackBy: trackById" class="list-group-item list-group-item-action p-3 rounded-4 border mb-2 shadow-sm">
                 <div class="d-flex justify-content-between align-items-start">
                   <div>
                     <h6 class="fw-bold mb-2">Q{{ i + 1 }}. {{ q.question }}</h6>
                     <ul class="list-unstyled mb-0 small text-muted">
-                      <li *ngFor="let opt of q.options; let optIdx = index" [class.text-success]="optIdx === q.correctIndex" [class.fw-bold]="optIdx === q.correctIndex">
+                      <li *ngFor="let opt of q.options; let optIdx = index; trackBy: trackById" [class.text-success]="optIdx === q.correctIndex" [class.fw-bold]="optIdx === q.correctIndex">
                         <i class="bi" [ngClass]="{'bi-check-circle-fill': optIdx === q.correctIndex, 'bi-circle': optIdx !== q.correctIndex}"></i> {{ opt }}
                       </li>
                     </ul>
@@ -885,7 +885,7 @@
             
             <div class="mb-3">
               <label class="form-label fw-bold small text-muted">Options (At least 2)</label>
-              <div class="input-group mb-2" *ngFor="let opt of newTestQuestion.options; let idx = index; trackBy: trackByIndex">
+              <div class="input-group mb-2" *ngFor="let opt of newTestQuestion.options; let idx = index; trackBy: trackByIndex; trackBy: trackById">
                 <div class="input-group-text bg-white border">
                   <input class="form-check-input mt-0" type="radio" name="correctIndex" [value]="idx" [(ngModel)]="newTestQuestion.correctIndex">
                 </div>
@@ -969,7 +969,7 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr *ngFor="let res of getFilteredCourseResources()">
+                    <tr *ngFor="let res of getFilteredCourseResources(); trackBy: trackById">
                       <td class="py-2 fw-bold text-dark">{{ res.title }}</td>
                       <td class="py-2">
                         <span class="badge bg-light text-dark border">{{ res.type }}</span>
