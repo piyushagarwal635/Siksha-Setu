@@ -228,17 +228,7 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
         if (user.profileImage !== undefined) {
           this.studentInfo.profileImage = user.profileImage;
         }
-        
-        if (!this.refreshInterval) {
-          this.loadAllData();
-          this.refreshInterval = setInterval(() => {
-            if (this.userId) {
-              this.fetchAnalyticsData();
-              this.loadNotifications();
-              this.loadEditRequests();
-            }
-          }, 10000);
-        }
+        this.loadAllData();
       }
     });
   }

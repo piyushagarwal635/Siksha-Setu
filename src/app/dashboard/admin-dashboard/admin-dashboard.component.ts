@@ -337,20 +337,8 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
           this.profileImage = user.profileImage;
         }
         
-        if (!this.refreshInterval) {
-          this.loadStats();
-          this.loadAnalytics();
-          
-          this.refreshInterval = setInterval(() => {
-            if (this.adminId) {
-              this.loadStats();
-              this.loadAnalytics();
-              if (this.activeSection === 'edit-requests') this.loadEditRequests();
-              if (this.activeSection === 'notifications')
-                this.loadBroadcastHistory();
-            }
-          }, 10000);
-        }
+        this.loadStats();
+        this.loadAnalytics();
       }
     });
   }
