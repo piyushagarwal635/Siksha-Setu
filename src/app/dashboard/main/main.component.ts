@@ -2,14 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { ToastService } from '../../services/toast.service';
 import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-main',
   standalone: true,
-  imports: [MatExpansionModule, CommonModule, MatTabsModule],
+  imports: [MatExpansionModule, CommonModule, MatTabsModule, RouterModule],
   templateUrl: './main.component.html',
   styleUrls: ['./main.component.css']
 })
