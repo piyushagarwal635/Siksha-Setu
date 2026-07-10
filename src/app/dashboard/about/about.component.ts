@@ -40,7 +40,7 @@ export class AboutComponent {
       year: 'Innovation',
       title: 'Virtual Braille Display',
       desc: 'Developed a cutting-edge 3D virtual Braille display and liblouis integration, allowing real-time translation of study materials into readable Braille cells.',
-      icon: 'bi-grid-3x3'
+      icon: 'bi-grid-fill'
     },
     {
       year: 'Future',
