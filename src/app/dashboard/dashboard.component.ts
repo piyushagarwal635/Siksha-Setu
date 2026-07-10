@@ -11,6 +11,7 @@ import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { FormsModule } from '@angular/forms';
 import { SearchTelemetryService } from '../services/search-telemetry.service';
+import { AiService } from '../services/ai.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -24,6 +25,13 @@ export class DashboardComponent implements OnInit {
   showChatbot: boolean = false;
   showWarning: boolean = false;
   allCourses: any[] = [];
+  
+  // Custom Chatbot State
+  chatMessages: { text: string, isBot: boolean }[] = [
+    { text: 'Hello! I am the Siksha Setu AI Assistant. How can I help you today?', isBot: true }
+  ];
+  chatInput: string = '';
+  isChatLoading: boolean = false;
 
   previousActiveElement: HTMLElement | null = null;
 
@@ -55,6 +63,40 @@ export class DashboardComponent implements OnInit {
       this.focusModal();
     } else {
       this.restorePreviousFocus();
+    }
+  }
+
+  sendChatMessage() {
+    if (!this.chatInput.trim() || this.isChatLoading) return;
+    
+    const userMessage = this.chatInput.trim();
+    this.chatMessages.push({ text: userMessage, isBot: false });
+    this.chatInput = '';
+    this.isChatLoading = true;
+    
+    // Auto-scroll chat (if implemented with ViewChild, otherwise let Angular handle it)
+    setTimeout(() => this.scrollToBottom(), 100);
+
+    const userId = this.disabilityId || 'anonymous';
+    
+    this.aiService.askQuestion(userId, userMessage).subscribe({
+      next: (res) => {
+        this.chatMessages.push({ text: res.response, isBot: true });
+        this.isChatLoading = false;
+        setTimeout(() => this.scrollToBottom(), 100);
+      },
+      error: (err) => {
+        this.chatMessages.push({ text: 'Sorry, I am having trouble connecting right now.', isBot: true });
+        this.isChatLoading = false;
+        setTimeout(() => this.scrollToBottom(), 100);
+      }
+    });
+  }
+
+  scrollToBottom() {
+    const chatContainer = document.querySelector('.chat-messages');
+    if (chatContainer) {
+      chatContainer.scrollTop = chatContainer.scrollHeight;
     }
   }
 
@@ -388,6 +430,7 @@ export class DashboardComponent implements OnInit {
     private adminService: AdminService,
     private toastService: ToastService, 
     private telemetryService: SearchTelemetryService,
+    private aiService: AiService,
     private elementRef: ElementRef,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}

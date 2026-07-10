@@ -219,15 +219,37 @@
   <button class="chatbot-icon border-0" (click)="toggleChatbot()" title="Open AI Assistant" aria-label="Open AI Assistant Chatbot" [attr.aria-expanded]="showChatbot">
     <i class="bi bi-robot"></i>
   </button>
-  <div class="chatbot-popup" *ngIf="showChatbot">
-    <iframe 
-      src="https://cdn.botpress.cloud/webchat/v2.2/shareable.html?configUrl=https://files.bpcontent.cloud/2025/02/02/07/20250202073519-TKZMWKTW.json" 
-      width="350px" 
-      height="500px" 
-      frameborder="0" 
-      style="border: none; overflow: hidden;"
-      title="chatbot">
-    </iframe>
+  <div class="chatbot-popup shadow-lg rounded-4 overflow-hidden" *ngIf="showChatbot" style="width: 350px; background: white;">
+    <div class="chatbot-header d-flex justify-content-between align-items-center bg-primary text-white p-3 border-bottom">
+      <div class="d-flex align-items-center">
+        <img src="Siksha-logo-without-background.png" alt="Logo" width="30" class="me-2 rounded-circle bg-white p-1">
+        <h6 class="mb-0 fw-bold">Siksha AI Assistant</h6>
+      </div>
+      <button class="btn btn-sm text-white border-0 p-0" (click)="toggleChatbot()"><i class="bi bi-x-lg fs-5"></i></button>
+    </div>
+    
+    <div class="chat-messages p-3" style="height: 380px; overflow-y: auto; background-color: #f8fafc; scroll-behavior: smooth;">
+      <div *ngFor="let msg of chatMessages" class="mb-3 d-flex" [ngClass]="{'justify-content-start': msg.isBot, 'justify-content-end': !msg.isBot}">
+        <div class="p-2 px-3 rounded-4" style="max-width: 85%;" [ngClass]="msg.isBot ? 'bg-white border shadow-sm text-dark' : 'bg-primary text-white shadow-sm'">
+          <span class="d-block" style="font-size: 0.95rem; line-height: 1.5; white-space: pre-wrap;">{{ msg.text }}</span>
+        </div>
+      </div>
+      
+      <div *ngIf="isChatLoading" class="mb-3 d-flex justify-content-start">
+        <div class="p-2 px-3 rounded-4 bg-white border shadow-sm text-dark d-flex align-items-center gap-1" style="max-width: 85%; height: 38px;">
+          <div class="spinner-grow spinner-grow-sm text-primary opacity-75" role="status" style="width: 0.4rem; height: 0.4rem;"></div>
+          <div class="spinner-grow spinner-grow-sm text-primary opacity-75" role="status" style="width: 0.4rem; height: 0.4rem; animation-delay: 0.2s"></div>
+          <div class="spinner-grow spinner-grow-sm text-primary opacity-75" role="status" style="width: 0.4rem; height: 0.4rem; animation-delay: 0.4s"></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="chatbot-input p-3 border-top bg-white d-flex gap-2">
+      <input type="text" class="form-control rounded-pill border shadow-sm px-3 py-2" placeholder="Ask Siksha AI..." [(ngModel)]="chatInput" (keydown.enter)="sendChatMessage()" [disabled]="isChatLoading">
+      <button class="btn btn-primary rounded-circle shadow-sm d-flex align-items-center justify-content-center p-0 flex-shrink-0" style="width: 44px; height: 44px;" (click)="sendChatMessage()" [disabled]="isChatLoading || !chatInput.trim()">
+        <i class="bi bi-send-fill fs-5"></i>
+      </button>
+    </div>
   </div>
 </div>
 
