@@ -1,5 +1,5 @@
-import { CommonModule } from '@angular/common';
-import { Component, OnInit, OnDestroy, HostListener, ElementRef } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { Component, OnInit, OnDestroy, HostListener, ElementRef, Inject, PLATFORM_ID, NgZone } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { UserService } from '../../services/user.service';
 import { NotificationService, NotificationItem } from '../../services/notification.service';
@@ -71,7 +71,9 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private telemetryService: SearchTelemetryService,
-    private elementRef: ElementRef
+    private elementRef: ElementRef,
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private ngZone: NgZone
   ) {}
 
   isSectionScopeActive = false;
@@ -228,15 +230,19 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
         if (user.profileImage !== undefined) {
           this.studentInfo.profileImage = user.profileImage;
         }
-        if (!this.refreshInterval) {
+        if (!this.refreshInterval && isPlatformBrowser(this.platformId)) {
           this.loadAllData();
-          this.refreshInterval = setInterval(() => {
-            if (this.userId) {
-              this.fetchAnalyticsData();
-              this.loadNotifications();
-              this.loadEditRequests();
-            }
-          }, 10000);
+          this.ngZone.runOutsideAngular(() => {
+            this.refreshInterval = setInterval(() => {
+              if (this.userId) {
+                this.ngZone.run(() => {
+                  this.fetchAnalyticsData();
+                  this.loadNotifications();
+                  this.loadEditRequests();
+                });
+              }
+            }, 10000);
+          });
         }
       }
     });

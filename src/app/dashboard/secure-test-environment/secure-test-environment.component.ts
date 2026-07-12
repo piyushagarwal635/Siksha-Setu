@@ -1,5 +1,5 @@
-import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, OnDestroy, HostListener, Inject, PLATFORM_ID, NgZone } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UserService } from '../../services/user.service';
@@ -39,7 +39,17 @@ export class SecureTestEnvironmentComponent implements OnInit, OnDestroy {
   private boundVisibilityChange = this.handleVisibilityChange.bind(this);
   private boundFullscreenChange = this.handleFullscreenChange.bind(this);
 
-  constructor(private route: ActivatedRoute, private router: Router, private userService: UserService, private accService: AccessibilityService) { const user = this.userService.getCurrentUser(); this.userId = user ? (user.disabilityId || user.adminId || null) : null; }
+  constructor(
+    private route: ActivatedRoute, 
+    private router: Router, 
+    private userService: UserService, 
+    private accService: AccessibilityService,
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private ngZone: NgZone
+  ) { 
+    const user = this.userService.getCurrentUser(); 
+    this.userId = user ? (user.disabilityId || user.adminId || null) : null; 
+  }
 
   ngOnInit() {
     this.courseId = this.route.snapshot.paramMap.get('courseId');
@@ -190,12 +200,18 @@ export class SecureTestEnvironmentComponent implements OnInit, OnDestroy {
     
     
 
-    this.questionTimerInterval = setInterval(() => {
-      this.questionTimerSeconds--;
-      if (this.questionTimerSeconds <= 0) {
-        this.nextQuestion();
-      }
-    }, 1000);
+    if (isPlatformBrowser(this.platformId)) {
+      this.ngZone.runOutsideAngular(() => {
+        this.questionTimerInterval = setInterval(() => {
+          this.ngZone.run(() => {
+            this.questionTimerSeconds--;
+            if (this.questionTimerSeconds <= 0) {
+              this.nextQuestion();
+            }
+          });
+        }, 1000);
+      });
+    }
   }
 
   clearTimers() {

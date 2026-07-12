@@ -1,5 +1,5 @@
-import { Component, OnInit, OnDestroy, HostListener, ElementRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, OnDestroy, HostListener, ElementRef, Inject, PLATFORM_ID, NgZone } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { AdminService } from '../../services/admin.service';
@@ -165,7 +165,9 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     private toastService: ToastService,
     private telemetryService: SearchTelemetryService,
     private route: ActivatedRoute,
-    private elementRef: ElementRef
+    private elementRef: ElementRef,
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private ngZone: NgZone
   ) {}
 
   isSectionScopeActive = false;
@@ -336,19 +338,23 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
         if (user.profileImage !== undefined) {
           this.profileImage = user.profileImage;
         }
-        if (!this.refreshInterval) {
+        if (!this.refreshInterval && isPlatformBrowser(this.platformId)) {
           this.loadStats();
           this.loadAnalytics();
           
-          this.refreshInterval = setInterval(() => {
-            if (this.adminId) {
-              this.loadStats();
-              this.loadAnalytics();
-              if (this.activeSection === 'edit-requests') this.loadEditRequests();
-              if (this.activeSection === 'notifications')
-                this.loadBroadcastHistory();
-            }
-          }, 10000);
+          this.ngZone.runOutsideAngular(() => {
+            this.refreshInterval = setInterval(() => {
+              if (this.adminId) {
+                this.ngZone.run(() => {
+                  this.loadStats();
+                  this.loadAnalytics();
+                  if (this.activeSection === 'edit-requests') this.loadEditRequests();
+                  if (this.activeSection === 'notifications')
+                    this.loadBroadcastHistory();
+                });
+              }
+            }, 10000);
+          });
         }
       }
     });
