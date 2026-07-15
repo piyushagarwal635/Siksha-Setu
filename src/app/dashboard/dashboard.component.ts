@@ -276,7 +276,7 @@ export class DashboardComponent implements OnInit {
         const id = currentUser.disabilityId || currentUser.adminId || '';
         const role = this.userService.getUserRole(currentUser);
         if (role === 'ADMIN') {
-          this.adminService.getAdminById(id).subscribe({
+          this.adminService.getAdminById(id, true).subscribe({
             next: (adminData) => {
               if (adminData) {
                 const updatedUser = {
@@ -291,7 +291,7 @@ export class DashboardComponent implements OnInit {
             error: (err) => console.error('Error fetching admin details on load:', err)
           });
         } else {
-          this.userService.getUserByDisabilityId(id).subscribe({
+          this.userService.getUserByDisabilityId(id, true).subscribe({
             next: (userData) => {
               if (userData) {
                 const updatedUser = {
@@ -309,7 +309,7 @@ export class DashboardComponent implements OnInit {
         }
       }
       // Fetch courses for search
-      this.userService.getAllCourses().subscribe({
+      this.userService.getAllCourses(true).subscribe({
         next: (courses) => {
           this.allCourses = courses;
         },
@@ -412,7 +412,7 @@ export class DashboardComponent implements OnInit {
   bestStreak = 0;
 
   updateAndLoadStreak(userId: string): void {
-    this.userService.updateLoginStreak(userId).subscribe({
+    this.userService.updateLoginStreak(userId, true).subscribe({
       next: (progress: any) => {
         this.currentStreak = progress.currentStreak || 0;
         this.bestStreak = progress.longestStreak || 0;

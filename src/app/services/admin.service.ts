@@ -11,8 +11,10 @@ export class AdminService {
 
   constructor(private http: HttpClient) {}
 
-  getAdminById(adminId: string): Observable<any> {
-    return this.http.get<any>(`${this.adminApiUrl}/${adminId}`);
+  getAdminById(adminId: string, silent: boolean = false): Observable<any> {
+    let url = `${this.adminApiUrl}/${adminId}`;
+    if (silent) url += '?silent=true';
+    return this.http.get<any>(url);
   }
 
   updateAdmin(adminId: string, adminData: any): Observable<any> {

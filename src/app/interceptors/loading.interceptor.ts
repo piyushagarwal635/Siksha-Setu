@@ -15,10 +15,11 @@ export const loadingInterceptor: HttpInterceptorFn = (req, next) => {
     '/users/all-users',
     '/schemes',
     '/api/chat',
-    '/telemetry'
+    '/telemetry',
+    'silent=true'
   ];
   
-  const shouldSkipLoader = skipUrls.some(url => req.url.includes(url));
+  const shouldSkipLoader = skipUrls.some(url => req.urlWithParams.includes(url));
   
   if (!shouldSkipLoader) {
     loadingService.show();

@@ -141,8 +141,10 @@ export class UserService {
     return user ? user.user : null;
   }
 
-  getUserByDisabilityId(disabilityId: string): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/${disabilityId}`);
+  getUserByDisabilityId(disabilityId: string, silent: boolean = false): Observable<any> {
+    let url = `${this.apiUrl}/${disabilityId}`;
+    if (silent) url += '?silent=true';
+    return this.http.get<any>(url);
   }
 
   getUserRole(user: AuthUser | null): string {
@@ -167,8 +169,10 @@ export class UserService {
     return this.http.post(`${environment.apiUrl}/api/auth/forgot-password/answer`, resetData, { responseType: 'text' });
   }
 
-  updateLoginStreak(userId: string): Observable<any> {
-    return this.http.post(`${environment.apiUrl}/api/student/${userId}/login-streak`, null);
+  updateLoginStreak(userId: string, silent: boolean = false): Observable<any> {
+    let url = `${environment.apiUrl}/api/student/${userId}/login-streak`;
+    if (silent) url += '?silent=true';
+    return this.http.post(url, null);
   }
 
   restoreStreak(userId: string): Observable<any> {
@@ -197,8 +201,12 @@ export class UserService {
   }
 
   // Course and Resource Endpoints
-  getAllCourses(): Observable<any[]> {
-    return this.http.get<any[]>(`${environment.apiUrl}/api/courses`);
+  getAllCourses(silent: boolean = false): Observable<any[]> {
+    let url = `${environment.apiUrl}/api/courses`;
+    if (silent) {
+      url += '?silent=true';
+    }
+    return this.http.get<any[]>(url);
   }
 
   getAllResources(): Observable<any[]> {

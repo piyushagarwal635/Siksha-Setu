@@ -28,7 +28,7 @@ export class MainComponent implements OnInit {
   }
 
   loadCourses(): void {
-    this.userService.getAllCourses().subscribe({
+    this.userService.getAllCourses(true).subscribe({
       next: (data) => {
         // Show up to 6 courses on the main page
         this.courses = (data || []).slice(0, 6);
