@@ -19,7 +19,6 @@ import { SearchTelemetryService } from '../../services/search-telemetry.service'
 export class StudentDashboardComponent implements OnInit, OnDestroy {
   activeSection = 'overview';
   isLoading = false;
-  isSectionLoading = false;
   userId = '';
   
   studentInfo = {
@@ -307,20 +306,13 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
   setSection(section: string): void {
     this.activeSection = section;
     this.isSectionScopeActive = true;
-    this.isSectionLoading = true;
-    
-    // Simulate loading for better UX or re-fetch section data if needed
-    setTimeout(() => {
-      this.isSectionLoading = false;
-    }, 600);
-
     setTimeout(() => {
       const activeSectionEl = document.querySelector('.col-lg-9 h2, .col-lg-9 h4, .col-lg-9 h5') as HTMLElement;
       if (activeSectionEl) {
         activeSectionEl.setAttribute('tabindex', '-1');
         activeSectionEl.focus();
       }
-    }, 650);
+    }, 150);
   }
 
   loadStudentProfile(): void {

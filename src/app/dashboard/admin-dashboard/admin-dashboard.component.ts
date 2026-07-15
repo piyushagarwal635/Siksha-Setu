@@ -20,7 +20,6 @@ Chart.register(...registerables);
 export class AdminDashboardComponent implements OnInit, OnDestroy {
   activeSection = 'overview';
   isLoading = false;
-  isSectionLoading = false;
   adminId = '';
   adminUsername = '';
   profileImage = '';
@@ -374,38 +373,24 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   setSection(section: string): void {
     this.activeSection = section;
     this.isSectionScopeActive = true;
-    this.isSectionLoading = true;
-    
     if (section === 'overview') {
       this.loadStats();
       this.loadAnalytics();
-      setTimeout(() => this.isSectionLoading = false, 600);
     }
-    else if (section === 'courses') {
-      this.loadCourses();
-      setTimeout(() => this.isSectionLoading = false, 600);
-    }
-    else if (section === 'edit-requests') {
-      this.loadEditRequests();
-      setTimeout(() => this.isSectionLoading = false, 600);
-    }
-    else if (section === 'student-directory') {
-      this.loadStudentDirectory();
-      setTimeout(() => this.isSectionLoading = false, 600);
-    }
+    else if (section === 'courses') this.loadCourses();
+    else if (section === 'edit-requests') this.loadEditRequests();
+    else if (section === 'student-directory') this.loadStudentDirectory();
     else if (section === 'notifications') {
       this.loadBroadcastHistory();
       this.loadSchemes();
-      setTimeout(() => this.isSectionLoading = false, 600);
     }
-    
     setTimeout(() => {
       const activeSectionEl = document.querySelector('.col-lg-9 h2, .col-lg-9 h4, .col-lg-9 h5') as HTMLElement;
       if (activeSectionEl) {
         activeSectionEl.setAttribute('tabindex', '-1');
         activeSectionEl.focus();
       }
-    }, 650);
+    }, 150);
   }
 
   loadStats(): void {

@@ -66,15 +66,8 @@
         <p class="fs-5 text-white-50 mb-0">Ready to conquer your goals today? Dive into your courses and build that streak!</p>
       </div>
 
-      <!-- Section Loader (Removed per user feedback) -->
-
       <!-- ==================== OVERVIEW SECTION ==================== -->
-      <div *ngIf="activeSection === 'overview'" class="row g-4 fade-in position-relative">
-        
-        <!-- Overview Loading Overlay -->
-        <div *ngIf="isSectionLoading" class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="background: rgba(255,255,255,0.5); z-index: 50; border-radius: 1rem; margin-top: 0;">
-          <div class="modern-spinner"></div>
-        </div>
+      <div *ngIf="activeSection === 'overview'" class="row g-4 fade-in">
         
         <!-- Quick Stats Row: 4 cards -->
         <div class="col-6 col-md-3">
