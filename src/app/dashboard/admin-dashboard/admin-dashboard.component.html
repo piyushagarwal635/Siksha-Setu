@@ -59,8 +59,13 @@
         <p class="fs-5 text-white-50 mb-0">Manage courses, resources, students, and broadcasts across the entire platform.</p>
       </div>
 
+      <!-- Section Loader -->
+      <div *ngIf="isSectionLoading" class="d-flex justify-content-center align-items-center py-5 my-5 w-100">
+        <div class="modern-spinner"></div>
+      </div>
+
       <!-- Overview Section -->
-      <div *ngIf="activeSection === 'overview'" class="row g-4 fade-in">
+      <div *ngIf="activeSection === 'overview' && !isSectionLoading" class="row g-4 fade-in">
         
         <!-- Global Date Filter for Overview -->
         <div class="col-12 d-flex justify-content-between align-items-center mb-0 mt-2">
@@ -347,7 +352,7 @@
 
       <!-- Courses Section -->
       <!-- Courses Section -->
-      <div *ngIf="activeSection === 'courses'" class="row g-4 fade-in">
+      <div *ngIf="activeSection === 'courses' && !isSectionLoading" class="row g-4 fade-in">
         <div class="col-12 mb-2 d-flex justify-content-between align-items-center flex-wrap gap-2">
           <h4 class="fw-extrabold text-indigo mb-0"><i class="bi bi-journal-text me-2"></i>Manage Courses</h4>
         </div>
@@ -421,7 +426,7 @@
       </div>
 
       <!-- Notifications & Schemes Section -->
-      <div *ngIf="activeSection === 'notifications'" class="row g-4 fade-in">
+      <div *ngIf="activeSection === 'notifications' && !isSectionLoading" class="row g-4 fade-in">
         <!-- Left Column: Broadcast Notifications -->
         <div class="col-lg-6">
           <div class="card border-0 shadow-sm rounded-4 h-100">
@@ -531,7 +536,7 @@
       </div>
 
       <!-- Student Directory Section -->
-      <div *ngIf="activeSection === 'student-directory'" class="row g-4 fade-in">
+      <div *ngIf="activeSection === 'student-directory' && !isSectionLoading" class="row g-4 fade-in">
         <div class="col-12">
           <div class="card border-0 shadow-sm rounded-4">
             <div class="card-header bg-transparent border-0 pt-4 pb-0 px-4 d-flex flex-wrap gap-2 justify-content-between align-items-center">
@@ -595,7 +600,7 @@
       </div>
 
       <!-- Approvals Section -->
-      <div *ngIf="activeSection === 'edit-requests'" class="row g-4 fade-in">
+      <div *ngIf="activeSection === 'edit-requests' && !isSectionLoading" class="row g-4 fade-in">
         <div class="col-12">
           <div class="card border-0 shadow-sm rounded-4">
             <div class="card-header bg-transparent border-0 pt-4 pb-0 px-4 d-flex justify-content-between align-items-center">
