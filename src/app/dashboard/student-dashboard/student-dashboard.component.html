@@ -66,13 +66,15 @@
         <p class="fs-5 text-white-50 mb-0">Ready to conquer your goals today? Dive into your courses and build that streak!</p>
       </div>
 
-      <!-- Section Loader -->
-      <div *ngIf="isSectionLoading" class="d-flex justify-content-center align-items-center py-5 my-5 w-100">
-        <div class="modern-spinner"></div>
-      </div>
+      <!-- Section Loader (Removed per user feedback) -->
 
       <!-- ==================== OVERVIEW SECTION ==================== -->
-      <div *ngIf="activeSection === 'overview' && !isSectionLoading" class="row g-4 fade-in">
+      <div *ngIf="activeSection === 'overview'" class="row g-4 fade-in position-relative">
+        
+        <!-- Overview Loading Overlay -->
+        <div *ngIf="isSectionLoading" class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="background: rgba(255,255,255,0.5); z-index: 50; border-radius: 1rem; margin-top: 0;">
+          <div class="modern-spinner"></div>
+        </div>
         
         <!-- Quick Stats Row: 4 cards -->
         <div class="col-6 col-md-3">
@@ -264,7 +266,7 @@
       <!-- END OVERVIEW -->
 
       <!-- ==================== COURSES SECTION ==================== -->
-      <div *ngIf="activeSection === 'courses' && !isSectionLoading" class="row g-4 fade-in">
+      <div *ngIf="activeSection === 'courses'" class="row g-4 fade-in">
         <div class="col-12">
           <h2 class="h4 fw-extrabold text-indigo mb-1"><i class="bi bi-journal-text me-2 text-primary"></i> Available Courses</h2>
         </div>
@@ -340,7 +342,7 @@
       </div>
 
       <!-- ==================== NOTIFICATIONS SECTION ==================== -->
-      <div *ngIf="activeSection === 'notifications' && !isSectionLoading" class="row g-4 fade-in">
+      <div *ngIf="activeSection === 'notifications'" class="row g-4 fade-in">
         
         <!-- Search bar full width -->
         <div class="col-12">
@@ -485,7 +487,7 @@
 
 
             <!-- Achievements Section -->
-      <div *ngIf="activeSection === 'achievements' && !isSectionLoading" class="fade-in">
+      <div *ngIf="activeSection === 'achievements'" class="fade-in">
         <div class="d-flex justify-content-between align-items-center mb-4">
           <h2 class="h4 fw-extrabold text-dark mb-0"><i class="bi bi-award-fill text-warning me-2"></i>My Achievements</h2>
         </div>
@@ -554,7 +556,7 @@
       </div>
 
       <!-- ==================== MY REQUESTS SECTION ==================== -->
-      <div *ngIf="activeSection === 'requests' && !isSectionLoading" class="row g-4 fade-in">
+      <div *ngIf="activeSection === 'requests'" class="row g-4 fade-in">
         <div class="col-12">
           <h2 class="h4 fw-extrabold text-indigo mb-3"><i class="bi bi-ticket-detailed me-2 text-primary"></i> Edit Requests Status</h2>
           <div class="card border-0 shadow-sm rounded-4">
