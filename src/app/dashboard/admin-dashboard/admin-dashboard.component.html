@@ -580,7 +580,12 @@
                         <div class="small"><i class="bi bi-telephone me-1"></i>{{ student.phone || 'N/A' }}</div>
                       </td>
                       <td class="py-3 text-end px-4">
-                        <button class="btn btn-sm btn-primary rounded-pill px-3 shadow-sm fw-bold text-white" (click)="viewStudentDetails(student.disabilityId)">View Details</button>
+                        <button class="btn btn-sm btn-primary rounded-pill px-3 shadow-sm fw-bold text-white d-inline-flex align-items-center" 
+                                (click)="viewStudentDetails(student.disabilityId)"
+                                [disabled]="loadingStudentId === student.disabilityId">
+                          <span *ngIf="loadingStudentId === student.disabilityId" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                          {{ loadingStudentId === student.disabilityId ? 'Loading...' : 'View Details' }}
+                        </button>
                       </td>
                     </tr>
                     <tr *ngIf="getFilteredStudents().length === 0">

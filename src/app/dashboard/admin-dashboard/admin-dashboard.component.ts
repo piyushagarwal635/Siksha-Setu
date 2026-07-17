@@ -20,6 +20,7 @@ Chart.register(...registerables);
 export class AdminDashboardComponent implements OnInit, OnDestroy {
   activeSection = 'overview';
   isLoading = false;
+  loadingStudentId: string | null = null;
   adminId = '';
   adminUsername = '';
   profileImage = '';
@@ -926,6 +927,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
 
   viewStudentDetails(disabilityId: string): void {
     this.isLoading = true;
+    this.loadingStudentId = disabilityId;
     this.previousActiveElement = document.activeElement as HTMLElement;
     this.adminService.getStudentAnalytics(disabilityId).subscribe({
       next: (data) => {
@@ -941,12 +943,14 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
         
         this.showStudentDetailsModal = true;
         this.isLoading = false;
+        this.loadingStudentId = null;
         this.focusModal();
       },
       error: (err) => {
         console.error('Error fetching analytics:', err);
         this.toastService.error('Failed to load student details');
         this.isLoading = false;
+        this.loadingStudentId = null;
       },
     });
   }
