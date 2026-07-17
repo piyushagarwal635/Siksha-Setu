@@ -64,7 +64,10 @@
         
         <!-- Global Date Filter for Overview -->
         <div class="col-12 d-flex justify-content-between align-items-center mb-0 mt-2">
-          <h4 class="mb-0 fw-bolder text-dark">Platform Overview</h4>
+          <h4 class="mb-0 fw-bolder text-dark d-flex align-items-center gap-2">
+            Platform Overview
+            <div *ngIf="isLoading" class="spinner-border text-primary spinner-border-sm" role="status" title="Loading data..."></div>
+          </h4>
           <div class="d-flex align-items-center gap-2 bg-white px-3 py-2 rounded-pill shadow-sm border">
             <i class="bi bi-calendar3 text-primary"></i>
             <span class="fw-bold text-muted small text-nowrap">Global Filter:</span>

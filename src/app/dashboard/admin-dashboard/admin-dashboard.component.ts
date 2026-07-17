@@ -1032,6 +1032,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
 
   // Analytics Loading & Rendering Methods
   loadAnalytics(): void {
+    this.isLoading = true;
     this.loadAdminSummary();
     this.loadCourseAnalytics();
     this.loadResourceAnalytics();
@@ -1093,9 +1094,13 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
         // Render charts once summary is loaded
         setTimeout(() => {
           this.renderAccessibilityChart(summary.accessibilityUsage || {});
+          this.isLoading = false;
         }, 100);
       },
-      error: (err) => console.error('Error loading admin summary', err)
+      error: (err) => {
+        console.error('Error loading admin summary', err);
+        this.isLoading = false;
+      }
     });
   }
 
