@@ -3,7 +3,7 @@
   <div class="profile-header-card glass-panel shadow-3d mb-4">
     <div class="profile-header-content">
       <div class="avatar-container">
-        <img [src]="userForm.get('profileImage')?.value || 'https://api.dicebear.com/7.x/adventurer/svg?seed=' + userId" 
+        <img [src]="userForm.get('profileImage')?.value || 'assets/default-avatar.svg'" 
              alt="Profile Picture" class="profile-avatar shadow-sm" />
         <label for="profileImageInput" class="avatar-edit-badge" [class.locked]="isFieldLocked('profileImage')"
                [title]="isFieldLocked('profileImage') ? 'Request Edit Profile Image' : 'Upload Profile Image'">

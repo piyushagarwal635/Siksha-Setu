@@ -224,7 +224,7 @@ export class DashboardComponent implements OnInit {
   }
   userName = '';
   disabilityId = '';
-  defaultAvatar = 'avtar.jpeg';
+  defaultAvatar = 'assets/default-avatar.svg';
   profileImage: string | null = null;
   userRole = 'student';
   isLoggedIn = false;
