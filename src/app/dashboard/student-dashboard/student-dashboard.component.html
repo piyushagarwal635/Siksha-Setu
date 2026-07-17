@@ -11,7 +11,7 @@
         <div class="bg-primary-gradient position-relative" style="height: 80px;"></div>
         <div class="card-body text-center pt-0 px-4 pb-4">
           <div class="position-relative d-inline-block mx-auto mb-3" style="margin-top: -40px;">
-            <img [src]="studentInfo.profileImage || 'assets/default-avatar.png'" alt="Avatar" class="rounded-circle border border-4 border-white shadow-sm bg-white" style="width: 80px; height: 80px; object-fit: cover;">
+            <img [src]="studentInfo.profileImage || 'assets/default-avatar.svg'" alt="Avatar" class="rounded-circle border border-4 border-white shadow-sm bg-white" style="width: 80px; height: 80px; object-fit: cover;">
             <span class="position-absolute bottom-0 end-0 bg-success border border-2 border-white rounded-circle" style="width: 16px; height: 16px; transform: translate(-5px, -5px);" title="Online"></span>
           </div>
           <h5 class="fw-bolder text-dark mb-0">{{ studentInfo.name || 'Student' }}</h5>
@@ -130,7 +130,7 @@
                     (keyup.enter)="openCourseDetails(enrollment.course)"
                     [attr.aria-label]="(enrollment.course?.title || 'Course') + '. ' + (enrollment.course?.description || '')">
                     <div class="flex-shrink-0" aria-hidden="true">
-                      <img [src]="enrollment.course?.image || 'assets/default-course.png'" alt="Course"
+                      <img [src]="enrollment.course?.image || 'assets/default-course.svg'" alt="Course"
                            class="rounded-3 border shadow-sm" style="width: 60px; height: 60px; object-fit: cover;">
                     </div>
                     <div class="flex-grow-1 min-width-0">
@@ -271,7 +271,7 @@
             (keyup.enter)="openCourseDetails(course)"
             [attr.aria-label]="course.title + '. ' + course.description">
             <div class="course-img-wrapper position-relative">
-              <img [src]="course.image || 'assets/default-course.png'" class="card-img-top course-img" alt="{{ course.title }}" aria-hidden="true">
+              <img [src]="course.image || 'assets/default-course.svg'" class="card-img-top course-img" alt="{{ course.title }}" aria-hidden="true">
               <div class="course-overlay-gradient" aria-hidden="true"></div>
               <span class="badge course-badge bg-primary text-white text-uppercase fw-bold shadow" aria-hidden="true">{{ course.category }}</span>
               <button class="tts-quick-btn shadow" (click)="readCourseAloud(course, $event)" title="Read Course Description Aloud" [attr.aria-label]="'Read description aloud for ' + course.title">

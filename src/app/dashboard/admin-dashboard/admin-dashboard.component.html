@@ -10,7 +10,7 @@
         <div class="bg-primary-gradient position-relative" style="height: 80px;"></div>
         <div class="card-body text-center pt-0 px-4 pb-4">
           <div class="position-relative d-inline-block mx-auto mb-3" style="margin-top: -40px;">
-            <img [src]="profileImage || 'assets/default-avatar.png'" alt="Admin Avatar" class="rounded-circle border border-4 border-white shadow-sm bg-white" style="width: 80px; height: 80px; object-fit: cover;">
+            <img [src]="profileImage || 'assets/default-avatar.svg'" alt="Admin Avatar" class="rounded-circle border border-4 border-white shadow-sm bg-white" style="width: 80px; height: 80px; object-fit: cover;">
             <span class="position-absolute bottom-0 end-0 bg-success border border-2 border-white rounded-circle" style="width: 16px; height: 16px; transform: translate(-5px, -5px);" title="Online"></span>
           </div>
           <h5 class="fw-bolder text-dark mb-0">{{ adminUsername || 'Administrator' }}</h5>
@@ -381,7 +381,7 @@
             <div class="col-md-4 col-lg-4" *ngFor="let course of getFilteredCourses(); trackBy: trackById">
               <div class="card course-card hover-effect h-100 border-0 rounded-4 overflow-hidden position-relative d-flex flex-column">
                 <div class="course-img-wrapper position-relative">
-                  <img [src]="course.image || 'assets/default-course.png'" class="card-img-top course-img" alt="{{ course.title }}">
+                  <img [src]="course.image || 'assets/default-course.svg'" class="card-img-top course-img" alt="{{ course.title }}">
                   <div class="course-overlay-gradient"></div>
                   <span class="badge course-badge bg-primary text-white text-uppercase fw-bold shadow">{{ course.category }}</span>
                   <button class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2 shadow-sm" (click)="deleteCourse(course.id)" title="Delete Course" style="z-index: 10;">
@@ -566,7 +566,7 @@
                     <tr *ngFor="let student of getFilteredStudents(); trackBy: trackById">
                       <td class="px-4 py-3">
                         <div class="d-flex align-items-center">
-                          <img [src]="student.profileImage || 'assets/default-avatar.png'" alt="Avatar" class="rounded-circle me-3 border border-2 border-light shadow-sm" style="width: 45px; height: 45px; object-fit: cover;">
+                          <img [src]="student.profileImage || 'assets/default-avatar.svg'" alt="Avatar" class="rounded-circle me-3 border border-2 border-light shadow-sm" style="width: 45px; height: 45px; object-fit: cover;">
                           <span class="fw-bold text-dark">{{ student.name || student.user }}</span>
                         </div>
                       </td>
@@ -673,7 +673,7 @@
       <div class="modal-content rounded-4 border-0 shadow-lg" *ngIf="selectedStudentUser">
         <div class="modal-header bg-light border-0">
           <div class="d-flex align-items-center">
-            <img [src]="selectedStudentUser.profileImage || 'assets/default-avatar.png'" alt="Avatar" class="rounded-circle me-3 shadow-sm" style="width: 60px; height: 60px; object-fit: cover;">
+            <img [src]="selectedStudentUser.profileImage || 'assets/default-avatar.svg'" alt="Avatar" class="rounded-circle me-3 shadow-sm" style="width: 60px; height: 60px; object-fit: cover;">
             <div>
               <h5 class="modal-title fw-bolder mb-0 text-dark">{{ selectedStudentUser.name || selectedStudentUser.user }}</h5>
               <span class="badge bg-primary rounded-pill">{{ selectedStudentUser.disabilityId }}</span>
@@ -1020,7 +1020,7 @@
       <div *ngIf="selectedRequestStudentDetails && selectedEditRequest" class="row g-3">
         <!-- Student Info Header -->
         <div class="col-12 bg-light p-3 rounded-4 border d-flex align-items-center gap-3">
-          <img [src]="selectedRequestStudentDetails.profileImage || 'assets/default-avatar.png'" alt="Student avatar" class="rounded-circle border border-2 border-primary" style="width: 55px; height: 55px; object-fit: cover;">
+          <img [src]="selectedRequestStudentDetails.profileImage || 'assets/default-avatar.svg'" alt="Student avatar" class="rounded-circle border border-2 border-primary" style="width: 55px; height: 55px; object-fit: cover;">
           <div>
             <h6 class="fw-bold mb-0 text-dark">{{ selectedRequestStudentDetails.name }}</h6>
             <span class="badge bg-light text-secondary border mt-1">Disability ID: {{ selectedRequestStudentDetails.disabilityId }}</span>

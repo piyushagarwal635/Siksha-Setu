@@ -208,7 +208,7 @@
         <div class="col-md-6 col-lg-4 animate-fade-up" *ngFor="let course of courses; let i = index" [style.animationDelay]="(i * 100) + 'ms'">
           <div class="card course-card hover-effect h-100 border-0 rounded-4 overflow-hidden position-relative d-flex flex-column">
             <div class="course-img-wrapper position-relative">
-              <img [src]="course.image || 'assets/default-course.png'" class="card-img-top course-img" alt="{{ course.title }}">
+              <img [src]="course.image || 'assets/default-course.svg'" class="card-img-top course-img" alt="{{ course.title }}">
               <div class="course-overlay-gradient"></div>
               <span class="badge course-badge bg-primary text-white text-uppercase fw-bold shadow">{{ course.category }}</span>
             </div>
