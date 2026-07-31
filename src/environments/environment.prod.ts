@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://java-Divya-mfxj.onrender.com'
+  apiUrl: 'https://java-siksha-mfxj.onrender.com'
 };
