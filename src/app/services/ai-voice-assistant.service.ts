@@ -66,7 +66,7 @@ export class AiVoiceAssistantService {
         break;
 
       case ConversationState.IDLE:
-        if (newState === ConversationState.LISTENING || newState === ConversationState.SPEAKING) isValid = true;
+        if (newState === ConversationState.LISTENING) isValid = true;
         break;
 
       case ConversationState.LISTENING:
@@ -183,7 +183,6 @@ export class AiVoiceAssistantService {
   private currentAudioElement: HTMLAudioElement | null = null;
   private isSpeaking = false;
   private isMutedForSecurity = false;
-  private ttsEndedAt: number = 0; // timestamp when last TTS finished (for echo guard)
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
@@ -214,9 +213,11 @@ export class AiVoiceAssistantService {
       this.router.events.pipe(
         filter(event => event instanceof NavigationEnd)
       ).subscribe(() => {
-        // Page narration disabled: navigation reply is already spoken by the action handler.
-        // Triggering a second Gemini call here caused double-turn loops.
-        // The mic opens automatically after TTS ends via requestListen().
+        if (this.isEnabledSubject.value && !this.isSleeping) {
+          setTimeout(() => {
+            this.triggerPageNarration();
+          }, 800); // Delay to allow DOM rendering
+        }
       });
     }
   }
@@ -378,7 +379,6 @@ export class AiVoiceAssistantService {
     this.isEnabledSubject.next(true); // Keep hardware looping for wake words
     localStorage.setItem('aiVoiceGuestPref', 'sleeping');
 
-    this.ttsManager.stop(); // Stop any playing TTS immediately
     this.stopAnyRecording();
 
     // Sync with database if logged in
@@ -391,24 +391,18 @@ export class AiVoiceAssistantService {
       }
     }
 
-    const afterSleep = () => {
-      // Force clean state and restart listening for wake word
-      this.conversationStateSubject.next(ConversationState.IDLE);
-      if (!this.isMutedForSecurity) {
-        setTimeout(() => this.requestListen(), 300);
-      }
-    };
-
     if (!silent) {
-      // Use requestSpeak (state-machine-aware) so recovery always works
-      this.conversationStateSubject.next(ConversationState.IDLE); // force IDLE before speak
-      this.requestSpeak(
-        "Sleep mode mein aa gaya hun. Wake up karne ke liye 'Divya Mitra wake up' bolein.",
-        afterSleep,
-        'hi'
-      );
+      this.playTTS("Voice Agent is in sleep mode. You can wake me up anytime by saying 'Divya Mitra wake up' or by clicking the microphone icon.", () => {
+        if (!this.isMutedForSecurity) {
+          this.transitionState(ConversationState.IDLE);
+          this.requestListen();
+        }
+      });
     } else {
-      afterSleep();
+      if (!this.isMutedForSecurity) {
+        this.transitionState(ConversationState.IDLE);
+        this.requestListen();
+      }
     }
   }
 
@@ -453,16 +447,7 @@ export class AiVoiceAssistantService {
   public requestSpeak(text: string, onEnd?: () => void, language?: string): void {
     if (this.isMutedForSecurity || !this.isEnabledSubject.value) return;
 
-    // If stuck in ERROR, reset to IDLE first so transition can proceed
-    if (this.currentState === ConversationState.ERROR) {
-      this.conversationStateSubject.next(ConversationState.IDLE);
-    }
-
     if (!this.transitionState(ConversationState.SPEAKING)) {
-      // State guard rejected — force IDLE and recover mic so assistant never silently dies
-      console.warn(`[Voice Session] requestSpeak blocked from state: ${this.currentState}. Forcing recovery.`);
-      this.conversationStateSubject.next(ConversationState.IDLE);
-      setTimeout(() => { if (this.isEnabledSubject.value && !this.isMutedForSecurity) this.requestListen(); }, 300);
       return;
     }
 
@@ -478,25 +463,22 @@ export class AiVoiceAssistantService {
 
     this.ttsManager.speak(
       text,
-      language || 'hi',
+      language || 'hi', // Step 11: Dynamic language routing
       () => {
         this.isSpeaking = true;
-        // Open mic for barge-in (user can interrupt AI while it speaks)
-        if (this.isEnabledSubject.value && !this.isMutedForSecurity) {
-          this.startListening();
-        }
+        // Barge-in disabled: window.speechSynthesis bypasses browser echo cancellation.
+        // If we open the mic here, the AI will transcribe its own voice and loop endlessly.
       },
       (result) => {
         this.isSpeaking = false;
-        this.ttsEndedAt = Date.now(); // mark when AI stopped speaking
 
         // Auto-resume media that was playing before TTS
         pausedMedia.forEach(m => {
           m.play().catch(e => console.log('Media autoplay prevented', e));
         });
 
-        // Force state out of SPEAKING using direct next() so guard doesn't block
-        this.conversationStateSubject.next(ConversationState.IDLE);
+        // Guarantee state leaves SPEAKING before any external callback is invoked (Fixes race condition)
+        this.transitionState(ConversationState.LISTENING);
 
         if (onEnd) {
           onEnd();
@@ -511,20 +493,9 @@ export class AiVoiceAssistantService {
   private startListening(isMitrap: boolean = false) {
     if (this.isMutedForSecurity || this.isListeningSubject.value) return;
 
-    this.isProcessing = false;
-    this.browserTranscript = ''; // Reset transcript for new session
+    this.isProcessing = false; // Reset processing flag on new listen cycle
 
-    // Start browser STT in parallel with mic recording (fast transcript path)
-    this.initSpeechRecognition();
-    if (this.speechRecognition) {
-      try {
-        this.speechRecognition.lang = 'hi-IN';
-        this.speechRecognition.start();
-        console.log('[BrowserSTT] Started recognition');
-      } catch (e) {
-        console.warn('[BrowserSTT] Could not start:', e);
-      }
-    }
+    // Step 6: Route hardware calls through MicLifecycleManager wrapper
     const started = this.micManager.open(
       (result: MicSessionResult) => {
         if (!this.isMutedForSecurity) {
@@ -534,7 +505,7 @@ export class AiVoiceAssistantService {
             this.processAudio(isMitrap);
           } else {
             if (this.isEnabledSubject.value) {
-              setTimeout(() => this.startListening(isMitrap), 200);
+              setTimeout(() => this.startListening(isMitrap), 400);
             }
           }
         }
@@ -613,36 +584,13 @@ export class AiVoiceAssistantService {
     }, 60000);
   }
 
-  // Browser Speech Recognition instance (reused across sessions)
-  private speechRecognition: any = null;
-  private browserTranscript: string = '';
-
-  private initSpeechRecognition(): void {
-    const SpeechRecognitionClass = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SpeechRecognitionClass || this.speechRecognition) return;
-    this.speechRecognition = new SpeechRecognitionClass();
-    this.speechRecognition.continuous = false;
-    this.speechRecognition.interimResults = false;
-    this.speechRecognition.lang = 'hi-IN'; // Hindi + English
-    this.speechRecognition.maxAlternatives = 1;
-    this.speechRecognition.onresult = (event: any) => {
-      const result = event.results[0][0].transcript;
-      this.browserTranscript = result;
-      console.log(`[BrowserSTT] Transcript captured: "${result}"`);
-    };
-    this.speechRecognition.onerror = (e: any) => {
-      console.warn('[BrowserSTT] Error:', e.error);
-      this.browserTranscript = '';
-    };
-    this.speechRecognition.onend = () => {
-      console.log('[BrowserSTT] Recognition ended');
-    };
-  }
-
   private processAudio(isMitrap: boolean) {
     const sessionToken = this.getCurrentSessionToken();
 
+    // Violation #5 fix: this.stream is owned by MicLifecycleManager. Removed stale cleanup.
+
     if (this.audioChunks.length === 0) {
+      // Violation #4 fix: use guarded requestListen() instead of raw startListening()
       if (this.isEnabledSubject.value) {
         this.transitionState(ConversationState.IDLE);
         setTimeout(() => this.requestListen(), 500);
@@ -650,47 +598,9 @@ export class AiVoiceAssistantService {
       return;
     }
 
-    // ── Simple Echo Guard ─────────────────────────────────────────────────────
-    // If AI just stopped speaking < 1.5s ago AND audio chunk is tiny → echo, discard.
-    const timeSinceTts = Date.now() - this.ttsEndedAt;
-    const audioSize = this.audioChunks.reduce((s, b) => s + b.size, 0);
-    if (timeSinceTts < 1500 && audioSize < 5000 && this.ttsEndedAt > 0) {
-      console.warn('[EchoGuard] Discarding tiny audio captured right after TTS ended.');
-      this.conversationStateSubject.next(ConversationState.IDLE);
-      setTimeout(() => this.requestListen(), 300);
-      return;
-    }
-    // ─────────────────────────────────────────────────────────────────────────
-
-    // ── Fast client-side sleep/wake detection ────────────────────────────────
-    // Check BEFORE backend call for instant response.
-    const rawTranscript = (this.browserTranscript || '').toLowerCase().trim();
-
-    const WAKE_WORDS = ['wake up', 'activate', 'chalu karo', 'jago', 'shuru karo', 'divya mitra on', 'start'];
-    const SLEEP_WORDS = ['so jao', 'sleep mode', 'band karo', 'so ja', 'mute kar'];
-
-    if (rawTranscript && this.isSleeping && WAKE_WORDS.some(w => rawTranscript.includes(w))) {
-      this.isSleeping = false;
-      localStorage.setItem('aiVoiceGuestPref', 'true');
-      this.conversationStateSubject.next(ConversationState.IDLE);
-      this.requestSpeak(
-        'Divya Mitra active ho gaya. Boliye, main sun raha hun.',
-        () => { if (this.isEnabledSubject.value && !this.isMutedForSecurity) this.requestListen(); },
-        'hi'
-      );
-      return;
-    }
-
-    if (rawTranscript && !this.isSleeping && !isMitrap && !this.isSpeaking && SLEEP_WORDS.some(w => rawTranscript.includes(w))) {
-      this.disableAssistant(false);
-      return;
-    }
-    // ─────────────────────────────────────────────────────────────────────────
-
     const audioBlob = new Blob(this.audioChunks, { type: 'audio/webm' });
     const reader = new FileReader();
     reader.readAsDataURL(audioBlob);
-
     reader.onloadend = () => {
       if (!this.isValidSession(sessionToken)) return;
       let base64Audio = (reader.result as string).split(',')[1];
@@ -711,16 +621,14 @@ export class AiVoiceAssistantService {
       console.groupEnd();
 
       const payload = {
-        audioBase64: this.browserTranscript ? '' : base64Audio, // Skip audio blob when browser STT has transcript
-        transcript: this.browserTranscript || '',               // Fast path: text directly to Gemini
+        audioBase64: base64Audio,
         pageContext: dynamicContextPayload,
         userId: payloadUserId,
         isTestMode: this.router.url.includes('secure-test'),
         diagnosticId: diagnosticId
       };
 
-      console.log(`[Diagnostic] Mode: ${this.browserTranscript ? 'FAST (Browser STT)' : 'SLOW (Audio Blob)'}`);
-      console.log(`[Diagnostic] Transcript: ${this.browserTranscript || '(none)'}`);
+      console.log(`[Diagnostic] AudioChatRequest JSON Frontend->Backend:`, JSON.stringify({ ...payload, audioBase64: '<BASE64_TRUNCATED>' }, null, 2));
 
       // Violation #1 fix: transition state machine to PROCESSING before firing HTTP request
       if (!isMitrap) {
@@ -794,29 +702,23 @@ export class AiVoiceAssistantService {
             return;
           }
 
-          // NONE intent — silence detected, re-listen silently without speaking
-          if (intent === 'NONE' || replyText.trim() === '') {
-            this.transitionState(ConversationState.IDLE);
-            if (this.isEnabledSubject.value && !this.isMutedForSecurity) {
-              setTimeout(() => { if (this.isValidSession(sessionToken)) this.requestListen(); }, 300);
-            }
-            return;
-          }
-
-          // Enrollment check: enrolled = "Continue Learning" button present OR no "Enroll" button visible
           const isCourseDashboard = this.router.url.includes('course-dashboard') || this.router.url.includes('/course/');
-          const enrollButton = document.querySelector('button[data-ai-id*="enroll"], button[aria-label*="Enroll" i]');
-          const continueBtn = document.querySelector('button[aria-label*="Continue" i], a[aria-label*="Continue" i]');
-          const isActuallyEnrolled = !enrollButton && !!continueBtn;
+          const isStudyIntent = transcript.includes('padh') || transcript.includes('read') || transcript.includes('study');
+          const isEnrolled = !document.querySelector('button.btn-success[aria-label*="enroll" i]') && !document.body.innerText.includes('Enroll in Course');
 
           if (isCourseDashboard && transcript.includes('enroll')) {
-            if (isActuallyEnrolled) {
-              const isStudyIntent = transcript.includes('padh') || transcript.includes('read') || transcript.includes('study');
+            if (isEnrolled) {
               if (isStudyIntent) {
-                this.startReadingMode();
-                return;
+                const pdfTextEl = document.getElementById('pdf-accessible-text');
+                const contentEl = document.getElementById('resource-content-area');
+                if ((pdfTextEl && pdfTextEl.textContent && pdfTextEl.textContent.trim()) || contentEl) {
+                  this.startReadingMode();
+                  return;
+                } else {
+                  replyText = language === 'hi' ? "Aap pehle se enrolled hain. Kripya list mein se ek resource chunein." : "You are already enrolled. Please select a resource from the list.";
+                }
               } else {
-                replyText = language === 'hi' ? "Aap pehle se enrolled hain. Resources list mein se chunein." : "You are already enrolled. Select a resource to study.";
+                replyText = language === 'hi' ? "Haan, aap is course me pehle se enrolled hain. Padhne ke liye list me se resource chunein." : "Yes, you are already enrolled in this course. Choose a resource to study.";
               }
               this.requestSpeak(replyText, () => {
                 if (this.isEnabledSubject.value && !this.isMutedForSecurity) this.requestListen();
@@ -1082,7 +984,7 @@ export class AiVoiceAssistantService {
     };
 
     const links = extractElements('a', 'link');
-    const buttons = extractElements('button, [role="button"]', 'button');
+    const buttons = extractElements('button', 'button');
     const inputs = extractElements('input, select, textarea', 'input');
 
     const structuredContext = {
@@ -1166,27 +1068,6 @@ export class AiVoiceAssistantService {
       case 'MEDIA_PAUSE':
       case 'MEDIA_SEEK':
       case 'MEDIA_SPEED': {
-        // First check if it's a PDF (text) or Braille resource being "played" (read aloud)
-        if (this.activeResourceState && (this.activeResourceState.format === 'text' || this.activeResourceState.format === 'braille')) {
-          if (action.type === 'MEDIA_PLAY') {
-            if (this.activeResourceState.format === 'braille') {
-              // Open the full-screen Braille Console instead of just reading it
-              const brailleBtn = document.querySelector('[data-ai-id="launch-braille-console"]') as HTMLElement;
-              if (brailleBtn) {
-                brailleBtn.click();
-              }
-            } else if (!this.isReadingModeActive) {
-               // Extract text from the modal body directly if possible
-               const modalBody = document.querySelector('.modal-body-custom');
-               const textToRead = modalBody ? (modalBody as HTMLElement).innerText : undefined;
-               this.startReadingMode(textToRead);
-            }
-          } else if (action.type === 'MEDIA_PAUSE') {
-            this.stopReadingMode();
-          }
-          return true;
-        }
-
         const media = document.querySelector('video, audio') as HTMLMediaElement;
         if (media) {
           if (action.type === 'MEDIA_PLAY') media.play();
