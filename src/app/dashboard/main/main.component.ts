@@ -1,10 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, HostListener } from '@angular/core';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { ToastService } from '../../services/toast.service';
 import { UserService } from '../../services/user.service';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 @Component({
   selector: 'app-main',
@@ -13,9 +17,11 @@ import { UserService } from '../../services/user.service';
   templateUrl: './main.component.html',
   styleUrls: ['./main.component.css']
 })
-export class MainComponent implements OnInit {
+export class MainComponent implements OnInit, AfterViewInit {
 
   courses: any[] = [];
+  bgTransform: string = 'translate3d(0px, 0px, 0px) scale(1.05)';
+  
   
   // Design fallbacks
   defaultIcons = ['bi-code-slash', 'bi-chat-dots', 'bi-calculator', 'bi-journal-text', 'bi-laptop', 'bi-palette'];
@@ -25,6 +31,84 @@ export class MainComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadCourses();
+  }
+
+  @HostListener('document:mousemove', ['$event'])
+  onMouseMove(event: MouseEvent) {
+    // 3D dynamic parallax effect
+    const xAxis = (window.innerWidth / 2 - event.clientX) / 45;
+    const yAxis = (window.innerHeight / 2 - event.clientY) / 45;
+    this.bgTransform = `translate3d(${xAxis}px, ${yAxis}px, 0px) scale(1.1)`;
+  }
+
+  ngAfterViewInit(): void {
+    this.initGsapAnimations();
+  }
+
+  initGsapAnimations(): void {
+    // Hero Section Animations
+    const tl = gsap.timeline();
+    tl.from('.hero-badge', { y: -20, opacity: 0, duration: 0.6, ease: 'back.out(1.7)' })
+      .from('.hero-title', { y: 30, opacity: 0, duration: 0.8, ease: 'power3.out' }, '-=0.4')
+      .from('.hero-subtitle', { y: 20, opacity: 0, duration: 0.6, ease: 'power2.out' }, '-=0.4')
+      .from('.hero-section .btn', { y: 20, opacity: 0, duration: 0.5, stagger: 0.2, ease: 'power2.out' }, '-=0.3');
+
+    // Bento Cards Scroll Animation
+    gsap.utils.toArray('.bento-card').forEach((card: any, i) => {
+      gsap.from(card, {
+        scrollTrigger: {
+          trigger: card,
+          start: 'top 90%',
+        },
+        y: 50,
+        opacity: 0,
+        duration: 0.8,
+        ease: 'power3.out'
+      });
+    });
+
+    // Feature Cards Scroll Animation (Ecosystem)
+    gsap.utils.toArray('.hover-effect').forEach((card: any, i) => {
+      gsap.from(card, {
+        scrollTrigger: {
+          trigger: card,
+          start: 'top 90%',
+        },
+        y: 40,
+        opacity: 0,
+        duration: 0.6,
+        ease: 'power2.out'
+      });
+    });
+
+    // Journey Timeline Animation
+    gsap.utils.toArray('.journey-item').forEach((item: any) => {
+      gsap.from(item, {
+        scrollTrigger: {
+          trigger: item,
+          start: 'top 85%',
+        },
+        x: -30,
+        opacity: 0,
+        duration: 0.6,
+        ease: 'power2.out'
+      });
+    });
+
+    // Course Cards Animation
+    gsap.utils.toArray('.course-card').forEach((card: any, i) => {
+      gsap.from(card, {
+        scrollTrigger: {
+          trigger: card,
+          start: 'top 90%',
+        },
+        scale: 0.95,
+        y: 30,
+        opacity: 0,
+        duration: 0.6,
+        ease: 'back.out(1.2)'
+      });
+    });
   }
 
   loadCourses(): void {

@@ -1,0 +1,109 @@
+<div class="signup-host">
+  <div class="signup-card">
+
+    <!-- Brand Header -->
+    <div class="brand-header">
+      <img src="/Divya-logo.png" alt="Divya Mitra Logo" class="brand-logo" />
+      <div style="display: flex; align-items: center; justify-content: center; height: 70px; margin: 10px 0;">
+        <img src="/divyamitra-text-logo-removebg-preview.png" alt="Divya Mitra" style="height: 100%; width: auto; display: block; border: none; border-radius: 0; box-shadow: none; background: transparent;">
+      </div>
+      <p class="brand-subtitle">Create your accessibility account</p>
+    </div>
+
+    <!-- Error Banner -->
+    <div *ngIf="showSignUpError" class="alert-banner" role="alert">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i>
+      <strong>Error:</strong>&nbsp;{{ signUpErrorMessage }}
+      <button type="button" (click)="showSignUpError = false" class="alert-close">&times;</button>
+    </div>
+
+    <!-- Sign Up Form -->
+    <form [formGroup]="userForm" (ngSubmit)="onSubmit()" novalidate id="signup-form">
+
+      <div class="input-group-custom">
+        <label class="form-input-label" for="signup-user">
+          <i class="bi bi-person-fill-add"></i> Full Name
+        </label>
+        <input type="text" id="signup-user" placeholder="Enter your full name" formControlName="user" />
+        <div *ngIf="userForm.get('user')?.touched && userForm.get('user')?.invalid" class="validation-message">
+          Full name is required (minimum 5 characters).
+        </div>
+      </div>
+
+      <div class="input-group-custom">
+        <label class="form-input-label" for="signup-pass">
+          <i class="bi bi-shield-lock-fill"></i> Password
+        </label>
+        <input type="password" id="signup-pass" placeholder="Create a strong password" formControlName="pass"
+          (focus)="onPasswordFocus()" (blur)="onPasswordBlur()" />
+        <div *ngIf="userForm.get('pass')?.touched && userForm.get('pass')?.invalid" class="validation-message">
+          Password must be at least 8 characters and contain a special character.
+        </div>
+      </div>
+
+      <div class="input-group-custom">
+        <label class="form-input-label" for="signup-disability">
+          <i class="bi bi-credit-card-2-front-fill"></i> Disability ID Card Number
+        </label>
+        <input type="text" id="signup-disability" placeholder="e.g. DIS123456789" formControlName="disabilityId" />
+        <div *ngIf="userForm.get('disabilityId')?.touched && userForm.get('disabilityId')?.invalid"
+          class="validation-message">
+          Must start with DIS followed by exactly 9 digits.
+        </div>
+      </div>
+
+      <div class="input-group-custom">
+        <label class="form-input-label" for="signup-question">
+          <i class="bi bi-shield-lock-fill"></i> Security Question
+        </label>
+        <select id="signup-question" formControlName="securityQuestion">
+          <option value="" disabled>Choose a security question</option>
+          <option value="What is your pet's name?">What is your pet's name?</option>
+          <option value="What is your mother's maiden name?">What is your mother's maiden name?</option>
+          <option value="In what city were you born?">In what city were you born?</option>
+          <option value="What was your first school name?">What was your first school name?</option>
+        </select>
+        <div *ngIf="userForm.get('securityQuestion')?.touched && userForm.get('securityQuestion')?.invalid"
+          class="validation-message">
+          Please select a security question.
+        </div>
+      </div>
+
+      <div class="input-group-custom">
+        <label class="form-input-label" for="signup-answer">
+          <i class="bi bi-key-fill"></i> Security Answer
+        </label>
+        <input type="text" id="signup-answer" placeholder="Your answer (used for password recovery)"
+          formControlName="securityAnswer" />
+        <div *ngIf="userForm.get('securityAnswer')?.touched && userForm.get('securityAnswer')?.invalid"
+          class="validation-message">
+          Security answer is required.
+        </div>
+      </div>
+
+      <div class="remember-row mb-3 mt-2">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="signup-remember" formControlName="rememberMe" aria-label="Remember Me" />
+          <label class="form-check-label" for="signup-remember">Remember Me (Auto-login)</label>
+        </div>
+      </div>
+
+      <div class="form-actions-row">
+        <button type="submit" class="btn btn-submit-3d" id="signup-submit" [disabled]="isLoading">
+          <span *ngIf="!isLoading"><i class="bi bi-person-plus-fill me-1"></i> Create Account</span>
+          <span *ngIf="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          <span *ngIf="isLoading"> Creating...</span>
+        </button>
+        <button type="button" class="btn btn-reset-3d" (click)="onReset()" [disabled]="isLoading">Reset</button>
+      </div>
+
+    </form>
+
+    <!-- Bottom Link to Login -->
+    <div class="bottom-link">
+      <span>Already have an account?</span>
+      <a routerLink="/login" id="goto-login">Sign In here</a>
+    </div>
+
+  </div>
+</div>

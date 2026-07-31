@@ -25,10 +25,10 @@ export class DashboardComponent implements OnInit {
   showChatbot: boolean = false;
   showWarning: boolean = false;
   allCourses: any[] = [];
-  
+
   // Custom Chatbot State
   chatMessages: { text: string, isBot: boolean }[] = [
-    { text: 'Hello! I am the Siksha Setu AI Assistant. How can I help you today?', isBot: true }
+    { text: 'Hello! I am the Divya Mitra AI Assistant. How can I help you today?', isBot: true }
   ];
   chatInput: string = '';
   isChatLoading: boolean = false;
@@ -68,17 +68,17 @@ export class DashboardComponent implements OnInit {
 
   sendChatMessage() {
     if (!this.chatInput.trim() || this.isChatLoading) return;
-    
+
     const userMessage = this.chatInput.trim();
     this.chatMessages.push({ text: userMessage, isBot: false });
     this.chatInput = '';
     this.isChatLoading = true;
-    
+
     // Auto-scroll chat (if implemented with ViewChild, otherwise let Angular handle it)
     setTimeout(() => this.scrollToBottom(), 100);
 
     const userId = this.disabilityId || 'anonymous';
-    
+
     this.aiService.askQuestion(userId, userMessage).subscribe({
       next: (res) => {
         this.chatMessages.push({ text: res.response, isBot: true });
@@ -153,10 +153,10 @@ export class DashboardComponent implements OnInit {
     if (!modal) return;
     const focusable = modal.querySelectorAll('button, input, select, textarea, [tabindex]:not([tabindex="-1"])');
     if (focusable.length === 0) return;
-    
+
     const first = focusable[0] as HTMLElement;
     const last = focusable[focusable.length - 1] as HTMLElement;
-    
+
     if (event.shiftKey) {
       if (document.activeElement === first) {
         last.focus();
@@ -174,7 +174,7 @@ export class DashboardComponent implements OnInit {
   sidebarOpen = false;
   topMenuOpen = false;
   showLoginModal = false;
-  
+
   // Confirmation Modal state
   showConfirmModal = false;
   confirmTitle = '';
@@ -228,7 +228,7 @@ export class DashboardComponent implements OnInit {
   profileImage: string | null = null;
   userRole = 'student';
   isLoggedIn = false;
-  
+
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
       this.router.events.subscribe(event => {
@@ -256,7 +256,7 @@ export class DashboardComponent implements OnInit {
           this.userName = user.user || '';
           this.profileImage = user.profileImage || null;
           this.userRole = this.userService.getUserRole(user);
-          
+
           if (this.userRole === 'STUDENT' && this.disabilityId) {
             this.updateAndLoadStreak(this.disabilityId);
           }
@@ -316,7 +316,7 @@ export class DashboardComponent implements OnInit {
         error: (err) => console.error('Error fetching courses for search:', err)
       });
 
-      // Setup Search Debounce
+      // Mitrap Search Debounce
       this.searchSubject.pipe(
         debounceTime(2000), // 2 seconds debounceTime
         distinctUntilChanged()
@@ -348,7 +348,7 @@ export class DashboardComponent implements OnInit {
       this.searchGroupedResults = { courses: [], resources: [], schemes: [], notifications: [] };
       return;
     }
-    
+
     this.showSearchDropdown = true;
     this.isSearchLoading = true;
 
@@ -385,7 +385,7 @@ export class DashboardComponent implements OnInit {
         this.userService.getEnrollment(this.disabilityId, item.id).subscribe({
           next: (en) => {
             if (en && en.id) {
-              this.router.navigate(['/dashboard/courses']); 
+              this.router.navigate(['/dashboard/courses']);
             } else {
               this.router.navigate(['/dashboard/courses']);
             }
@@ -417,26 +417,31 @@ export class DashboardComponent implements OnInit {
         this.currentStreak = progress.currentStreak || 0;
         this.bestStreak = progress.longestStreak || 0;
       },
-      error: (err) => console.error('Error updating streak:', err)
+      error: (err) => {
+        // Suppress 401 errors for new accounts as they are harmless and confuse users
+        if (err.status !== 401) {
+          console.error('Error updating streak:', err);
+        }
+      }
     });
   }
 
 
 
-  
+
   constructor(
-    private router: Router, 
-    private userService: UserService, 
+    private router: Router,
+    private userService: UserService,
     private adminService: AdminService,
-    private toastService: ToastService, 
+    private toastService: ToastService,
     private telemetryService: SearchTelemetryService,
     private aiService: AiService,
     private elementRef: ElementRef,
     @Inject(PLATFORM_ID) private platformId: Object
-  ) {}
-  
+  ) { }
+
   private googleTranslateLoaded = false;
-  
+
   toggleMenu() {
     if (!this.menuOpen) {
       this.previousActiveElement = document.activeElement as HTMLElement;
@@ -444,22 +449,22 @@ export class DashboardComponent implements OnInit {
     this.menuOpen = !this.menuOpen;
     if (this.menuOpen) {
       this.focusModal();
-            if (!this.googleTranslateLoaded) {
-          setTimeout(() => {
-            this.googleTranslateLoaded = true;
-            (window as any).googleTranslateElementInit = () => {
-              new (window as any).google.translate.TranslateElement(
-                { pageLanguage: 'en', includedLanguages: 'en,hi,mr,bn,gu,ta,te,ur,ml', autoDisplay: false },
-                'google_translate_element'
-              );
-            };
-            const script = document.createElement('script');
-            script.type = 'text/javascript';
-            script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
-            document.body.appendChild(script);
-          }, 100);
-        }
-      
+      if (!this.googleTranslateLoaded) {
+        setTimeout(() => {
+          this.googleTranslateLoaded = true;
+          (window as any).googleTranslateElementInit = () => {
+            new (window as any).google.translate.TranslateElement(
+              { pageLanguage: 'en', includedLanguages: 'en,hi,mr,bn,gu,ta,te,ur,ml', autoDisplay: false },
+              'google_translate_element'
+            );
+          };
+          const script = document.createElement('script');
+          script.type = 'text/javascript';
+          script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+          document.body.appendChild(script);
+        }, 100);
+      }
+
     } else {
       this.restorePreviousFocus();
     }
@@ -477,7 +482,7 @@ export class DashboardComponent implements OnInit {
   changeLanguage(event: Event) {
     const select = event.target as HTMLSelectElement;
     const lang = select.value;
-    
+
     // Find the Google Translate select element
     const gtSelect = document.querySelector('.goog-te-combo') as HTMLSelectElement;
     if (gtSelect) {
@@ -509,7 +514,7 @@ export class DashboardComponent implements OnInit {
     this.topMenuOpen = false;
     this.router.navigate(['/dashboard/profile']);
   }
-  
+
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
@@ -527,10 +532,10 @@ export class DashboardComponent implements OnInit {
   executeChangeProfilePicture(base64: string) {
     this.profileImage = base64;
     this.updateUserData({ profileImage: base64 });
-    
+
     const currentUser = this.userService.getCurrentUser();
     const isRemembered = isPlatformBrowser(this.platformId) && localStorage.getItem('authUser') !== null;
-    
+
     if (this.userRole === 'ADMIN') {
       const adminId = currentUser?.adminId || this.disabilityId;
       const updatedData = {
@@ -564,7 +569,7 @@ export class DashboardComponent implements OnInit {
       });
     }
   }
-  
+
   removeProfileImage() {
     this.openConfirmModal(
       'Remove Profile Picture',
@@ -579,10 +584,10 @@ export class DashboardComponent implements OnInit {
     const defaultImage = this.defaultAvatar;
     this.profileImage = defaultImage;
     this.updateUserData({ profileImage: defaultImage });
-    
+
     const currentUser = this.userService.getCurrentUser();
     const isRemembered = isPlatformBrowser(this.platformId) && localStorage.getItem('authUser') !== null;
-    
+
     if (this.userRole === 'ADMIN') {
       const adminId = currentUser?.adminId || this.disabilityId;
       const updatedData = {
@@ -616,7 +621,7 @@ export class DashboardComponent implements OnInit {
       });
     }
   }
-  
+
   updateUserData(updatedData: any) {
     if (isPlatformBrowser(this.platformId)) {
       const currentUser = this.userService.getCurrentUser();
@@ -627,21 +632,21 @@ export class DashboardComponent implements OnInit {
       }
     }
   }
-  
+
   logout() {
     this.toastService.success('Logged out successfully!');
     this.userService.logout();
     this.router.navigate(['/dashboard/main']);
   }
-  
+
   @HostListener('document:click', ['$event'])
   closeMenu(event: MouseEvent) {
     const target = event.target as HTMLElement;
     // Also check if clicked inside Google Translate iframe or popup
-    const isTranslate = target.closest('.goog-te-menu-frame') || target.closest('iframe.goog-te-menu-frame') || 
-                        target.classList.contains('goog-te-menu-value') || 
-                        target.closest('[class^="goog-"]') || target.closest('[id^="goog"]');
-                        
+    const isTranslate = target.closest('.goog-te-menu-frame') || target.closest('iframe.goog-te-menu-frame') ||
+      target.classList.contains('goog-te-menu-value') ||
+      target.closest('[class^="goog-"]') || target.closest('[id^="goog"]');
+
     if (!target.closest('.position-relative') && !target.closest('.avatar-button') && !isTranslate) {
       this.menuOpen = false;
     }
@@ -649,16 +654,16 @@ export class DashboardComponent implements OnInit {
       this.showSearchDropdown = false;
     }
   }
-  about(){
+  about() {
     this.router.navigate(['/dashboard/about']);
   }
-  resources(){
+  resources() {
     this.router.navigate(['/dashboard/courses']);
   }
-  cources(){
+  cources() {
     this.router.navigate(['/dashboard/courses']);
   }
-  contact(){
+  contact() {
     this.router.navigate(['/dashboard/contact']);
   }
 

@@ -44,7 +44,7 @@ export class AccessibilityService {
     private telemetryService: SearchTelemetryService
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
-    
+
     if (this.isBrowser) {
       // Whenever current user changes, reload settings
       this.userService.currentUser$.subscribe(() => {
@@ -61,8 +61,8 @@ export class AccessibilityService {
     try {
       const currentUser = this.userService.getCurrentUser();
       const id = currentUser ? (currentUser.disabilityId || currentUser.adminId) : null;
-      return id 
-        ? `acc_settings_${id}` 
+      return id
+        ? `acc_settings_${id}`
         : 'acc_settings_anonymous';
     } catch (e) {
       return 'acc_settings_anonymous';
@@ -83,7 +83,7 @@ export class AccessibilityService {
         this.letterSpacing = settings.letterSpacing || 'normal';
         this.lineHeight = settings.lineHeight || 'normal';
         this.dyslexiaFont = !!settings.dyslexiaFont;
-        
+
         // Migration from old cursorStyle to new cursorType/cursorColor
         if (settings.cursorStyle === 'large-red') {
           this.cursorType = 'pointer'; this.cursorColor = '#ef4444';
@@ -105,7 +105,7 @@ export class AccessibilityService {
         this.soundsEnabled = settings.soundsEnabled !== false;
         this.ttsEnabled = !!settings.ttsEnabled;
       } else {
-        // Fallback default setup when no settings exist
+        // Fallback default Mitrap when no settings exist
         this.contrastMode = 'normal';
         this.fontSize = 16;
         this.letterSpacing = 'normal';
@@ -149,7 +149,7 @@ export class AccessibilityService {
       try {
         const currentUser = this.userService.getCurrentUser();
         const userId = currentUser ? (currentUser.disabilityId || currentUser.adminId) : undefined;
-        
+
         if (this.contrastMode !== 'normal') {
           this.telemetryService.logTelemetry('ACCESSIBILITY_USE', 'Contrast Mode: ' + this.contrastMode, 'User saved high contrast settings', userId).subscribe();
         }
@@ -280,7 +280,7 @@ export class AccessibilityService {
       const utterance = new SpeechSynthesisUtterance(cleanText);
       utterance.rate = 1.0;
       utterance.pitch = 1.1; // Friendly higher pitch
-      
+
       utterance.onstart = () => {
         this.isSpeaking = true;
       };
@@ -302,7 +302,7 @@ export class AccessibilityService {
     if (!this.isBrowser) return;
     try {
       window.speechSynthesis.cancel();
-    } catch (e) {}
+    } catch (e) { }
   }
 
   // Synthesizer Audio Tones via Web Audio API
@@ -337,7 +337,7 @@ export class AccessibilityService {
 
       osc.start();
       osc.stop(ctx.currentTime + 0.08);
-    } catch (e) {}
+    } catch (e) { }
   }
 
   public playClickSound() {
@@ -362,7 +362,7 @@ export class AccessibilityService {
 
       osc.start();
       osc.stop(ctx.currentTime + 0.15);
-    } catch (e) {}
+    } catch (e) { }
   }
 
   public playSuccessSound() {
@@ -391,7 +391,7 @@ export class AccessibilityService {
       playTone(523.25, 0, 0.25);     // C5
       playTone(659.25, 0.08, 0.25);  // E5
       playTone(783.99, 0.16, 0.35);  // G5
-    } catch (e) {}
+    } catch (e) { }
   }
 
   // Voice Command Listener
@@ -407,7 +407,7 @@ export class AccessibilityService {
     if (this.recognition) {
       try {
         this.recognition.stop();
-      } catch (e) {}
+      } catch (e) { }
     }
 
     try {
@@ -459,7 +459,7 @@ export class AccessibilityService {
       try {
         this.recognition.stop();
         this.recognition = null;
-      } catch (e) {}
+      } catch (e) { }
     }
   }
 }

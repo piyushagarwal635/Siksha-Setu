@@ -4,6 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { FormComponent } from '../form/form.component';
 import { UserService } from '../../services/user.service';
 import { AccessibilityService } from '../../services/accessibility.service';
+import { AiVoiceAssistantService } from '../../services/ai-voice-assistant.service';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-settings',
@@ -28,9 +31,15 @@ export class SettingsComponent implements OnInit {
   public notifSuccess = '';
   public notifError = '';
 
+  public aiVoiceEnabled = false;
+  public aiVoiceSuccess = '';
+  public aiVoiceError = '';
+
   constructor(
     private userService: UserService,
-    private accService: AccessibilityService
+    private accService: AccessibilityService,
+    private aiVoiceService: AiVoiceAssistantService,
+    private http: HttpClient
   ) {}
 
   ngOnInit() {
@@ -38,6 +47,7 @@ export class SettingsComponent implements OnInit {
       if (user) {
         this.userRole = this.userService.getUserRole(user);
         this.disabilityId = user.disabilityId || user.adminId || '';
+        this.aiVoiceEnabled = user.aiVoiceEnabled || false;
       }
     });
   }
@@ -109,5 +119,29 @@ export class SettingsComponent implements OnInit {
 
   openWidget() {
     this.accService.toggleWidget$.next();
+  }
+
+  toggleAiVoice() {
+    this.aiVoiceSuccess = '';
+    this.aiVoiceError = '';
+
+    const payload = {
+      userId: this.disabilityId,
+      enabled: this.aiVoiceEnabled
+    };
+
+    this.http.post(`${environment.apiUrl}/api/voice/preferences`, payload).subscribe({
+      next: () => {
+        this.aiVoiceSuccess = 'AI Voice preference updated';
+        if (this.aiVoiceEnabled) {
+           this.aiVoiceService.executeCommand('CMD_ACTIVATE', { speakWelcome: true });
+        } else {
+           this.aiVoiceService.executeCommand('CMD_DEACTIVATE');
+        }
+      },
+      error: () => {
+        this.aiVoiceError = 'Failed to update AI Voice preference';
+      }
+    });
   }
 }

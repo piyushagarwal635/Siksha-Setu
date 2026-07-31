@@ -1,29 +1,34 @@
-import { Component, OnInit, Inject, PLATFORM_ID, Input, Output, EventEmitter } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit, Inject, PLATFORM_ID, Input, Output, EventEmitter, AfterViewInit, HostListener } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
 import { FormsModule, FormGroup, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { UserService } from '../services/user.service';
 import { AdminService } from '../services/admin.service';
 import { ToastService } from '../services/toast.service';
+import { AiVoiceAssistantService } from '../services/ai-voice-assistant.service';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 @Component({
   selector: 'app-login',
   standalone: true,
   templateUrl: './login.component.html',
-  imports: [FormsModule, CommonModule, ReactiveFormsModule],
+  imports: [FormsModule, CommonModule, ReactiveFormsModule, RouterModule],
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent implements OnInit, AfterViewInit {
 
-  userForm: FormGroup;
   signInForm: FormGroup;
   forgotForm: FormGroup;
   isLoading = false;
   menuOpen = false;
   isForgotPasswordActive = false;
+  private isBrowser: boolean;
 
   // Step-by-step Recovery properties
-  recoveryStep = 1; // 1 = Enter ID, 2 = Answer Question, 3 = Admin Assistance
+  recoveryStep = 1;
   recoveryUserId = '';
   recoveryQuestion = '';
   recoveryAnswer = '';
@@ -34,9 +39,6 @@ export class LoginComponent implements OnInit {
   showSignInError = false;
   signInErrorMessage = '';
 
-  showSignUpError = false;
-  signUpErrorMessage = '';
-
   @Input() isModal = false;
   @Output() loginSuccess = new EventEmitter<string>();
 
@@ -46,29 +48,10 @@ export class LoginComponent implements OnInit {
     private adminService: AdminService,
     private rl: Router,
     private toastService: ToastService,
+    private aiVoiceService: AiVoiceAssistantService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
-    this.userForm = this.fb.group({
-      user: ['', [Validators.required, Validators.minLength(5)]],
-      pass: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(8),
-          Validators.pattern(/[!@#$%^&*(),.?":{}|<>]/)
-        ]
-      ],
-      disabilityId: [
-        '',
-        [
-          Validators.required,
-          Validators.pattern(/^DIS\d{9}$/)
-        ]
-      ],
-      securityQuestion: ['', Validators.required],
-      securityAnswer: ['', Validators.required]
-    });
-
+    this.isBrowser = isPlatformBrowser(this.platformId);
     this.signInForm = this.fb.group({
       disabilityId: ['', Validators.required],
       pass: ['', Validators.required],
@@ -99,68 +82,51 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  onSubmit(): void {
-    this.showSignUpError = false;
-    this.signUpErrorMessage = '';
-
-    if (this.userForm.invalid) {
-      this.signUpErrorMessage = 'Please fill all fields correctly before creating an account.';
-      this.showSignUpError = true;
-      return;
+  ngAfterViewInit(): void {
+    if (this.isBrowser) {
+      setTimeout(() => {
+        this.initGsapAnimations();
+      }, 100);
     }
+  }
 
-    this.isLoading = true;
-    this.userForm.disable();
-    const rawVal = this.userForm.value;
-    
-    // Serialize single question/answer pair to JSON Map for database uniformity
-    const regPairs = { [rawVal.securityQuestion]: rawVal.securityAnswer };
-    const userData = {
-      ...rawVal,
-      securityQuestion: JSON.stringify(regPairs),
-      securityAnswer: ''
-    };
+  initGsapAnimations(): void {
+    // Login Card Entrance
+    gsap.from('.login-card', {
+      y: 50,
+      opacity: 0,
+      duration: 0.8,
+      ease: 'power3.out'
+    });
 
-    this.userService
-      .checkUserExists(userData.disabilityId)
-      .subscribe(
-        (exists: any) => {
-          if (exists) {
-            this.toastService.warning('Account already exists. Please sign in instead.');
-            this.signUpErrorMessage = 'Account already exists. Please sign in instead.';
-            this.showSignUpError = true;
-            this.isLoading = false;
-            this.userForm.enable();
-          } else {
-            this.userService
-              .createUser(userData)
-              .subscribe(
-                (response: any) => {
-                  console.log('User created:', response);
-                  this.isLoading = false;
-                  this.userForm.enable();
-                  this.toastService.success('Account created successfully. Please sign in.');
-                  this.togglePanel(false);
-                  this.userForm.reset();
-                },
-                (error: any) => {
-                  console.error('Error creating user:', error);
-                  this.signUpErrorMessage = 'Error creating account. Please try again.';
-                  this.showSignUpError = true;
-                  this.isLoading = false;
-                  this.userForm.enable();
-                }
-              );
-          }
-        },
-        (error: any) => {
-          console.error('Error checking user:', error);
-          this.signUpErrorMessage = 'Error checking user. Please try again.';
-          this.showSignUpError = true;
-          this.isLoading = false;
-          this.userForm.enable();
-        }
-      );
+    // Brand Header
+    gsap.from('.brand-header img', { scale: 0.5, opacity: 0, duration: 0.6, delay: 0.2, ease: 'back.out(1.5)' });
+    gsap.from('.brand-header h1', { y: 20, opacity: 0, duration: 0.5, delay: 0.4, ease: 'power2.out' });
+    gsap.from('.brand-header p', { y: 20, opacity: 0, duration: 0.5, delay: 0.5, ease: 'power2.out' });
+
+    // Inputs & Actions Stagger
+    gsap.from('.input-group-custom, .remember-row, .form-actions-row, .bottom-link', {
+      y: 20,
+      opacity: 0,
+      duration: 0.5,
+      stagger: 0.1,
+      delay: 0.6,
+      ease: 'power2.out'
+    });
+  }
+
+  onPasswordFocus(): void {
+    // Disabled to allow blind users to dictate their passwords via voice
+  }
+
+  onPasswordBlur(): void {
+    // Disabled
+  }
+
+  onreset(): void {
+    this.signInForm.reset();
+    this.forgotForm.reset();
+    this.showSignInError = false;
   }
 
   onSignIn(): void {
@@ -190,7 +156,8 @@ export class LoginComponent implements OnInit {
             disabilityId: response.disabilityId,
             adminId: response.adminId,
             role: response.role,
-            token: response.token
+            token: response.token,
+            aiVoiceEnabled: response.aiVoiceEnabled
           }, rememberMe);
 
           this.toastService.success('Login successful.');
@@ -220,31 +187,13 @@ export class LoginComponent implements OnInit {
       );
   }
 
-  onreset(): void {
-    this.userForm.reset();
-    this.signInForm.reset();
-    this.forgotForm.reset();
-    this.showSignInError = false;
-    this.showSignUpError = false;
-  }
-
   toggleMenu(): void {
     this.menuOpen = !this.menuOpen;
-  }
-
-  isRightPanelActive = false;
-
-  togglePanel(isRightPanelActive: boolean): void {
-    this.isRightPanelActive = isRightPanelActive;
-    this.isForgotPasswordActive = false;
-    this.showSignInError = false;
-    this.showSignUpError = false;
   }
 
   toggleForgotPassword(active: boolean): void {
     this.isForgotPasswordActive = active;
     this.showSignInError = false;
-    this.showSignUpError = false;
     this.goToRecoveryStep1();
   }
 

@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, PLATFORM_ID, ViewChild, ElementRef, OnDestroy, HostListener } from '@angular/core';
+import { Component, OnInit, Inject, PLATFORM_ID, ViewChild, ElementRef, OnDestroy, HostListener, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -27,7 +27,7 @@ export class CourseDashboardComponent implements OnInit, OnDestroy {
   courseId: string | null = null;
   courseDetails: any = null;
   resources: any[] = [];
-  
+
   // Grouped resources
   textResources: any[] = [];
   videoResources: any[] = [];
@@ -60,6 +60,10 @@ export class CourseDashboardComponent implements OnInit, OnDestroy {
   videoDuration = 0;
   videoProgressPercent = 0;
   videoTimeDisplay = '00:00 / 00:00';
+  showSettingsMenu = false;
+
+  // State for Mark as Complete
+  // Using existing enrollment.completedResources instead
 
   // Audio player references & state
   @ViewChild('customAudioPlayer') customAudioPlayerRef!: ElementRef<HTMLAudioElement>;
@@ -78,6 +82,7 @@ export class CourseDashboardComponent implements OnInit, OnDestroy {
   pdfPageNumber = 1;
   pdfTotalPages = 0;
   isPdfLoading = false;
+  pdfExtractedText = '';
 
   // Test State
   TestQuestions: TestQuestion[] = [];
@@ -142,6 +147,7 @@ export class CourseDashboardComponent implements OnInit, OnDestroy {
     private telemetryService: SearchTelemetryService,
     private http: HttpClient,
     private elementRef: ElementRef,
+    private cdr: ChangeDetectorRef,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
@@ -280,10 +286,10 @@ export class CourseDashboardComponent implements OnInit, OnDestroy {
     if (!modal) return;
     const focusable = modal.querySelectorAll('button, input, select, textarea, [tabindex]:not([tabindex="-1"])');
     if (focusable.length === 0) return;
-    
+
     const first = focusable[0] as HTMLElement;
     const last = focusable[focusable.length - 1] as HTMLElement;
-    
+
     if (event.shiftKey) {
       if (document.activeElement === first) {
         last.focus();
@@ -306,18 +312,18 @@ export class CourseDashboardComponent implements OnInit, OnDestroy {
     const focusable = host.querySelectorAll('button, input, select, textarea, a, [tabindex]:not([tabindex="-1"])');
     const focusableFiltered = Array.from(focusable).filter(el => {
       const style = window.getComputedStyle(el as HTMLElement);
-      return style.display !== 'none' && 
-             style.visibility !== 'hidden' && 
-             (el as HTMLElement).offsetWidth > 0 && 
-             (el as HTMLElement).offsetHeight > 0 && 
-             !(el as HTMLButtonElement).disabled;
+      return style.display !== 'none' &&
+        style.visibility !== 'hidden' &&
+        (el as HTMLElement).offsetWidth > 0 &&
+        (el as HTMLElement).offsetHeight > 0 &&
+        !(el as HTMLButtonElement).disabled;
     }) as HTMLElement[];
-    
+
     if (focusableFiltered.length === 0) return;
-    
+
     const first = focusableFiltered[0];
     const last = focusableFiltered[focusableFiltered.length - 1];
-    
+
     if (event.shiftKey) {
       if (document.activeElement === first) {
         last.focus();
@@ -358,7 +364,7 @@ export class CourseDashboardComponent implements OnInit, OnDestroy {
 
   loadCourseData() {
     this.isLoading = true;
-    
+
     // Fetch all courses and filter
     this.userService.getAllCourses().pipe(
       timeout(10000),
@@ -458,7 +464,7 @@ export class CourseDashboardComponent implements OnInit, OnDestroy {
     this.resources.forEach(res => {
       const format = res.format?.toLowerCase() || '';
       const fileUrl = res.fileUrl?.toLowerCase() || '';
-      
+
       let resolvedFormat = format;
       if (!resolvedFormat) {
         if (fileUrl.endsWith('.pdf') || fileUrl.endsWith('.txt') || fileUrl.endsWith('.doc') || fileUrl.endsWith('.docx')) {
@@ -527,6 +533,7 @@ export class CourseDashboardComponent implements OnInit, OnDestroy {
     this.pdfDoc = null;
     this.pdfTotalPages = 0;
     this.pdfPageNumber = 1;
+    this.pdfExtractedText = '';
 
     // Fetch resource as blob securely
     if (res && res.fileUrl) {
@@ -535,7 +542,7 @@ export class CourseDashboardComponent implements OnInit, OnDestroy {
       this.http.get(targetUrl, { responseType: 'blob' }).subscribe({
         next: (blob) => {
           this.currentBlobUrl = URL.createObjectURL(blob);
-          
+
           if (this.isPdfResource(res)) {
             this.securePdfBlob = blob;
             this.loadPdfjsAndRender(blob);
@@ -680,6 +687,12 @@ export class CourseDashboardComponent implements OnInit, OnDestroy {
     }
   }
 
+  setVideoSpeed(speed: number) {
+    if (this.customVideoPlayerRef && this.customVideoPlayerRef.nativeElement) {
+      this.customVideoPlayerRef.nativeElement.playbackRate = speed;
+    }
+  }
+
   toggleVideoFullscreen() {
     if (this.customVideoPlayerRef && this.customVideoPlayerRef.nativeElement) {
       const video = this.customVideoPlayerRef.nativeElement;
@@ -794,7 +807,7 @@ export class CourseDashboardComponent implements OnInit, OnDestroy {
     this.isPdfLoading = true;
     this.loadPdfjs().then((pdfjsLib) => {
       this.pdfjsLoaded = true;
-      
+
       const reader = new FileReader();
       reader.onload = (e: any) => {
         const arrayBuffer = e.target.result;
@@ -857,6 +870,25 @@ export class CourseDashboardComponent implements OnInit, OnDestroy {
         viewport: viewport
       };
       page.render(renderContext);
+
+      // Extract text for AI reading
+      page.getTextContent().then((textContent: any) => {
+        let extracted = '';
+        let lastY = -1;
+        for (const item of textContent.items) {
+          if (lastY !== -1 && Math.abs(item.transform[5] - lastY) > 5) {
+            extracted += '\n';
+          } else if (lastY !== -1) {
+            // Add a small space if it's on the same line but separated
+            extracted += ' ';
+          }
+          extracted += item.str.trim();
+          lastY = item.transform[5];
+        }
+        // Clean up multiple spaces
+        this.pdfExtractedText = extracted.replace(/[ \t]{2,}/g, ' ');
+        this.cdr.detectChanges();
+      });
     });
   }
 
@@ -901,10 +933,16 @@ export class CourseDashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  isResourceCompleted(resourceId: number): boolean {
+  isResourceCompleted(resourceId: any): boolean {
     if (!this.enrollment || !this.enrollment.completedResources) return false;
     const completedList = this.enrollment.completedResources.split(',');
     return completedList.includes(String(resourceId));
+  }
+
+  markCurrentResourceCompleted(): void {
+    if (this.selectedResource) {
+      this.markAsCompleted(this.selectedResource);
+    }
   }
 
   // Test Handling
@@ -914,14 +952,14 @@ export class CourseDashboardComponent implements OnInit, OnDestroy {
       return;
     }
     this.accService.playClickSound();
-    
+
     // Telemetry: Log TEST_ATTEMPT land/start event
     const currentUser = this.userService.getCurrentUser();
     const userId = currentUser ? (currentUser.disabilityId || currentUser.adminId || '') : '';
     if (userId && this.courseId) {
       this.telemetryService.logTelemetry('TEST_ATTEMPT', this.courseId, 'Started evaluation test', userId).subscribe();
     }
-    
+
     // Navigate to the secure full-screen test environment
     this.router.navigate(['/secure-test', this.courseId]);
   }
@@ -1051,7 +1089,7 @@ export class CourseDashboardComponent implements OnInit, OnDestroy {
     const currentUser = this.userService.getCurrentUser();
     if (currentUser && this.courseDetails) {
       const userId = currentUser.disabilityId || currentUser.adminId || '';
-      
+
       let prefString = '';
       if (this.selectedPreferences['All Resources']) {
         prefString = 'All Resources';
@@ -1089,27 +1127,27 @@ export class CourseDashboardComponent implements OnInit, OnDestroy {
     if (!this.enrollment || !this.enrollment.resourcePreference) return false;
     const pref = this.enrollment.resourcePreference.toLowerCase();
     if (pref.includes('all resources')) return true;
-    
+
     if (category === 'text' && pref.includes('text')) return true;
     if (category === 'video' && pref.includes('video')) return true;
     if (category === 'audio' && pref.includes('audio')) return true;
     if (category === 'sign' && pref.includes('sign language')) return true;
     if (category === 'braille' && pref.includes('braille')) return true;
-    
+
     return false;
   }
 
   handleCategoryHeaderClick(category: string, event: Event) {
     this.accService.playClickSound();
     const resources = this.getResourcesByCategory(category);
-    
+
     if (resources.length === 0) {
       // If there are no resources in the course, do not toggle accordion
       event.stopPropagation();
       event.preventDefault();
       return;
     }
-    
+
     // Toggle expansion locally (even if locked, so user can see locked items)
     this.expandedSections[category] = !this.expandedSections[category];
   }
@@ -1125,7 +1163,7 @@ export class CourseDashboardComponent implements OnInit, OnDestroy {
   confirmUnlockCategory() {
     const cat = this.pendingUnlockCategory;
     if (!cat || !this.enrollment) return;
-    
+
     let currentPref = this.enrollment.resourcePreference || '';
     let formatName = '';
     switch (cat) {
@@ -1135,7 +1173,7 @@ export class CourseDashboardComponent implements OnInit, OnDestroy {
       case 'sign': formatName = 'Sign Language'; break;
       case 'braille': formatName = 'Braille'; break;
     }
-    
+
     let newPref = '';
     if (currentPref.toLowerCase().includes('all resources') || currentPref === '') {
       newPref = 'All Resources';
@@ -1144,7 +1182,7 @@ export class CourseDashboardComponent implements OnInit, OnDestroy {
       if (!parts.includes(formatName)) {
         parts.push(formatName);
       }
-      
+
       const allFormats = ['Text', 'Video', 'Audio', 'Sign Language', 'Braille'];
       const allAvailable = allFormats.filter(f => this.isFormatAvailable(f));
       const allSelected = allAvailable.every(f => parts.includes(f));
@@ -1154,7 +1192,7 @@ export class CourseDashboardComponent implements OnInit, OnDestroy {
         newPref = parts.join(', ');
       }
     }
-    
+
     const currentUser = this.userService.getCurrentUser();
     if (currentUser) {
       const userId = currentUser.disabilityId || currentUser.adminId || '';
@@ -1165,7 +1203,7 @@ export class CourseDashboardComponent implements OnInit, OnDestroy {
           this.showUnlockPromptModal = false;
           this.restorePreviousFocus();
           this.expandedSections[cat] = true; // Auto-expand the newly unlocked category
-          
+
           const resourcesOfCat = this.getResourcesByCategory(cat);
           if (resourcesOfCat.length > 0) {
             this.selectResource(resourcesOfCat[0], cat);
@@ -1194,7 +1232,7 @@ export class CourseDashboardComponent implements OnInit, OnDestroy {
 
   getCategoryLabel(cat: string): string {
     switch (cat) {
-      case 'text': return 'Text Notes';
+      case 'text': return 'PDF Notes';
       case 'video': return 'Video Lessons';
       case 'audio': return 'Audio Lessons';
       case 'sign': return 'Sign Language Video';
@@ -1377,7 +1415,7 @@ export class CourseDashboardComponent implements OnInit, OnDestroy {
         confetti.style.zIndex = '99999';
         confetti.style.opacity = Math.random().toString();
         confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
-        
+
         document.body.appendChild(confetti);
 
         const duration = Math.random() * 2000 + 1500;
@@ -1415,7 +1453,7 @@ export class CourseDashboardComponent implements OnInit, OnDestroy {
     popupWin.document.write(`
       <html>
         <head>
-          <title>Siksha Setu Certificate</title>
+          <title>Divya Mitra Certificate</title>
           <style>
             @media print {
               body {

@@ -1,10 +1,10 @@
 /* Premium Layout & Typography */
 .main-container {
-  background: rgba(255, 255, 255, 0.3); /* Not pure white, slightly transparent */
-  backdrop-filter: blur(12px);
+  background: linear-gradient(135deg, rgba(240, 244, 255, 0.6) 0%, rgba(255, 240, 245, 0.6) 100%);
+  backdrop-filter: blur(16px);
   border-radius: 2rem;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); /* Slight shadow initially */
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.6);
   margin-top: 1rem;
   overflow: hidden;
   transition: all 0.4s ease;
@@ -33,26 +33,47 @@
 
 /* Hero Section */
 .hero-section {
-  background: radial-gradient(circle at 50% -20%, rgba(99, 102, 241, 0.08) 0%, transparent 60%),
-              radial-gradient(circle at 80% 50%, rgba(6, 182, 212, 0.05) 0%, transparent 40%);
   padding: 8rem 1rem 6rem;
-  border-bottom: 1px solid rgba(0,0,0,0.03);
+  border-bottom: 1px solid rgba(255,255,255,0.4);
   text-align: center;
   position: relative;
   overflow: hidden;
 }
 
+.hero-bg-layer {
+  position: absolute;
+  top: -5%; left: -5%; right: -5%; bottom: -5%;
+  background-image: url('/background image.png');
+  background-size: cover;
+  background-position: top center;
+  filter: blur(6px);
+  z-index: -2;
+  transition: transform 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.hero-section::after {
+  content: "";
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 250px;
+  background: linear-gradient(to top, rgba(240, 244, 255, 1) 0%, rgba(240, 244, 255, 0.7) 35%, transparent 100%);
+  z-index: -1;
+  pointer-events: none;
+}
+
 .hero-badge {
-  background: rgba(99, 102, 241, 0.08);
-  color: var(--primary-color);
-  border: 1px solid rgba(99, 102, 241, 0.2);
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.5);
   padding: 0.5rem 1.2rem;
   border-radius: 100px;
-  font-weight: 700;
+  font-weight: 800;
   font-size: 0.85rem;
   letter-spacing: 0.5px;
   display: inline-block;
   margin-bottom: 1.5rem;
+  backdrop-filter: blur(8px);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
 }
 
 .hero-title {
@@ -61,18 +82,23 @@
   line-height: 1.1;
   letter-spacing: -0.04em;
   margin-bottom: 1.5rem;
-  color: #0f172a;
-  background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #fff; 
+  text-shadow: 0 4px 12px rgba(0,0,0,0.5), 0 2px 4px rgba(0,0,0,0.8);
 }
 
 .hero-subtitle {
   font-size: 1.25rem;
-  color: var(--text-muted);
+  color: #f8fafc; 
+  text-shadow: 0 2px 8px rgba(0,0,0,0.6);
   max-width: 650px;
   margin: 0 auto 2.5rem;
   line-height: 1.6;
+  font-weight: 600;
+}
+
+.section-title {
+  color: #1e1b4b;
+  font-weight: 800;
 }
 
 /* Bento Box Grid */
@@ -84,15 +110,31 @@
 }
 
 .bento-card {
-  background: #ffffff;
+  background: linear-gradient(145deg, rgba(240, 244, 255, 0.8) 0%, rgba(250, 235, 245, 0.8) 100%);
+  backdrop-filter: blur(12px);
   border-radius: 24px;
-  border: 1px solid rgba(0,0,0,0.06);
+  border: 1px solid rgba(255, 255, 255, 0.6);
   padding: 2.5rem;
   transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
   position: relative;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+}
+
+.bento-card h3 {
+  font-weight: 800;
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.02em;
+  color: #1e1b4b; /* Deep indigo for better contrast */
+}
+
+.bento-card p {
+  color: #4338ca; /* Saturated indigo text */
+  margin-bottom: 0;
+  line-height: 1.6;
+  font-weight: 500;
 }
 
 .bento-card:hover {
@@ -114,19 +156,6 @@
 .bento-card-large { grid-column: span 8; }
 .bento-card-small { grid-column: span 4; }
 .bento-card-medium { grid-column: span 6; }
-
-.bento-card h3 {
-  font-weight: 800;
-  font-size: 1.5rem;
-  margin-bottom: 0.75rem;
-  letter-spacing: -0.02em;
-}
-
-.bento-card p {
-  color: var(--text-muted);
-  margin-bottom: 0;
-  line-height: 1.6;
-}
 
 /* Journey Timeline */
 .journey-line {
@@ -180,6 +209,44 @@
 }
 
 .footer-link:hover { color: #fff; }
+
+/* Add colors and glassmorphism to all cards to avoid pure white */
+.card {
+  background: linear-gradient(135deg, rgba(235, 245, 255, 0.75) 0%, rgba(245, 235, 255, 0.65) 100%) !important;
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+}
+
+.card h5 {
+  color: #1e1b4b !important;
+  font-weight: 800;
+}
+
+.card p.text-muted {
+  color: #4f46e5 !important; /* Darker vibrant text instead of muted grey */
+  font-weight: 500;
+}
+
+.course-card {
+  background: linear-gradient(145deg, rgba(230, 245, 255, 0.8) 0%, rgba(220, 255, 240, 0.7) 100%) !important;
+}
+
+/* Specific colored gradients for Ecosystem cards based on their icon colors */
+.card .text-indigo { color: #6366f1 !important; }
+.card .text-danger { color: #ef4444 !important; }
+.card .text-success { color: #22c55e !important; }
+.card .text-warning { color: #f59e0b !important; }
+.card .text-primary { color: #3b82f6 !important; }
+.card .text-info { color: #06b6d4 !important; }
+
+.why-choose-card {
+  background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%) !important;
+  color: white !important;
+}
+
+.why-choose-card h3, .why-choose-card li {
+  color: white !important;
+}
 
 @media (max-width: 992px) {
   .hero-title { font-size: 3rem; }

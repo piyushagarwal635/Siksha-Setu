@@ -1,6 +1,6 @@
 ﻿import re
 
-with open('D:/All Backends/Siksha Setu/Siksha-Setu/src/main/java/com/example/Siksha/Setu/controller/StudentAnalyticsController.java', 'r', encoding='utf-8') as f:
+with open('D:/All Backends/Divya Mitra/Divya Mitra/src/main/java/com/example/Divya/Mitra/controller/StudentAnalyticsController.java', 'r', encoding='utf-8') as f:
     content = f.read()
 
 # Fix the stray lines
@@ -17,7 +17,7 @@ enroll_pattern = re.compile(r'(enrollmentRepository\.save\(enrollment\);\s*// Up
 content = enroll_pattern.sub(r'\1calculateAndSaveProgress(enrollment);\n        return ResponseEntity.ok(enrollment);', content)
 
 # Update completeResource
-complete_pattern = re.compile(r'(// Calculate progress\s*List<com\.example\.Siksha\.Setu\.StudyResource> totalResources.*?)(\s*return ResponseEntity\.ok\(enrollment\);)', re.DOTALL)
+complete_pattern = re.compile(r'(// Calculate progress\s*List<com\.example\.Divya\.Mitra\.StudyResource> totalResources.*?)(\s*return ResponseEntity\.ok\(enrollment\);)', re.DOTALL)
 content = complete_pattern.sub(r'calculateAndSaveProgress(enrollment);\n        \2', content)
 
 # Add lastOpenedResourceId endpoint
@@ -41,7 +41,7 @@ last_opened_endpoint = '''
 
 content = content.replace('    // Complete resource', last_opened_endpoint + '\n    // Complete resource')
 
-with open('D:/All Backends/Siksha Setu/Siksha-Setu/src/main/java/com/example/Siksha/Setu/controller/StudentAnalyticsController.java', 'w', encoding='utf-8') as f:
+with open('D:/All Backends/Divya Mitra/Divya Mitra/src/main/java/com/example/Divya/Mitra/controller/StudentAnalyticsController.java', 'w', encoding='utf-8') as f:
     f.write(content)
 
 print("Done updating StudentAnalyticsController.java")

@@ -8,7 +8,8 @@
       </span>
       <h2 class="fw-extrabold mb-3 text-dark">Contact & Support Desk</h2>
       <p class="text-muted leading-relaxed max-w-xl mb-0">
-        Have questions? Fill out our accessible feedback form or start chatting with our instant learning assistant for quick support answers.
+        Have questions? Fill out our accessible feedback form or start chatting with our instant learning assistant for
+        quick support answers.
       </p>
     </div>
   </div>
@@ -33,28 +34,37 @@
             <!-- Full Name -->
             <div class="input-group-custom mb-3.5">
               <div class="d-flex justify-content-between align-items-center mb-1">
-                <label class="form-label fw-bold mb-0" for="contact-name">Full Name <span class="text-danger">*</span></label>
-                <button type="button" class="btn-tts-guide" (click)="speakPrompt('Please enter your full name')" aria-label="Read label"><i class="bi bi-volume-up-fill"></i> Read</button>
+                <label class="form-label fw-bold mb-0" for="contact-name">Full Name <span
+                    class="text-danger">*</span></label>
+                <button type="button" class="btn-tts-guide" (click)="speakPrompt('Please enter your full name')"
+                  aria-label="Read label"><i class="bi bi-volume-up-fill"></i> Read</button>
               </div>
-              <input type="text" id="contact-name" class="form-control rounded-3 p-3 border" placeholder="Enter Full Name" [(ngModel)]="name" name="name" required />
+              <input type="text" id="contact-name" class="form-control rounded-3 p-3 border"
+                placeholder="Enter Full Name" [(ngModel)]="name" name="name" required />
             </div>
 
             <!-- Email Address -->
             <div class="input-group-custom mb-3.5">
               <div class="d-flex justify-content-between align-items-center mb-1">
-                <label class="form-label fw-bold mb-0" for="contact-email">Email Address <span class="text-danger">*</span></label>
-                <button type="button" class="btn-tts-guide" (click)="speakPrompt('Please enter your email address')" aria-label="Read label"><i class="bi bi-volume-up-fill"></i> Read</button>
+                <label class="form-label fw-bold mb-0" for="contact-email">Email Address <span
+                    class="text-danger">*</span></label>
+                <button type="button" class="btn-tts-guide" (click)="speakPrompt('Please enter your email address')"
+                  aria-label="Read label"><i class="bi bi-volume-up-fill"></i> Read</button>
               </div>
-              <input type="email" id="contact-email" class="form-control rounded-3 p-3 border" placeholder="e.g. email@domain.com" [(ngModel)]="email" name="email" required />
+              <input type="email" id="contact-email" class="form-control rounded-3 p-3 border"
+                placeholder="e.g. email@domain.com" [(ngModel)]="email" name="email" required />
             </div>
 
             <!-- Assistive needs -->
             <div class="input-group-custom mb-3.5">
               <div class="d-flex justify-content-between align-items-center mb-1">
                 <label class="form-label fw-bold mb-0" for="contact-need">Specific Accessibility Need</label>
-                <button type="button" class="btn-tts-guide" (click)="speakPrompt('Select your primary accessibility need, if any')" aria-label="Read label"><i class="bi bi-volume-up-fill"></i> Read</button>
+                <button type="button" class="btn-tts-guide"
+                  (click)="speakPrompt('Select your primary accessibility need, if any')" aria-label="Read label"><i
+                    class="bi bi-volume-up-fill"></i> Read</button>
               </div>
-              <select id="contact-need" class="form-select rounded-3 p-3 border" [(ngModel)]="disabilityType" name="disabilityType">
+              <select id="contact-need" class="form-select rounded-3 p-3 border" [(ngModel)]="disabilityType"
+                name="disabilityType">
                 <option value="none">None / General Question</option>
                 <option value="visual">Visual Impairment Assistant</option>
                 <option value="auditory">Auditory / Speech Assistant</option>
@@ -66,10 +76,15 @@
             <!-- Message box -->
             <div class="input-group-custom mb-4">
               <div class="d-flex justify-content-between align-items-center mb-1">
-                <label class="form-label fw-bold mb-0" for="contact-msg">Your Message <span class="text-danger">*</span></label>
-                <button type="button" class="btn-tts-guide" (click)="speakPrompt('Enter your comments or questions here')" aria-label="Read label"><i class="bi bi-volume-up-fill"></i> Read</button>
+                <label class="form-label fw-bold mb-0" for="contact-msg">Your Message <span
+                    class="text-danger">*</span></label>
+                <button type="button" class="btn-tts-guide"
+                  (click)="speakPrompt('Enter your comments or questions here')" aria-label="Read label"><i
+                    class="bi bi-volume-up-fill"></i> Read</button>
               </div>
-              <textarea id="contact-msg" class="form-control rounded-3 p-3 border" rows="4" placeholder="How can we help make your learning easier?" [(ngModel)]="message" name="message" required></textarea>
+              <textarea id="contact-msg" class="form-control rounded-3 p-3 border" rows="4"
+                placeholder="How can we help make your learning easier?" [(ngModel)]="message" name="message"
+                required></textarea>
             </div>
 
             <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow-md">
@@ -83,16 +98,15 @@
     <!-- Live Chat Assistant Card -->
     <div class="col-lg-6">
       <div class="card glass-panel shadow-3d border-0 rounded-4 h-100 d-flex flex-column">
-        <div class="card-header bg-transparent border-0 p-4 pb-0 d-flex align-items-center justify-content-between gap-2">
+        <div
+          class="card-header bg-transparent border-0 p-4 pb-0 d-flex align-items-center justify-content-between gap-2">
           <div class="d-flex align-items-center gap-2">
             <span class="chat-status-indicator pulse-green"></span>
             <h3 class="fw-extrabold text-indigo mb-0">Help Desk Assistant</h3>
           </div>
-          <button 
-            type="button" 
+          <button type="button"
             class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1.5 fw-bold d-flex align-items-center gap-1.5"
-            [disabled]="chatState !== 'CHAT' || isLoading"
-            (click)="emailChatToSupport()">
+            [disabled]="chatState !== 'CHAT' || isLoading" (click)="emailChatToSupport()">
             <i class="bi bi-envelope-at-fill"></i> Email Chat to Support
           </button>
         </div>
@@ -100,13 +114,11 @@
         <div class="card-body p-4 d-flex flex-column flex-grow-1 overflow-hidden" style="max-height: 480px;">
           <!-- Chat History -->
           <div class="chat-history flex-grow-1 overflow-y-auto mb-3 p-2 d-flex flex-column gap-3">
-            <div 
-              *ngFor="let msg of chatMessages" 
-              class="chat-bubble-wrapper d-flex flex-column" 
-              [class.align-items-end]="msg.sender === 'user'" 
-              [class.align-items-start]="msg.sender === 'bot'">
-              
-              <div class="chat-bubble p-3 rounded-4 shadow-sm" [class.user-bubble]="msg.sender === 'user'" [class.bot-bubble]="msg.sender === 'bot'">
+            <div *ngFor="let msg of chatMessages" class="chat-bubble-wrapper d-flex flex-column"
+              [class.align-items-end]="msg.sender === 'user'" [class.align-items-start]="msg.sender === 'bot'">
+
+              <div class="chat-bubble p-3 rounded-4 shadow-sm" [class.user-bubble]="msg.sender === 'user'"
+                [class.bot-bubble]="msg.sender === 'bot'">
                 {{ msg.text }}
               </div>
               <span class="chat-time text-muted mt-1 px-1">{{ msg.time }}</span>
@@ -124,15 +136,10 @@
 
           <!-- Chat Input -->
           <div class="chat-input-wrapper d-flex gap-2 pt-3 border-top">
-            <input 
-              type="text" 
-              class="form-control rounded-pill px-4 py-2.5 border" 
-              placeholder="Ask a question..." 
-              [(ngModel)]="chatMessageText"
-              (keyup.enter)="sendChatMessage()"
-              aria-label="Ask assistant a question"
-            />
-            <button class="btn btn-primary rounded-circle d-grid place-items-center" style="width: 46px; height: 46px; min-width: 46px;" (click)="sendChatMessage()" aria-label="Send message">
+            <input type="text" class="form-control rounded-pill px-4 py-2.5 border" placeholder="Ask a question..."
+              [(ngModel)]="chatMessageText" (keyup.enter)="sendChatMessage()" aria-label="Ask assistant a question" />
+            <button class="btn btn-primary rounded-circle d-grid place-items-center"
+              style="width: 46px; height: 46px; min-width: 46px;" (click)="sendChatMessage()" aria-label="Send message">
               <i class="bi bi-arrow-up text-white fs-5"></i>
             </button>
           </div>
@@ -143,9 +150,11 @@
 
   <!-- FAQ Accordion Section -->
   <div class="faq-section mt-5 glass-panel shadow-3d p-4 p-md-5 rounded-5 mb-5 bg-white">
-    <h3 class="fw-extrabold text-indigo text-center mb-3"><span class="title-underline">Frequently Asked Questions</span></h3>
+    <h3 class="fw-extrabold text-indigo text-center mb-3"><span class="title-underline">Frequently Asked
+        Questions</span></h3>
     <p class="text-muted text-center max-w-2xl mx-auto mb-5">
-      Find detailed support answers regarding course enrollments, sensory accessibility features, haptics, testing environments, and government scholarships.
+      Find detailed support answers regarding course enrollments, sensory accessibility features, haptics, testing
+      environments, and government scholarships.
     </p>
 
     <mat-accordion class="custom-faq-accordion">
@@ -157,7 +166,10 @@
           </mat-panel-title>
         </mat-expansion-panel-header>
         <div class="faq-content text-muted p-2">
-          Registration is completely free and accessible. Click the "Login / Sign Up" button in the navigation bar to create a student account by entering your details. Once registered, log in, browse the "Courses" page, select any course matching your curriculum (e.g. BCA, B.Sc IT), and click the "Enroll Now" button. The course will instantly link to your personal student dashboard.
+          Registration is completely free and accessible. Click the "Login / Sign Up" button in the navigation bar to
+          create a student account by entering your details. Once registered, log in, browse the "Courses" page, select
+          any course matching your curriculum (e.g. BCA, B.Sc IT), and click the "Enroll Now" button. The course will
+          instantly link to your personal student dashboard.
         </div>
       </mat-expansion-panel>
 
@@ -165,15 +177,20 @@
       <mat-expansion-panel class="faq-panel mb-3 border-0 rounded-4 overflow-hidden shadow-sm">
         <mat-expansion-panel-header class="py-4">
           <mat-panel-title class="fw-bold text-dark d-flex align-items-center">
-            <i class="bi bi-universal-access-circle text-info me-3 fs-5"></i> What accessibility controls does Siksha Setu provide?
+            <i class="bi bi-universal-access-circle text-info me-3 fs-5"></i> What accessibility controls does Divya
+            Mitra provide?
           </mat-panel-title>
         </mat-expansion-panel-header>
         <div class="faq-content text-muted p-2">
-          We provide a global floating Accessibility Widget (represented by a palette/wheel icon at the bottom-right). Clicking this widget opens a drawer enabling:
+          We provide a global floating Accessibility Widget (represented by a palette/wheel icon at the bottom-right).
+          Clicking this widget opens a drawer enabling:
           <ul class="mt-2 pl-3">
-            <li><strong>High Contrast</strong>: Toggle Yellow-on-Black or White-on-Black modes for low-vision comfort.</li>
-            <li><strong>Dyslexia Friendly Font</strong>: Change the global typeface to Lexend for enhanced readability.</li>
-            <li><strong>Custom Spacing</strong>: Choose between Loose or Extra Word Spacing and double-line heights.</li>
+            <li><strong>High Contrast</strong>: Toggle Yellow-on-Black or White-on-Black modes for low-vision comfort.
+            </li>
+            <li><strong>Dyslexia Friendly Font</strong>: Change the global typeface to Lexend for enhanced readability.
+            </li>
+            <li><strong>Custom Spacing</strong>: Choose between Loose or Extra Word Spacing and double-line heights.
+            </li>
             <li><strong>Large Cursor</strong>: Swap to a high-visibility red pointing cursor.</li>
             <li><strong>Focus Ruler</strong>: Activate a horizontal reading guide that tracks your cursor.</li>
           </ul>
@@ -184,11 +201,15 @@
       <mat-expansion-panel class="faq-panel mb-3 border-0 rounded-4 overflow-hidden shadow-sm">
         <mat-expansion-panel-header class="py-4">
           <mat-panel-title class="fw-bold text-dark d-flex align-items-center">
-            <i class="bi bi-grid-3x3-gap-fill text-indigo me-3 fs-5"></i> How does the Braille display translation engine work?
+            <i class="bi bi-grid-3x3-gap-fill text-indigo me-3 fs-5"></i> How does the Braille display translation
+            engine work?
           </mat-panel-title>
         </mat-expansion-panel-header>
         <div class="faq-content text-muted p-2">
-          Siksha Setu features a built-in Braille converter. When visually impaired learners view lesson resources, they can toggle "Braille View". The system translates letters, numbers, and symbols into standard 6-dot Braille cells instantly. We are currently developing integration APIs to transmit this converted Braille data directly to external refreshable physical Braille hardware displays via Bluetooth/USB.
+          Divya Mitra features a built-in Braille converter. When visually impaired learners view lesson resources, they
+          can toggle "Braille View". The system translates letters, numbers, and symbols into standard 6-dot Braille
+          cells instantly. We are currently developing integration APIs to transmit this converted Braille data directly
+          to external refreshable physical Braille hardware displays via Bluetooth/USB.
         </div>
       </mat-expansion-panel>
 
@@ -200,7 +221,9 @@
           </mat-panel-title>
         </mat-expansion-panel-header>
         <div class="faq-content text-muted p-2">
-          To support deaf and hard-of-hearing learners, our core video player contains sign language sync options. Enrolled students can activate sign language overlay windows that render synchronized hand-gesture guides alongside course video modules. Full closed caption controls are also adjustable inside the reader settings.
+          To support deaf and hard-of-hearing learners, our core video player contains sign language sync options.
+          Enrolled students can activate sign language overlay windows that render synchronized hand-gesture guides
+          alongside course video modules. Full closed caption controls are also adjustable inside the reader settings.
         </div>
       </mat-expansion-panel>
 
@@ -212,7 +235,10 @@
           </mat-panel-title>
         </mat-expansion-panel-header>
         <div class="faq-content text-muted p-2">
-          At the end of each course, students can launch the course evaluation test. Upon completing and passing the test with a score of 60% or more, our backend dynamically stamps a verified completion certificate. This certificate appears under the "Certificates" block of your Student Dashboard, ready for instant download or sharing.
+          At the end of each course, students can launch the course evaluation test. Upon completing and passing the
+          test with a score of 60% or more, our backend dynamically stamps a verified completion certificate. This
+          certificate appears under the "Certificates" block of your Student Dashboard, ready for instant download or
+          sharing.
         </div>
       </mat-expansion-panel>
 
@@ -224,7 +250,9 @@
           </mat-panel-title>
         </mat-expansion-panel-header>
         <div class="faq-content text-muted p-2">
-          Our evaluation tests launch in a secure mode to ensure certificate integrity. In this state, the window detects exit triggers, locks page context copy/paste actions, detects tab switching, and provides auditory warnings if focus is lost. It ensures students complete assessments fairly and autonomously.
+          Our evaluation tests launch in a secure mode to ensure certificate integrity. In this state, the window
+          detects exit triggers, locks page context copy/paste actions, detects tab switching, and provides auditory
+          warnings if focus is lost. It ensures students complete assessments fairly and autonomously.
         </div>
       </mat-expansion-panel>
 
@@ -236,7 +264,10 @@
           </mat-panel-title>
         </mat-expansion-panel-header>
         <div class="faq-content text-muted p-2">
-          Siksha Setu hosts a verified index of national and state-level schemes for disabled students (e.g. AICTE Saksham Scholarship, Post-Matric Scholarships, ADIP Scheme for free aid distribution). On your student dashboard, click "Government Schemes" to check eligibility details, required income brackets, and directly access the official application portals.
+          Divya Mitra hosts a verified index of national and state-level schemes for disabled students (e.g. AICTE
+          Saksham Scholarship, Post-Matric Scholarships, ADIP Scheme for free aid distribution). On your student
+          dashboard, click "Government Schemes" to check eligibility details, required income brackets, and directly
+          access the official application portals.
         </div>
       </mat-expansion-panel>
 
@@ -248,7 +279,10 @@
           </mat-panel-title>
         </mat-expansion-panel-header>
         <div class="faq-content text-muted p-2">
-          You can edit fields like address or contact numbers under "My Profile" at any time. However, to prevent academic fraud, secure fields (like full name or disability registration files) are locked once verified. To edit these, submit a change request through the profile editor form; your platform Administrator will review and approve the upload.
+          You can edit fields like address or contact numbers under "My Profile" at any time. However, to prevent
+          academic fraud, secure fields (like full name or disability registration files) are locked once verified. To
+          edit these, submit a change request through the profile editor form; your platform Administrator will review
+          and approve the upload.
         </div>
       </mat-expansion-panel>
     </mat-accordion>

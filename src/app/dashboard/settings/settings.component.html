@@ -160,6 +160,22 @@
               </div>
             </div>
           </div>
+
+          <div class="col-12 mt-4">
+            <div class="card border-0 shadow-sm bg-white">
+              <div class="card-body p-4 d-flex justify-content-between align-items-center">
+                <div>
+                  <h5 class="fw-bold mb-1"><i class="bi bi-robot text-primary me-2"></i> AI Voice Agent</h5>
+                  <p class="text-muted mb-0 small">Enable the AI Voice Agent to navigate and use the website using voice commands completely hands-free.</p>
+                  <div class="text-success small mt-1" *ngIf="aiVoiceSuccess">{{aiVoiceSuccess}}</div>
+                  <div class="text-danger small mt-1" *ngIf="aiVoiceError">{{aiVoiceError}}</div>
+                </div>
+                <div class="form-check form-switch fs-3">
+                  <input class="form-check-input" type="checkbox" role="switch" [(ngModel)]="aiVoiceEnabled" (change)="toggleAiVoice()">
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 

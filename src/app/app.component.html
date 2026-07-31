@@ -4,7 +4,13 @@
   </div>
 </div>
 
+<!-- App Splash Screen -->
+<div *ngIf="showSplash" class="splash-screen">
+  <img src="DivyaMitra-Logo-removebg-preview.png" alt="Divya Mitra Logo" class="splash-logo">
+</div>
+
 <router-outlet></router-outlet>
+<app-ai-voice-indicator></app-ai-voice-indicator>
 <app-accessibility-widget></app-accessibility-widget>
 
 <!-- Cookie Consent Banner Overlay -->
@@ -16,12 +22,16 @@
     <div class="cookie-text-content">
       <h5 class="fw-bold text-dark m-0" style="font-size: 1.05rem;">We Respect Your Privacy</h5>
       <p class="text-muted small m-0 mt-1" style="line-height: 1.45; font-size: 0.85rem;">
-        Siksha Setu uses secure session cookies to verify authentication credentials, keep you logged in between refreshes, and support 'Remember Me' preferences. By accepting, you consent to our secure cookie usage. You can change this at any time in the settings.
+        Divya Mitra uses secure session cookies to verify authentication credentials, keep you logged in between
+        refreshes, and support 'Remember Me' preferences. By accepting, you consent to our secure cookie usage. You can
+        change this at any time in the settings.
       </p>
     </div>
   </div>
   <div class="cookie-actions d-flex gap-2 justify-content-end mt-2">
-    <button (click)="declineCookies()" class="btn btn-sm btn-decline px-3 py-1.5 fw-bold rounded-pill" style="font-size: 0.8rem;">Decline</button>
-    <button (click)="acceptCookies()" class="btn btn-sm btn-accept px-4 py-1.5 fw-bold rounded-pill" style="font-size: 0.8rem;">Accept Cookies</button>
+    <button (click)="declineCookies()" class="btn btn-sm btn-decline px-3 py-1.5 fw-bold rounded-pill"
+      style="font-size: 0.8rem;">Decline</button>
+    <button (click)="acceptCookies()" class="btn btn-sm btn-accept px-4 py-1.5 fw-bold rounded-pill"
+      style="font-size: 0.8rem;">Accept Cookies</button>
   </div>
 </div>

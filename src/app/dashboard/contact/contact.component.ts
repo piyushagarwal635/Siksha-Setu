@@ -1,10 +1,14 @@
-import { Component, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, Inject, PLATFORM_ID, AfterViewInit, HostListener } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AccessibilityService } from '../../services/accessibility.service';
 import { ToastService } from '../../services/toast.service';
 import { UserService } from '../../services/user.service';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 interface ChatMessage {
   id: number;
@@ -20,7 +24,9 @@ interface ChatMessage {
   templateUrl: './contact.component.html',
   styleUrls: ['./contact.component.css']
 })
-export class ContactComponent {
+export class ContactComponent implements AfterViewInit {
+  bgTransform: string = 'translate3d(0px, 0px, 0px) scale(1.05)';
+  
   // Contact Form data
   public name: string = '';
   public email: string = '';
@@ -34,11 +40,11 @@ export class ContactComponent {
   public chatUserName: string = '';
   public chatUserContact: string = '';
   public chatUserIssue: string = '';
-  
+
   public chatMessages: ChatMessage[] = [
     {
       id: 1,
-      text: 'Hello there! Welcome to Siksha Setu Help Desk. To assist you better, could you please enter your Full Name?',
+      text: 'Hello there! Welcome to Divya Mitra Help Desk. To assist you better, could you please enter your Full Name?',
       sender: 'bot',
       time: 'Just now'
     }
@@ -48,12 +54,62 @@ export class ContactComponent {
   private isBrowser: boolean;
 
   constructor(
-    private accService: AccessibilityService,
+    public accService: AccessibilityService,
     private toastService: ToastService,
     private userService: UserService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
+  }
+
+  ngAfterViewInit() {
+    if (this.isBrowser) {
+      setTimeout(() => {
+        this.initGsapAnimations();
+      }, 100);
+    }
+  }
+
+  initGsapAnimations(): void {
+    // Header Animation
+    gsap.from('.contact-header', { y: -50, opacity: 0, duration: 1, ease: 'power3.out' });
+    gsap.from('.contact-header h2', { y: 20, opacity: 0, duration: 0.8, delay: 0.2, ease: 'power2.out' });
+    gsap.from('.contact-header p', { y: 20, opacity: 0, duration: 0.8, delay: 0.4, ease: 'power2.out' });
+
+    // Main Cards (Form and FAQ)
+    gsap.from('.form-card', { 
+      x: -50, opacity: 0, duration: 0.8, delay: 0.6, ease: 'power3.out' 
+    });
+    gsap.from('.faq-card', { 
+      x: 50, opacity: 0, duration: 0.8, delay: 0.8, ease: 'power3.out' 
+    });
+
+    // FAQ Items
+    gsap.utils.toArray('.faq-item').forEach((item: any, i) => {
+      gsap.from(item, {
+        scrollTrigger: {
+          trigger: item,
+          start: 'top 95%',
+        },
+        y: 30,
+        opacity: 0,
+        duration: 0.6,
+        ease: 'power2.out',
+        delay: i * 0.1
+      });
+    });
+
+    // Chatbot Panel
+    gsap.from('.chatbot-panel', {
+      scrollTrigger: {
+        trigger: '.chatbot-panel',
+        start: 'top 90%',
+      },
+      y: 50,
+      opacity: 0,
+      duration: 0.8,
+      ease: 'power3.out'
+    });
   }
 
   // Speak input prompts for accessibility
@@ -137,7 +193,7 @@ export class ContactComponent {
         this.chatUserIssue = text;
         this.chatState = 'CHAT';
         reply = `Got it. Let me answer that or anything else you need. (You can click the "Email Chat to Support" button at any time to send this chat directly to our volunteer team).`;
-        
+
         // Push this transition reply
         this.chatMessages.push({
           id: this.chatMessages.length + 1,

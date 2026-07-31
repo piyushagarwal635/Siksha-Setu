@@ -66,11 +66,11 @@ export class BrailleHardwareService {
 
   async connectUsb(): Promise<boolean> {
     if (!this.isBrowser || !('usb' in navigator)) {
-      this.setUnsupported('WebUSB is not supported by this browser. Virtual display remains active.');
+      this.Mitransupported('WebUSB is not supported by this browser. Virtual display remains active.');
       return false;
     }
     if (!BRAILLE_DEVICE_PROFILES.some(profile => profile.transport === 'usb')) {
-      this.setUnsupported('No reviewed USB Braille device profiles are configured.');
+      this.Mitransupported('No reviewed USB Braille device profiles are configured.');
       return false;
     }
 
@@ -104,14 +104,14 @@ export class BrailleHardwareService {
 
   async connectBluetooth(): Promise<boolean> {
     if (!this.isBrowser || !('bluetooth' in navigator)) {
-      this.setUnsupported('Web Bluetooth is not supported by this browser. Virtual display remains active.');
+      this.Mitransupported('Web Bluetooth is not supported by this browser. Virtual display remains active.');
       return false;
     }
     const profiles = BRAILLE_DEVICE_PROFILES.filter(
       profile => profile.transport === 'bluetooth' && profile.bluetoothServiceUuid
     );
     if (!profiles.length) {
-      this.setUnsupported('No reviewed Bluetooth Braille device profiles are configured.');
+      this.Mitransupported('No reviewed Bluetooth Braille device profiles are configured.');
       return false;
     }
 
@@ -259,8 +259,8 @@ export class BrailleHardwareService {
       if (this.activeProfile?.usbInterface !== undefined) {
         await device.releaseInterface(this.activeProfile.usbInterface);
       }
-    } catch {}
-    try { await device.close(); } catch {}
+    } catch { }
+    try { await device.close(); } catch { }
   }
 
   private setChecking(): void {
@@ -281,7 +281,7 @@ export class BrailleHardwareService {
     });
   }
 
-  private setUnsupported(message: string): void {
+  private Mitransupported(message: string): void {
     this.statusSubject.next({ ...VIRTUAL_STATUS, state: 'unsupported', message });
   }
 

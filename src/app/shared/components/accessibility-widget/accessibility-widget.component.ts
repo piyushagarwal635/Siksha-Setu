@@ -101,22 +101,48 @@ export class AccessibilityWidgetComponent implements OnInit, OnDestroy {
   // Text-To-Speech Global Hover Reader
   private onGlobalMouseOver(event: MouseEvent) {
     if (!this.accService.ttsEnabled) return;
+    // Don't interrupt if accessibility TTS is already speaking
+    if (this.accService.isSpeaking) return;
 
     const target = event.target as HTMLElement;
     if (!target) return;
 
-    // Speak text of headers, paragraphs, buttons, input labels, links
-    const matches = target.matches('h1, h2, h3, h4, h5, h6, p, button, a, span, label, input, select');
+    // Include media elements + standard text elements
+    const matches = target.matches(
+      'h1, h2, h3, h4, h5, h6, p, button, a, span, label, input, select, ' +
+      'video, audio, img, figure, iframe, [role="button"], [role="link"]'
+    );
     if (matches) {
-      // Avoid speaking long parent blocks if we hovered a child
       event.stopPropagation();
-      
+
       let speakText = '';
-      if (target.tagName === 'INPUT') {
+      const tag = target.tagName.toLowerCase();
+
+      if (tag === 'input') {
         const inputEl = target as HTMLInputElement;
         speakText = (inputEl.placeholder || 'Input text box') + (inputEl.value ? ', current value: ' + inputEl.value : '');
+      } else if (tag === 'video') {
+        // For video: read aria-label, title, or a helpful description
+        speakText = target.getAttribute('aria-label') ||
+                    target.getAttribute('title') ||
+                    'Video. Click to play or pause.';
+      } else if (tag === 'audio') {
+        speakText = target.getAttribute('aria-label') ||
+                    target.getAttribute('title') ||
+                    'Audio player. Click to play or pause.';
+      } else if (tag === 'img') {
+        speakText = (target as HTMLImageElement).alt ||
+                    target.getAttribute('aria-label') ||
+                    'Image';
+      } else if (tag === 'iframe') {
+        speakText = target.getAttribute('title') ||
+                    target.getAttribute('aria-label') ||
+                    'Embedded content';
       } else {
-        speakText = target.innerText || target.getAttribute('aria-label') || '';
+        speakText = (target as HTMLElement).innerText?.trim() ||
+                    target.getAttribute('aria-label') || '';
+        // Truncate very long text (e.g. full paragraphs) to first 120 chars
+        if (speakText.length > 120) speakText = speakText.substring(0, 120) + '...';
       }
 
       if (speakText) {
@@ -169,7 +195,7 @@ export class AccessibilityWidgetComponent implements OnInit, OnDestroy {
     this.accService.cursorType = type;
     this.accService.saveSettings();
     this.accService.playClickSound();
-    
+
     let name = 'default';
     if (type === 'system') name = 'system default (off)';
     if (type === 'default') name = 'standard pointer';
@@ -287,7 +313,7 @@ export class AccessibilityWidgetComponent implements OnInit, OnDestroy {
       this.userService.getAllCourses().subscribe({
         next: (courses) => {
           const count = courses ? courses.length : 0;
-          this.speakAndReply(cmd, `There are ${count} courses currently available on Siksha Setu.`);
+          this.speakAndReply(cmd, `There are ${count} courses currently available on Divya Mitra.`);
         },
         error: () => {
           this.speakAndReply(cmd, "Sorry, I could not fetch the course count right now.");
@@ -437,6 +463,30 @@ export class AccessibilityWidgetComponent implements OnInit, OnDestroy {
     if (normalizedCmd.includes('streak') || normalizedCmd.includes('fire') || normalizedCmd.includes('contribution')) {
       this.router.navigate(['/dashboard/streak']);
       this.speakAndReply(cmd, "Navigating to Streak Board.", true);
+      return;
+    }
+    if (normalizedCmd.includes('login') || normalizedCmd.includes('log in') || normalizedCmd.includes('sign in')) {
+      this.router.navigate(['/login']);
+      this.speakAndReply(cmd, "Navigating to Login Page.", true);
+      return;
+    }
+    if (normalizedCmd.includes('register') || normalizedCmd.includes('signup') || normalizedCmd.includes('sign up')) {
+      this.router.navigate(['/signup']);
+      this.speakAndReply(cmd, "Navigating to Registration Page.", true);
+      return;
+    }
+    if (normalizedCmd.includes('logout') || normalizedCmd.includes('log out') || normalizedCmd.includes('sign out')) {
+      this.userService.logout();
+      this.router.navigate(['/login']);
+      this.speakAndReply(cmd, "Logging you out. See you soon.", true);
+      return;
+    }
+    if (normalizedCmd.includes('who am i') || normalizedCmd.includes('my name') || normalizedCmd.includes('what is my name')) {
+      if (currentUser && currentUser.user) {
+        this.speakAndReply(cmd, `You are logged in as ${currentUser.user}.`);
+      } else {
+        this.speakAndReply(cmd, "You are not logged in right now.");
+      }
       return;
     }
 

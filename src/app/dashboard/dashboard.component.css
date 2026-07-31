@@ -48,9 +48,9 @@
   margin-right: 1rem;
 }
 
-.nav-left img {
-  width: 55px;
-  height: 55px;
+.nav-left .nav-logo {
+  width: 65px;
+  height: 65px;
   border-radius: 50%;
   border: 2px solid var(--primary-color);
   box-shadow: var(--shadow-sm);
@@ -59,7 +59,7 @@
   transition: transform var(--transition-bounce);
 }
 
-.nav-left img:hover {
+.nav-left .nav-logo:hover {
   transform: scale(1.05) rotate(3deg);
 }
 

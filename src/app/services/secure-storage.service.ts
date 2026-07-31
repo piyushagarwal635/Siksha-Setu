@@ -10,8 +10,8 @@ export class SecureStorageService {
   private isBrowser: boolean;
 
   // Static key material for PBKDF2
-  private secretPassphrase = 'Siksha-Setu-Client-Side-Secure-Passphrase-2026-SuperKey!';
-  private salt = new Uint8Array([83, 106, 107, 115, 104, 97, 83, 101, 116, 117, 83, 97, 108, 116, 50, 51]); // "SikshaSetuSalt23"
+  private secretPassphrase = 'Divya Mitra-Client-Side-Secure-Passphrase-2026-SuperKey!';
+  private salt = new Uint8Array([83, 106, 107, 115, 104, 97, 83, 101, 116, 117, 83, 97, 108, 116, 50, 51]); // "DivyaMitraSalt23"
   private cryptoKey: CryptoKey | null = null;
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {
@@ -24,7 +24,7 @@ export class SecureStorageService {
 
     try {
       await this.initKey();
-      
+
       const keysToLoad = ['authUser', 'token'];
       for (const key of keysToLoad) {
         // Check localStorage first
@@ -131,7 +131,7 @@ export class SecureStorageService {
     const key = await this.ensureKey();
     const encoder = new TextEncoder();
     const iv = window.crypto.getRandomValues(new Uint8Array(12)); // 12-byte IV for GCM
-    
+
     const encrypted = await window.crypto.subtle.encrypt(
       {
         name: 'AES-GCM',

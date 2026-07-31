@@ -1,11 +1,21 @@
 import { Injectable, inject } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Subject } from 'rxjs';
+
+export interface ToastEvent {
+  message: string;
+  type: 'success' | 'danger' | 'warning' | 'info';
+  title: string;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class ToastService {
   private snackBar = inject(MatSnackBar);
+  
+  private toastEventsSubject = new Subject<ToastEvent>();
+  public toastEvents$ = this.toastEventsSubject.asObservable();
 
   show(message: string, type: 'success' | 'danger' | 'warning' | 'info' = 'info', title: string = '', duration: number = 4000) {
     const fullMessage = title ? `${title}: ${message}` : message;
@@ -23,6 +33,8 @@ export class ToastService {
       verticalPosition: 'bottom',
       panelClass
     });
+    
+    this.toastEventsSubject.next({ message: fullMessage, type, title });
   }
 
   success(message: string, title?: string, duration?: number) {

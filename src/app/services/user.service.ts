@@ -1,6 +1,7 @@
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { shareReplay, finalize } from 'rxjs/operators';
 import { isPlatformBrowser } from '@angular/common';
 import { SecureStorageService } from './secure-storage.service';
 import { environment } from '../../environments/environment';
@@ -13,6 +14,8 @@ export interface AuthUser {
   token: string;
   email?: string;
   profileImage?: string;
+  aiVoiceEnabled?: boolean;
+  experienceProfile?: any;
 }
 
 @Injectable({
@@ -27,6 +30,8 @@ export class UserService {
 
   private isAuthenticated = new BehaviorSubject<boolean>(false);
   public isAuthenticated$ = this.isAuthenticated.asObservable();
+
+  private sessionPollingInterval: any;
 
   constructor(
     private http: HttpClient,
@@ -56,6 +61,30 @@ export class UserService {
     return this.http.post(`${this.apiUrl}/forgot-password`, resetData);
   }
 
+  updateExperienceProfile(profile: any) {
+    const user = this.currentUser.value;
+    if (user) {
+      user.experienceProfile = profile;
+      this.currentUser.next(user);
+      if (isPlatformBrowser(this.platformId)) {
+        this.secureStorage.setItem('authUser', JSON.stringify(user), true);
+      }
+      
+      const payloadUserId = user.disabilityId || user.adminId;
+      if (payloadUserId) {
+        // We will just store it locally for now. The backend can also save it if needed.
+        // Assuming we have a preference endpoint, we can send it:
+        this.http.post(`${environment.apiUrl}/api/voice/preferences`, {
+           userId: payloadUserId,
+           experienceProfile: profile
+        }).subscribe({
+           next: () => {},
+           error: (err) => console.warn('Failed to sync profile to server', err)
+        });
+      }
+    }
+  }
+
   updatePassword(disabilityId: string, passwordData: any): Observable<any> {
     return this.http.put(`${this.apiUrl}/update-password/${disabilityId}`, passwordData, { responseType: 'text' });
   }
@@ -69,17 +98,43 @@ export class UserService {
   }
 
   login(user: AuthUser, rememberMe: boolean = false): void {
-    this.currentUser.next(user);
-    this.isAuthenticated.next(true);
     if (isPlatformBrowser(this.platformId)) {
       this.secureStorage.setItem('authUser', JSON.stringify(user), rememberMe);
       if (user.token) {
         this.secureStorage.setItem('token', user.token, rememberMe);
+        // Grace period marker: Interceptor will ignore 401s for 5s after login to prevent race conditions
+        this.secureStorage.setItem('session_established_at', Date.now().toString(), false);
       }
+    }
+    // Trigger observables AFTER token is saved so API calls made in reaction have the token
+    this.currentUser.next(user);
+    this.isAuthenticated.next(true);
+    this.startSessionPolling();
+  }
+
+  private startSessionPolling(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      this.stopSessionPolling();
+      // Poll every 15 seconds quietly
+      this.sessionPollingInterval = setInterval(() => {
+        if (this.isLoggedIn()) {
+          this.http.get(`${this.apiUrl}/validate-session`, { params: new HttpParams().set('silent', 'true') }).subscribe({
+             error: () => {} // The auth.interceptor catches 401s and logs them out
+          });
+        }
+      }, 15000);
+    }
+  }
+
+  private stopSessionPolling(): void {
+    if (this.sessionPollingInterval) {
+      clearInterval(this.sessionPollingInterval);
+      this.sessionPollingInterval = null;
     }
   }
 
   logout(): void {
+    this.stopSessionPolling();
     this.currentUser.next(null);
     this.isAuthenticated.next(false);
     if (isPlatformBrowser(this.platformId)) {
@@ -103,6 +158,7 @@ export class UserService {
           const user = JSON.parse(storedUserStr) as AuthUser;
           this.currentUser.next(user);
           this.isAuthenticated.next(true);
+          this.startSessionPolling();
         } catch (e) {
           console.error('Failed to parse stored authUser', e);
           this.logout();
@@ -169,10 +225,23 @@ export class UserService {
     return this.http.post(`${environment.apiUrl}/api/auth/forgot-password/answer`, resetData, { responseType: 'text' });
   }
 
+  private streakRequestCache = new Map<string, Observable<any>>();
+
   updateLoginStreak(userId: string, silent: boolean = false): Observable<any> {
+    if (this.streakRequestCache.has(userId)) {
+      return this.streakRequestCache.get(userId)!;
+    }
+
     let url = `${environment.apiUrl}/api/student/${userId}/login-streak`;
     if (silent) url += '?silent=true';
-    return this.http.post(url, null);
+    
+    const request = this.http.post(url, null).pipe(
+      finalize(() => setTimeout(() => this.streakRequestCache.delete(userId), 500)),
+      shareReplay(1)
+    );
+    
+    this.streakRequestCache.set(userId, request);
+    return request;
   }
 
   restoreStreak(userId: string): Observable<any> {

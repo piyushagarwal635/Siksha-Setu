@@ -1,5 +1,5 @@
 {
-  "name": "SikshaSetu",
+  "name": "DivyaMitra",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
@@ -7,7 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:SikshaSetu": "node dist/SikshaSetu/server/server.mjs"
+    "serve:ssr:DivyaMitra": "node dist/DivyaMitra/server/server.mjs"
   },
   "private": true,
   "dependencies": {
@@ -16,7 +16,6 @@
     "@angular/common": "^19.1.6",
     "@angular/compiler": "^19.1.6",
     "@angular/core": "^19.1.6",
-    "@angular/fire": "^19.0.0",
     "@angular/forms": "^19.1.6",
     "@angular/material": "^19.1.1",
     "@angular/platform-browser": "^19.1.6",
@@ -24,15 +23,15 @@
     "@angular/platform-server": "^19.1.6",
     "@angular/router": "^19.1.6",
     "@angular/ssr": "^19.1.8",
-    "@google-cloud/dialogflow": "^6.14.0",
     "@nguniversal/express-engine": "^7.0.2",
     "@types/three": "^0.184.1",
     "bootstrap": "^5.3.3",
     "chart.js": "^4.4.7",
     "express": "^4.18.2",
-    "firebase": "^11.2.0",
     "glob": "^11.0.1",
+    "gsap": "^3.15.0",
     "inflight": "^1.0.6",
+    "livekit-client": "^2.21.0",
     "rimraf": "^6.0.1",
     "rxjs": "~7.8.0",
     "three": "^0.184.0",

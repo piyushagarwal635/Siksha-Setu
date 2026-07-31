@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "SikshaSetu": {
+    "DivyaMitra": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/SikshaSetu",
+            "outputPath": "dist/DivyaMitra",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -70,10 +70,10 @@
           },
           "configurations": {
             "production": {
-              "buildTarget": "SikshaSetu:build:production"
+              "buildTarget": "DivyaMitra:build:production"
             },
             "development": {
-              "buildTarget": "SikshaSetu:build:development"
+              "buildTarget": "DivyaMitra:build:development"
             }
           },
           "defaultConfiguration": "development"

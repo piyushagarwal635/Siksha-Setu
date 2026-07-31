@@ -1,10 +1,14 @@
-import { Component, Inject, PLATFORM_ID, HostListener } from '@angular/core';
+import { Component, Inject, PLATFORM_ID, HostListener, AfterViewInit } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AccessibilityService } from '../../services/accessibility.service';
 import { ToastService } from '../../services/toast.service';
 import { UserService } from '../../services/user.service';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 interface Course {
   id: string;
@@ -33,7 +37,8 @@ interface Course {
   templateUrl: './courses.component.html',
   styleUrls: ['./courses.component.css']
 })
-export class CoursesComponent {
+export class CoursesComponent implements AfterViewInit {
+  bgTransform: string = 'translate3d(0px, 0px, 0px) scale(1.05)';
   public searchQuery: string = '';
   public activeTab: string = 'all';
   public selectedCourse: Course | null = null;
@@ -134,7 +139,7 @@ export class CoursesComponent {
   }
 
   constructor(
-    private accService: AccessibilityService,
+    public accService: AccessibilityService,
     private toastService: ToastService,
     private router: Router,
     private userService: UserService,
@@ -146,6 +151,45 @@ export class CoursesComponent {
   ngOnInit() {
     this.loadCourses();
     this.loadEnrollments();
+  }
+
+  ngAfterViewInit() {
+    if (this.isBrowser) {
+      setTimeout(() => {
+        this.initGsapAnimations();
+      }, 100);
+    }
+  }
+
+  initGsapAnimations(): void {
+    // Header Animation
+    gsap.from('.courses-header', { 
+      y: -50, opacity: 0, duration: 1, ease: 'power3.out' 
+    });
+    gsap.from('.courses-header h1', { 
+      y: 20, opacity: 0, duration: 0.8, delay: 0.2, ease: 'power2.out' 
+    });
+    gsap.from('.courses-header p', { 
+      y: 20, opacity: 0, duration: 0.8, delay: 0.4, ease: 'power2.out' 
+    });
+    gsap.from('.search-box, .btn-tab', {
+      y: 20, opacity: 0, duration: 0.6, stagger: 0.1, delay: 0.6, ease: 'power2.out'
+    });
+
+    // Course Cards Staggered Entrance
+    gsap.utils.toArray('.course-card').forEach((card: any, i) => {
+      gsap.from(card, {
+        scrollTrigger: {
+          trigger: card,
+          start: 'top 90%',
+        },
+        y: 50,
+        opacity: 0,
+        duration: 0.8,
+        ease: 'power3.out',
+        delay: (i % 2) * 0.2
+      });
+    });
   }
 
   loadCourses() {
@@ -182,7 +226,6 @@ export class CoursesComponent {
     }
   }
 
-  // Filter courses based on query and tab selector
   get filteredCourses(): Course[] {
     return this.courses.filter(course => {
       const matchesSearch = course.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
@@ -192,23 +235,19 @@ export class CoursesComponent {
     });
   }
 
-  // TTS helper for Course details
   public readCourseAloud(course: Course, event: Event) {
     event.stopPropagation();
     this.accService.playClickSound();
     
-    // Check if TTS is globally enabled, if not enable temporarily
     const wasTtsEnabled = this.accService.ttsEnabled;
     this.accService.ttsEnabled = true;
     
     const textToSpeak = `Course: ${course.title}. Category: ${course.category}. Description: ${course.description}. Duration is ${course.duration} with ${course.lessons} lessons.`;
     this.accService.speakText(textToSpeak);
     
-    // Restore TTS state
     this.accService.ttsEnabled = wasTtsEnabled;
   }
 
-  // View course details
   public openCourseDetails(course: Course) {
     this.accService.playClickSound();
     const currentUser = this.userService.getCurrentUser();
@@ -226,7 +265,6 @@ export class CoursesComponent {
     this.accService.stopSpeaking();
   }
 
-  // Enroll in course
   public enrollCourse(course: Course) {
     this.accService.playClickSound();
     const currentUser = this.userService.getCurrentUser();
@@ -250,7 +288,7 @@ export class CoursesComponent {
   }
 
   public isFormatAvailable(pref: string): boolean {
-    return true; // General stubs; CourseDashboard does real checks
+    return true; 
   }
 
   public togglePreference(pref: string) {

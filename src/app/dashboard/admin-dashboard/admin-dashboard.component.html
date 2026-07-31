@@ -1130,3 +1130,25 @@
     </div>
   </div>
 </div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal-backdrop-custom" *ngIf="showDeleteConfirmModal" (click)="closeDeleteConfirm()"></div>
+<div class="modal-dialog-custom shadow-lg" *ngIf="showDeleteConfirmModal" style="max-width: 500px; z-index: 10060;" role="dialog" aria-modal="true" tabindex="-1">
+  <div class="modal-content">
+    <div class="modal-header border-0 pb-0">
+      <h3 class="modal-title fw-bold text-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i>{{ deleteConfirmTitle }}</h3>
+      <button type="button" class="modal-close-custom" (click)="closeDeleteConfirm()" aria-label="Close" title="Cancel">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+    
+    <div class="modal-body py-4 text-center">
+      <p class="fs-5 text-dark mb-0 fw-semibold">{{ deleteConfirmMessage }}</p>
+    </div>
+    
+    <div class="modal-footer border-0 pt-0 d-flex justify-content-center gap-3">
+      <button class="btn btn-light py-2 px-4 rounded-pill fw-bold border" (click)="closeDeleteConfirm()">Cancel</button>
+      <button class="btn btn-danger py-2 px-4 rounded-pill fw-bold text-white" (click)="executeDeleteConfirm()">Yes, Delete</button>
+    </div>
+  </div>
+</div>

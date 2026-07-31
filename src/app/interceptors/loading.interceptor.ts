@@ -15,6 +15,8 @@ export const loadingInterceptor: HttpInterceptorFn = (req, next) => {
     '/users/all-users',
     '/schemes',
     '/api/chat',
+    '/api/voice',
+    '/api/tts',
     '/telemetry',
     'silent=true'
   ];

@@ -8,6 +8,8 @@ import { AccessibilityService } from '../../services/accessibility.service';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { BrailleContentViewerComponent } from '../../braille/braille-content-viewer/braille-content-viewer.component';
 import { SearchTelemetryService } from '../../services/search-telemetry.service';
+import { AiDescriptorProtocol, ComponentDescriptor, ComponentPriority } from '../../services/ai-semantic-engine/ai-descriptor.protocol';
+import { ComponentRegistry } from '../../services/ai-semantic-engine/component-registry.service';
 
 @Component({
   selector: 'app-student-dashboard',
@@ -16,11 +18,11 @@ import { SearchTelemetryService } from '../../services/search-telemetry.service'
   templateUrl: './student-dashboard.component.html',
   styleUrls: ['./student-dashboard.component.css']
 })
-export class StudentDashboardComponent implements OnInit, OnDestroy {
+export class StudentDashboardComponent implements OnInit, OnDestroy, AiDescriptorProtocol {
   activeSection = 'overview';
   isLoading = false;
   userId = '';
-  
+
   studentInfo = {
     name: '',
     disabilityId: '',
@@ -41,7 +43,7 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
   userEnrollmentMap: { [courseId: string]: any } = {};
   resources: any[] = [];
   unreadNotificationsCount = 0;
-  
+
   // Unenroll Modal state
   showUnenrollModal = false;
   unenrollReview = '';
@@ -73,8 +75,9 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
     private telemetryService: SearchTelemetryService,
     private elementRef: ElementRef,
     @Inject(PLATFORM_ID) private platformId: Object,
-    private ngZone: NgZone
-  ) {}
+    private ngZone: NgZone,
+    private componentRegistry: ComponentRegistry
+  ) { }
 
   isSectionScopeActive = false;
   previousActiveElement: HTMLElement | null = null;
@@ -154,22 +157,22 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
   private trapSectionFocus(event: KeyboardEvent) {
     const container = document.getElementById('activeSectionContainer');
     if (!container) return;
-    
+
     const focusable = container.querySelectorAll('button, input, select, textarea, a, [tabindex]:not([tabindex="-1"])');
     const focusableFiltered = Array.from(focusable).filter(el => {
       const style = window.getComputedStyle(el as HTMLElement);
-      return style.display !== 'none' && 
-             style.visibility !== 'hidden' && 
-             (el as HTMLElement).offsetWidth > 0 && 
-             (el as HTMLElement).offsetHeight > 0 && 
-             !(el as HTMLButtonElement).disabled;
+      return style.display !== 'none' &&
+        style.visibility !== 'hidden' &&
+        (el as HTMLElement).offsetWidth > 0 &&
+        (el as HTMLElement).offsetHeight > 0 &&
+        !(el as HTMLButtonElement).disabled;
     }) as HTMLElement[];
-    
+
     if (focusableFiltered.length === 0) return;
-    
+
     const first = focusableFiltered[0];
     const last = focusableFiltered[focusableFiltered.length - 1];
-    
+
     if (event.shiftKey) {
       if (document.activeElement === first) {
         last.focus();
@@ -198,10 +201,10 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
     if (!modal) return;
     const focusable = modal.querySelectorAll('button, input, select, textarea, [tabindex]:not([tabindex="-1"])');
     if (focusable.length === 0) return;
-    
+
     const first = focusable[0] as HTMLElement;
     const last = focusable[focusable.length - 1] as HTMLElement;
-    
+
     if (event.shiftKey) {
       if (document.activeElement === first) {
         last.focus();
@@ -216,6 +219,8 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.componentRegistry.register('student-dashboard-main', () => this.getSemanticState());
+
     this.route.queryParams.subscribe(params => {
       const section = params['tab'] || params['section'];
       if (section) {
@@ -253,9 +258,32 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.componentRegistry.unregister('student-dashboard-main');
     if (this.refreshInterval) {
       clearInterval(this.refreshInterval);
     }
+  }
+
+  getSemanticState(): ComponentDescriptor {
+    return {
+      componentId: 'student-dashboard-main',
+      componentType: 'DASHBOARD_OVERVIEW',
+      displayName: 'Student Dashboard Overview',
+      state: 'DEFAULT',
+      properties: {
+        activeSection: this.activeSection,
+        unreadNotifications: this.unreadNotificationsCount,
+        streak: this.analytics.currentStreak
+      },
+      availableActions: [
+        { actionId: 'view-courses', naturalLanguageLabel: 'View Enrolled Courses' },
+        { actionId: 'view-notifications', naturalLanguageLabel: 'View Notifications' }
+      ],
+      focusTarget: '.col-lg-9 h2',
+      isVisible: true, // TODO: Replace hardcoded visibility with viewport detection
+      isInteractive: true,
+      priority: ComponentPriority.CRITICAL
+    };
   }
 
   hasCertificates(): boolean {
@@ -269,10 +297,10 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
       const originalContents = document.body.innerHTML;
       // Replace button so it doesn't show in print
       const cleanContents = printContents.replace(/<button[^>]*>.*?<\/button>/gi, '');
-      
+
       document.body.innerHTML = `
         <div style="padding: 40px; text-align: center; font-family: 'Inter', sans-serif; background: white;">
-          <h2 style="color: #4f46e5; margin-bottom: 30px; font-weight: 800;">Siksha Setu E-Learning Platform</h2>
+          <h2 style="color: #4f46e5; margin-bottom: 30px; font-weight: 800;">Divya Mitra E-Learning Platform</h2>
           <div style="border: 4px solid #e2e8f0; padding: 40px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin: 0 auto; max-width: 800px; position: relative;">
             ${cleanContents}
             <div style="margin-top: 40px; pt-3; border-top: 2px dashed #cbd5e1; display: flex; justify-content: space-between;">
@@ -339,7 +367,7 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
         this.notifications = data;
         // Split: BROADCAST_ prefix = admin public announcements, SCHEME = scheme publish, everything else = personal
         this.broadcastNotifications = data.filter((n: any) => n.type && n.type.startsWith('BROADCAST_'));
-        this.personalNotifications  = data.filter((n: any) => !n.type || (!n.type.startsWith('BROADCAST_') && n.type !== 'SCHEME'));
+        this.personalNotifications = data.filter((n: any) => !n.type || (!n.type.startsWith('BROADCAST_') && n.type !== 'SCHEME'));
         // Unread count based on isRead field
         this.unreadNotificationsCount = data.filter((n: any) => !n.isRead && !n.read).length;
       },
@@ -369,7 +397,7 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
 
   getBroadcastCategoryDetails(type?: string): any {
     if (!type) return { label: 'Announcement', colorClass: 'primary', icon: 'bi-megaphone-fill' };
-    
+
     if (type.includes('INFO')) {
       return { label: 'Information', colorClass: 'info', icon: 'bi-info-circle-fill' };
     } else if (type.includes('WARNING')) {
@@ -377,7 +405,7 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
     } else if (type.includes('SUCCESS')) {
       return { label: 'Good News', colorClass: 'success', icon: 'bi-stars' };
     }
-    
+
     return { label: type.replace('BROADCAST_', ''), colorClass: 'secondary', icon: 'bi-megaphone-fill' };
   }
 
@@ -407,7 +435,7 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
 
   loadAnalytics(): void {
     if (!this.userId) return;
-    
+
     this.userService.updateLoginStreak(this.userId).subscribe({
       next: (progress: any) => {
         if (progress) {
@@ -448,7 +476,7 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
               if (a.actionDetails.includes('Logged in')) icon = 'bi-box-arrow-in-right text-info';
               else if (a.actionDetails.includes('Profile updated')) icon = 'bi-person-lines-fill text-primary';
               else if (a.actionDetails.includes('lesson') || a.actionDetails.includes('course')) icon = 'bi-book-fill text-success';
-              
+
               return { date: a.activityTimestamp, text: a.actionDetails, icon: icon };
             });
           }

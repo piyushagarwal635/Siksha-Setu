@@ -4,11 +4,11 @@
     <div class="header-decor"></div>
     <div class="position-relative z-2">
       <span class="badge bg-indigo text-white px-3 py-1.5 rounded-pill fw-bold text-uppercase mb-2 shadow-sm">
-        ðŸ“š Skill Building
+        📚 Skill Building
       </span>
       <h1 class="fw-extrabold mb-3 text-indigo">Interactive Study Courses</h1>
       <p class="text-muted leading-relaxed max-w-xl">
-        Explore interactive lessons tailored for absolute accessibility. You can read, listen to voice descriptions, or test your skills with our interactive Testzes!
+        Explore interactive lessons tailored for absolute accessibility. You can read, listen to voice descriptions, or test your skills with our interactive quizzes!
       </p>
 
       <!-- Search & Filters Row -->
@@ -133,6 +133,9 @@
                  [class.active]="selectedPreferences[pref]"
                  [class.disabled-pref]="!isFormatAvailable(pref) || (pref !== 'All Resources' && selectedPreferences['All Resources'])"
                  (click)="isFormatAvailable(pref) && !(pref !== 'All Resources' && selectedPreferences['All Resources']) && togglePreference(pref)"
+                 [attr.id]="isFormatAvailable(pref) || pref === 'All Resources' ? 'pref-' + pref.replace(' ', '') : null"
+                 [attr.data-ai-id]="isFormatAvailable(pref) || pref === 'All Resources' ? 'pref-' + pref.replace(' ', '') : null"
+                 [attr.aria-label]="pref + (!isFormatAvailable(pref) && pref !== 'All Resources' ? ' (Not available)' : '')"
                  style="background: rgba(255,255,255,0.7); border-color: rgba(99,102,241,0.1) !important; cursor: pointer;">
               <div class="d-flex align-items-center gap-3">
                 <div class="pref-icon-circle rounded-circle p-2 bg-indigo-soft text-indigo d-grid place-items-center" style="width: 40px; height: 40px;">

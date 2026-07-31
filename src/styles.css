@@ -531,3 +531,6 @@ textarea:focus-visible {
   outline-offset: -3px;
 }
 
+
+.bg-indigo { background-color: var(--primary-color) !important; }
+

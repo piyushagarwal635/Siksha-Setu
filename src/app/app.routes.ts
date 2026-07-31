@@ -1,5 +1,6 @@
 import { RouterModule, Routes } from '@angular/router';
 import { LoginComponent } from './login/login.component';
+import { SignupComponent } from './signup/signup.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { MainComponent } from './dashboard/main/main.component';
 import { StudentDashboardComponent } from './dashboard/student-dashboard/student-dashboard.component';
@@ -15,6 +16,7 @@ import { RoleGuard } from './guards/role.guard';
 export const routes: Routes = [ 
     { path: '', redirectTo: '/dashboard/main', pathMatch: 'full' },
     { path: 'login', component: LoginComponent },
+    { path: 'signup', component: SignupComponent },
     { path: 'secure-test/:courseId',
       loadComponent: () => import('./dashboard/secure-test-environment/secure-test-environment.component').then(m => m.SecureTestEnvironmentComponent),
       canActivate: [AuthGuard, RoleGuard],

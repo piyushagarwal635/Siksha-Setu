@@ -20,8 +20,8 @@ import { BrailleHardwareService } from '../../services/braille-hardware.service'
   styleUrl: './braille-testing.component.css'
 })
 export class BrailleTestingComponent implements OnInit, OnDestroy {
-  readonly examples = ['Hello', 'Angular', 'Siksha Setu', 'Government Schemes', 'Course Notes'];
-  text = 'Siksha Setu';
+  readonly examples = ['Hello', 'Angular', 'Divya Mitra', 'Government Schemes', 'Course Notes'];
+  text = 'Divya Mitra';
   dotMode: BrailleDotMode = 6;
   translation?: BrailleTranslation;
   error = '';
@@ -40,7 +40,7 @@ export class BrailleTestingComponent implements OnInit, OnDestroy {
   constructor(
     private readonly api: BrailleApiService,
     readonly hardware: BrailleHardwareService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.subscriptions.add(this.hardware.status$.subscribe(status => this.hardwareStatus = status));
