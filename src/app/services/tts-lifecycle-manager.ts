@@ -1,21 +1,16 @@
 import { HttpClient } from '@angular/common/http';
-import { Subscription } from 'rxjs';
 
 export type TtsSessionResult = { completed: boolean; error?: any };
 
 /**
  * TtsLifecycleManager
  *
- * Step 8 of Stabilization Blueprint.
- * Owns the HTTP TTS request, the Audio element, and cancellation.
- * Resolves RC-3 by decoupling request start from actual audio playback start.
+ * Rewritten to use browser-native window.speechSynthesis.
+ * This eliminates the dependency on the Python backend and fixes the 500 errors.
  */
 export class TtsLifecycleManager {
-  private state: 'IDLE' | 'FETCHING' | 'PLAYING' | 'STOPPING' = 'IDLE';
-  private currentAudioElement: HTMLAudioElement | null = null;
-  private httpSubscription: Subscription | null = null;
-
-  // Safety net: if onended never fires, recover after 30s
+  private state: 'IDLE' | 'PLAYING' | 'STOPPING' = 'IDLE';
+  private currentUtterance: SpeechSynthesisUtterance | null = null;
   private safetyTimerId: any = null;
 
   constructor(private http: HttpClient, private apiUrl: string) {}
@@ -27,70 +22,48 @@ export class TtsLifecycleManager {
     onCompleted: (result: TtsSessionResult) => void,
     speed: number = 1.0
   ): boolean {
-    if (this.state === 'FETCHING' || this.state === 'PLAYING') {
+    if (this.state === 'PLAYING') {
       this.stop();
     }
 
-    this.state = 'FETCHING';
+    this.state = 'PLAYING';
+    
+    // Clean text to avoid reading markdown asterisks aloud
+    const cleanedText = text.replace(/\*/g, '');
 
-    let voiceId = 'en-IN-NeerjaNeural';
-    if (language === 'hi') {
-      voiceId = 'hi-IN-SwaraNeural';
-    } else if (language === 'en') {
-      voiceId = 'en-IN-NeerjaNeural';
-    }
+    const utterance = new SpeechSynthesisUtterance(cleanedText);
+    utterance.lang = language === 'hi' ? 'hi-IN' : 'en-IN';
+    utterance.rate = speed;
 
-    this.httpSubscription = this.http.post(
-      `${this.apiUrl}/api/voice/tts`,
-      { text, voice: voiceId },
-      { responseType: 'blob' }
-    ).subscribe({
-      next: (audioBlob) => {
-        if (this.state === 'STOPPING' || this.state === 'IDLE') {
-          // stop() was called while fetching — do not play
-          return;
-        }
-        this.state = 'PLAYING';
-        onStartPlaying();
+    utterance.onstart = () => {
+      onStartPlaying();
+    };
 
-        const audioUrl = URL.createObjectURL(audioBlob as Blob);
-        this.currentAudioElement = new Audio(audioUrl);
-        this.currentAudioElement.crossOrigin = 'anonymous';
-        this.currentAudioElement.playbackRate = speed;
-        this.currentAudioElement.volume = 1.0;
+    utterance.onend = () => {
+      this.clearSafetyTimer();
+      this.cleanup();
+      onCompleted({ completed: true });
+    };
 
-        this.currentAudioElement.onended = () => {
-          this.clearSafetyTimer();
-          this.cleanup();
-          onCompleted({ completed: true });
-        };
+    utterance.onerror = (e) => {
+      if (this.state === 'STOPPING') return; // expected when canceled
+      console.warn('[TtsLifecycle] SpeechSynthesis failed:', e);
+      this.clearSafetyTimer();
+      this.cleanup();
+      onCompleted({ completed: false, error: e });
+    };
 
-        const playPromise = this.currentAudioElement.play();
-        if (playPromise !== undefined) {
-          playPromise.catch(e => {
-            if (e.name === 'AbortError') return; // Expected when stop() cancels mid-play
-            console.warn('[TtsLifecycle] Audio playback failed:', e);
-            this.clearSafetyTimer();
-            this.cleanup();
-            onCompleted({ completed: false, error: e }); // CRITICAL: unblock state machine
-          });
-        }
+    this.currentUtterance = utterance;
+    window.speechSynthesis.speak(utterance);
 
-        // 30s hard failsafe — if onended never fires (browser bug), recover the mic loop
-        this.safetyTimerId = setTimeout(() => {
-          if (this.state === 'PLAYING') {
-            console.warn('[TtsLifecycle] Safety timeout hit — forcing recovery.');
-            this.cleanup();
-            onCompleted({ completed: false });
-          }
-        }, 30000);
-      },
-      error: (err) => {
-        console.error('[TtsLifecycle] Error fetching TTS', err);
+    // 30s hard failsafe — if onended never fires (browser bug), recover the mic loop
+    this.safetyTimerId = setTimeout(() => {
+      if (this.state === 'PLAYING') {
+        console.warn('[TtsLifecycle] Safety timeout hit — forcing recovery.');
         this.cleanup();
-        onCompleted({ completed: false, error: err });
+        onCompleted({ completed: false });
       }
-    });
+    }, 30000);
 
     return true;
   }
@@ -99,18 +72,11 @@ export class TtsLifecycleManager {
     this.clearSafetyTimer();
     this.state = 'STOPPING';
 
-    if (this.httpSubscription) {
-      this.httpSubscription.unsubscribe();
-      this.httpSubscription = null;
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
     }
-
-    if (this.currentAudioElement) {
-      this.currentAudioElement.onended = null;
-      this.currentAudioElement.pause();
-      this.currentAudioElement.src = '';
-      this.currentAudioElement = null;
-    }
-
+    
+    this.currentUtterance = null;
     this.state = 'IDLE';
   }
 
@@ -123,12 +89,7 @@ export class TtsLifecycleManager {
 
   private cleanup(): void {
     this.clearSafetyTimer();
-    if (this.currentAudioElement) {
-      this.currentAudioElement.onended = null;
-      this.currentAudioElement.src = '';
-      this.currentAudioElement = null;
-    }
-    this.httpSubscription = null;
+    this.currentUtterance = null;
     this.state = 'IDLE';
   }
 }
