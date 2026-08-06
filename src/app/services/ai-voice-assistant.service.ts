@@ -214,6 +214,8 @@ export class AiVoiceAssistantService {
         filter(event => event instanceof NavigationEnd)
       ).subscribe(() => {
         if (this.isEnabledSubject.value && !this.isSleeping) {
+          // Do not interrupt if we are already processing a voice command (avoids the loop)
+          if (this.isProcessing) return;
           setTimeout(() => {
             this.triggerPageNarration();
           }, 800); // Delay to allow DOM rendering
@@ -512,7 +514,10 @@ export class AiVoiceAssistantService {
       },
       () => {
         // onSpoke interruption logic
-        if (this.isSpeaking) {
+        const mediaElements = Array.from(document.querySelectorAll('video, audio')) as HTMLMediaElement[];
+        const isMediaPlaying = mediaElements.some(m => !m.paused && !m.muted);
+
+        if (this.isSpeaking && !this.isReadingModeActive && !isMediaPlaying) {
           this.ttsManager.stop();
           this.isSpeaking = false;
         }
@@ -666,6 +671,42 @@ export class AiVoiceAssistantService {
             }
           }
 
+          // ===== LOCAL INTERRUPTION FOR MEDIA/READING =====
+          const mediaElements = Array.from(document.querySelectorAll('video, audio')) as HTMLMediaElement[];
+          const isMediaPlaying = mediaElements.some(m => !m.paused && !m.muted);
+          const isReadingOrMediaActive = this.isReadingModeActive || isMediaPlaying;
+
+          if (isReadingOrMediaActive) {
+            const stopWords = ['stop', 'ruk', 'ruko', 'pause', 'band', 'chup', 'skip', 'roko'];
+            const isStopCommand = stopWords.some(w => transcript.includes(w));
+            
+            if (isStopCommand) {
+              if (this.isReadingModeActive) {
+                this.stopReadingMode();
+              }
+              mediaElements.forEach(m => {
+                if (!m.paused) {
+                  m.pause();
+                }
+              }); // Stop all media
+              
+              this.transitionState(ConversationState.IDLE);
+              if (this.isEnabledSubject.value && !this.isMutedForSecurity) {
+                this.requestListen();
+              }
+              return; // Stop processing, don't speak replyText!
+            } else {
+              // Ignore background noise or AI's own voice while media is playing
+              // Just restart the mic silently so it keeps listening for "stop"
+              this.transitionState(ConversationState.IDLE);
+              if (this.isEnabledSubject.value && !this.isMutedForSecurity) {
+                this.requestListen();
+              }
+              return;
+            }
+          }
+          // ================================================
+
           if (this.isSleeping) {
             if (transcript.includes('activate') || transcript.includes('chalu') || transcript.includes('on') || transcript.includes('wake') || transcript.includes('jago')) {
               this.isSleeping = false;
@@ -733,8 +774,11 @@ export class AiVoiceAssistantService {
             this.handleComplexIntent(transcript, language, diagnosticId);
             return;
           }
-
-
+          // Stop reading mode if the user issues a new command that is not a reading continuation
+          const isReadingContinuation = response.action && (response.action.type === 'READ_NEXT' || response.action.type === 'READ_PREV' || response.action.type === 'READ_REPEAT' || response.action.type === 'READ_START');
+          if (this.isReadingModeActive && !isReadingContinuation && (response.action || replyText)) {
+            this.stopReadingMode();
+          }
 
           const isNavAction = response.action && response.action.type === 'NAVIGATE';
 
@@ -745,11 +789,30 @@ export class AiVoiceAssistantService {
             }, null, 2));
           }
 
-          if (response.action && response.action.type.startsWith('READ_')) {
-            try {
-              this.executeAction(response.action);
-            } catch (e) {
-              console.error("Error executing READ action", e);
+          // Special handling for READ and MEDIA actions to prevent TTS overlapping (speaking reply and reading text simultaneously)
+          const isReadOrMediaAction = response.action && (response.action.type.startsWith('READ_') || response.action.type.startsWith('MEDIA_'));
+
+          if (isReadOrMediaAction) {
+            const executeReadOrMedia = () => {
+              if (!this.isValidSession(sessionToken)) return;
+              try {
+                this.executeAction(response.action);
+              } catch (e) {
+                console.error("Error executing READ/MEDIA action", e);
+              }
+              // ALWAYS restart the mic after a media or read action so the user can interrupt/control it
+              if (this.isEnabledSubject.value && !this.isMutedForSecurity) {
+                this.transitionState(ConversationState.IDLE);
+                this.requestListen();
+              }
+            };
+
+            if (replyText) {
+              this.requestSpeak(replyText, () => {
+                executeReadOrMedia();
+              }, language);
+            } else {
+              executeReadOrMedia();
             }
             return;
           }
@@ -822,11 +885,12 @@ export class AiVoiceAssistantService {
             if (replyText) {
               this.requestSpeak(replyText, () => {
                 if (!this.isValidSession(sessionToken)) return;
-                if (this.isEnabledSubject.value && !this.isMutedForSecurity) {
+                // Don't turn on mic if a reading mode was just activated, because the reading loop manages its own mic state
+                if (this.isEnabledSubject.value && !this.isMutedForSecurity && !this.isReadingModeActive) {
                   this.requestListen();
                 }
               }, language);
-            } else if (this.isEnabledSubject.value && !this.isMutedForSecurity) {
+            } else if (this.isEnabledSubject.value && !this.isMutedForSecurity && !this.isReadingModeActive) {
               this.transitionState(ConversationState.IDLE);
               setTimeout(() => {
                 if (!this.isValidSession(sessionToken)) return;
@@ -935,7 +999,8 @@ export class AiVoiceAssistantService {
       'header', 'nav', 'footer', 'script', 'style', '.visually-hidden', '.sr-only', '.skip-link',
       '.accessibility-toolbar', '.theme-controls', '.cursor-controls', '.dev-controls', '.accessibility-widget', '.dev-tools', '.floating-actions',
       '.accessibility-panel', '#accessibility-panel', '.voice-controls', '#voice-controls', '.font-controls', '#font-controls',
-      '[aria-label*="accessibility" i]', '[aria-label*="theme" i]'
+      '[aria-label*="accessibility" i]', '[aria-label*="theme" i]',
+      '.sidebar', '.sidebar-overlay', '.cookie-banner-container'
     ];
 
     unwantedSelectors.forEach(sel => {
@@ -986,6 +1051,7 @@ export class AiVoiceAssistantService {
     const links = extractElements('a', 'link');
     const buttons = extractElements('button', 'button');
     const inputs = extractElements('input, select, textarea', 'input');
+    const customAiElements = extractElements('[data-ai-id]:not(button):not(a):not(input):not(select):not(textarea)', 'action_element');
 
     const structuredContext = {
       currentPage: this.router.url,
@@ -1004,7 +1070,8 @@ export class AiVoiceAssistantService {
       interactiveElements: {
         links: links,
         buttons: buttons,
-        inputs: inputs
+        inputs: inputs,
+        custom: customAiElements
       },
       visiblePageTextContent: pageText
     };
@@ -1087,6 +1154,18 @@ export class AiVoiceAssistantService {
             }
           }
           return true;
+        } else {
+          const pdfTextEl = document.getElementById('pdf-accessible-text');
+          const contentEl = document.getElementById('resource-content-area');
+          if (pdfTextEl || contentEl) {
+            if (action.type === 'MEDIA_PLAY') {
+              this.startReadingMode();
+              return true;
+            } else if (action.type === 'MEDIA_PAUSE') {
+              this.stopReadingMode();
+              return true;
+            }
+          }
         }
         return false;
       }
@@ -1162,6 +1241,12 @@ export class AiVoiceAssistantService {
             el = document.getElementById('signin-id') || document.querySelector('[formControlName="disabilityId"]');
           } else if (lowerTarget.includes('pass') || lowerTarget.includes('password')) {
             el = document.getElementById('signin-pass') || document.querySelector('[formControlName="pass"]');
+          } else if (lowerTarget.includes('braille')) {
+            el = document.querySelector('[data-ai-id="launch-braille-console"]') as HTMLElement;
+            if (!el) {
+              this.router.navigate(['/dashboard/braille-testing']);
+              return true;
+            }
           } else if (lowerTarget.includes('submit')) {
             el = document.querySelector('button[type="submit"]') || document.querySelector('.btn-submit-3d');
           } else if (document.activeElement && (document.activeElement instanceof HTMLInputElement || document.activeElement instanceof HTMLTextAreaElement || document.activeElement instanceof HTMLSelectElement)) {
@@ -1546,7 +1631,20 @@ export class AiVoiceAssistantService {
 
   private readCurrentChunk() {
     if (this.currentReadingChunkIndex >= this.readingChunks.length) {
-      this.playTTS("Yeh part poora ho gaya hai. Kya aap agle page par jana chahte hain?", () => {
+      const nextBtn = document.getElementById('pdf-next-page-btn') as HTMLButtonElement;
+      if (nextBtn && !nextBtn.disabled) {
+        nextBtn.click();
+        this.playTTS("Agle page par jaa rahi hoon.", () => {
+          setTimeout(() => {
+            if (this.isReadingModeActive) {
+              this.startReadingMode();
+            }
+          }, 1500);
+        });
+        return;
+      }
+
+      this.playTTS("Yeh document poora ho gaya hai.", () => {
         this.stopReadingMode();
         if (this.isEnabledSubject.value && !this.isMutedForSecurity) {
           this.requestListen();
@@ -1595,6 +1693,7 @@ export class AiVoiceAssistantService {
 
   public stopReadingMode() {
     this.isReadingModeActive = false;
+    this.ttsManager.stop();
     // Do not reset chunks or index so we can resume later if needed
     this.updateActiveContext({
       reading: { isReading: false, currentChunk: this.currentReadingChunkIndex, totalChunks: this.readingChunks.length }

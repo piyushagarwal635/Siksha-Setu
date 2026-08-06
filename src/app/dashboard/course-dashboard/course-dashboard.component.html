@@ -243,8 +243,8 @@
                       class="btn resource-btn text-start p-2.5 rounded-3 d-flex flex-column gap-1"
                       [class.active]="selectedResource?.id === res.id"
                       [class.locked-resource]="!isCategoryEnabled('text')"
-                      [attr.id]="'resource-btn-' + res.id"
-                      [attr.aria-label]="(!isCategoryEnabled('text') ? '[LOCKED] ' : '') + 'Open resource ' + res.title" [attr.title]="
+                      [attr.id]="'resource-text-' + res.id"
+                      [attr.aria-label]="(!isCategoryEnabled('text') ? '[LOCKED] ' : '') + 'Open text (PDF) resource ' + res.title" [attr.title]="
                         !isCategoryEnabled('text')
                           ? 'Unlock this format to access this resource'
                           : null
@@ -319,8 +319,8 @@
                       class="btn resource-btn text-start p-2.5 rounded-3 d-flex flex-column gap-1"
                       [class.active]="selectedResource?.id === res.id"
                       [class.locked-resource]="!isCategoryEnabled('video')"
-                      [attr.id]="'resource-btn-' + res.id"
-                      [attr.aria-label]="(!isCategoryEnabled('video') ? '[LOCKED] ' : '') + 'Open resource ' + res.title" [attr.title]="
+                      [attr.id]="'resource-video-' + res.id"
+                      [attr.aria-label]="(!isCategoryEnabled('video') ? '[LOCKED] ' : '') + 'Open video resource ' + res.title" [attr.title]="
                         !isCategoryEnabled('video')
                           ? 'Unlock this format to access this resource'
                           : null
@@ -395,8 +395,8 @@
                       class="btn resource-btn text-start p-2.5 rounded-3 d-flex flex-column gap-1"
                       [class.active]="selectedResource?.id === res.id"
                       [class.locked-resource]="!isCategoryEnabled('audio')"
-                      [attr.id]="'resource-btn-' + res.id"
-                      [attr.aria-label]="(!isCategoryEnabled('audio') ? '[LOCKED] ' : '') + 'Open resource ' + res.title" [attr.title]="
+                      [attr.id]="'resource-audio-' + res.id"
+                      [attr.aria-label]="(!isCategoryEnabled('audio') ? '[LOCKED] ' : '') + 'Open audio resource ' + res.title" [attr.title]="
                         !isCategoryEnabled('audio')
                           ? 'Unlock this format to access this resource'
                           : null
@@ -474,7 +474,8 @@
                       class="btn resource-btn text-start p-2.5 rounded-3 d-flex flex-column gap-1"
                       [class.active]="selectedResource?.id === res.id"
                       [class.locked-resource]="!isCategoryEnabled('sign')"
-                      [attr.aria-label]="(!isCategoryEnabled('sign') ? '[LOCKED] ' : '') + 'Open resource ' + res.title" [attr.title]="
+                      [attr.id]="'resource-sign-' + res.id"
+                      [attr.aria-label]="(!isCategoryEnabled('sign') ? '[LOCKED] ' : '') + 'Open sign language resource ' + res.title" [attr.title]="
                         !isCategoryEnabled('sign')
                           ? 'Unlock this format to access this resource'
                           : null
@@ -552,7 +553,7 @@
                       class="btn resource-btn text-start p-2.5 rounded-3 d-flex flex-column gap-1"
                       [class.active]="selectedResource?.id === res.id"
                       [class.locked-resource]="!isCategoryEnabled('braille')"
-                      [attr.aria-label]="(!isCategoryEnabled('braille') ? '[LOCKED] ' : '') + 'Open resource ' + res.title" [attr.title]="
+                      [attr.aria-label]="(!isCategoryEnabled('braille') ? '[LOCKED] ' : '') + 'Open braille resource ' + res.title" [attr.title]="
                         !isCategoryEnabled('braille')
                           ? 'Unlock this format to access this resource'
                           : null
@@ -686,7 +687,7 @@
                         <i class="bi bi-chevron-left"></i> Previous Page
                       </button>
                       <span class="text-muted small fw-bold">Page {{pdfPageNumber}} of {{pdfTotalPages}}</span>
-                      <button class="btn btn-sm btn-outline-indigo" [disabled]="pdfPageNumber >= pdfTotalPages"
+                      <button id="pdf-next-page-btn" class="btn btn-sm btn-outline-indigo" [disabled]="pdfPageNumber >= pdfTotalPages"
                         (click)="nextPdfPage()">
                         Next Page <i class="bi bi-chevron-right"></i>
                       </button>

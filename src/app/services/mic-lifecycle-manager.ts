@@ -173,20 +173,20 @@ export class MicLifecycleManager {
       for (let i = 0; i < bufferLength; i++) sum += dataArray[i];
       let average = sum / bufferLength;
 
+      let threshold = 25;
+      const mediaElementsForTimer = Array.from(document.querySelectorAll('video, audio')) as HTMLMediaElement[];
+      const isMediaPlayingForTimer = mediaElementsForTimer.some(m => !m.paused && !m.muted);
+      
       if (isSpeakingFn()) {
-         if (average > 65) {
-             onSpoke();
-         }
-      } else {
-         if (average > 35) {
-             onSpoke();
-             if (this.failsafeTimerId) {
-                 clearTimeout(this.failsafeTimerId);
-                 this.failsafeTimerId = null;
-             }
-             if (this.silenceTimerId) clearTimeout(this.silenceTimerId);
-             this.silenceTimerId = setTimeout(() => this.stop(), 4500);
-         }
+         threshold = 85;
+      } else if (isMediaPlayingForTimer) {
+         threshold = 85;
+      }
+
+      if (average > threshold) {
+         onSpoke();
+         if (this.silenceTimerId) clearTimeout(this.silenceTimerId);
+         this.silenceTimerId = setTimeout(() => this.stop(), 2500); // 2.5s for natural pause
       }
 
       if (isListeningFn()) {
@@ -195,6 +195,9 @@ export class MicLifecycleManager {
     };
 
     checkAudio();
-    this.failsafeTimerId = setTimeout(() => this.stop(), 15000);
+    const mediaElementsForTimer = Array.from(document.querySelectorAll('video, audio')) as HTMLMediaElement[];
+    const isMediaPlayingForTimer = mediaElementsForTimer.some(m => !m.paused && !m.muted);
+    const failsafeDuration = isSpeakingFn() || isMediaPlayingForTimer ? 5000 : 15000;
+    this.failsafeTimerId = setTimeout(() => this.stop(), failsafeDuration);
   }
 }

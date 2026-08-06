@@ -1,16 +1,20 @@
 import { HttpClient } from '@angular/common/http';
+import { Subscription } from 'rxjs';
 
 export type TtsSessionResult = { completed: boolean; error?: any };
 
 /**
  * TtsLifecycleManager
  *
- * Rewritten to use browser-native window.speechSynthesis.
- * This eliminates the dependency on the Python backend and fixes the 500 errors.
+ * Restored to use the Python TTS backend for high-quality neural voices.
  */
 export class TtsLifecycleManager {
-  private state: 'IDLE' | 'PLAYING' | 'STOPPING' = 'IDLE';
-  private currentUtterance: SpeechSynthesisUtterance | null = null;
+  private state: 'IDLE' | 'FETCHING' | 'PLAYING' | 'STOPPING' = 'IDLE';
+  private currentAudioElement: HTMLAudioElement | null = null;
+  private httpSubscription: Subscription | null = null;
+  private pendingOnCompleted: ((result: TtsSessionResult) => void) | null = null;
+
+  // Safety net: if onended never fires, recover after 30s
   private safetyTimerId: any = null;
 
   constructor(private http: HttpClient, private apiUrl: string) {}
@@ -22,62 +26,143 @@ export class TtsLifecycleManager {
     onCompleted: (result: TtsSessionResult) => void,
     speed: number = 1.0
   ): boolean {
-    if (this.state === 'PLAYING') {
+    if (this.state === 'FETCHING' || this.state === 'PLAYING') {
       this.stop();
     }
 
-    this.state = 'PLAYING';
-    
-    // Clean text to avoid reading markdown asterisks aloud
+    this.pendingOnCompleted = onCompleted;
+    this.state = 'FETCHING';
+
+    let voiceId = 'en-IN-NeerjaNeural';
+    if (language === 'hi') {
+      voiceId = 'hi-IN-SwaraNeural'; // High quality Hindi Female
+    } else if (language === 'en') {
+      voiceId = 'en-IN-NeerjaNeural'; // High quality English Female
+    }
+
+    // Clean text
     const cleanedText = text.replace(/\*/g, '');
 
-    const utterance = new SpeechSynthesisUtterance(cleanedText);
+    this.httpSubscription = this.http.post(
+      `${this.apiUrl}/api/voice/tts`,
+      { text: cleanedText, voice: voiceId },
+      { responseType: 'blob' }
+    ).subscribe({
+      next: (audioBlob) => {
+        if (this.state === 'STOPPING' || this.state === 'IDLE') {
+          return;
+        }
+        this.state = 'PLAYING';
+        onStartPlaying();
+
+        const audioUrl = URL.createObjectURL(audioBlob as Blob);
+        this.currentAudioElement = new Audio(audioUrl);
+        this.currentAudioElement.crossOrigin = 'anonymous';
+        this.currentAudioElement.playbackRate = speed;
+        this.currentAudioElement.volume = 1.0;
+
+        this.currentAudioElement.onended = () => {
+          this.clearSafetyTimer();
+          this.cleanup();
+          const cb = this.pendingOnCompleted;
+          this.pendingOnCompleted = null;
+          if (cb) cb({ completed: true });
+        };
+
+        const playPromise = this.currentAudioElement.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(e => {
+            if (e.name === 'AbortError') return; // Expected when stop() cancels mid-play
+            console.warn('[TtsLifecycle] Audio playback failed:', e);
+            this.clearSafetyTimer();
+            this.cleanup();
+            const cb = this.pendingOnCompleted;
+            this.pendingOnCompleted = null;
+            if (cb) cb({ completed: false, error: e }); // CRITICAL: unblock state machine
+          });
+        }
+
+        // 30s hard failsafe — if onended never fires (browser bug), recover the mic loop
+        this.safetyTimerId = setTimeout(() => {
+          if (this.state === 'PLAYING') {
+            console.warn('[TtsLifecycle] Safety timeout hit — forcing recovery.');
+            this.cleanup();
+            const cb = this.pendingOnCompleted;
+            this.pendingOnCompleted = null;
+            if (cb) cb({ completed: false });
+          }
+        }, 30000);
+      },
+      error: (err) => {
+        console.error('[TtsLifecycle] Error fetching TTS', err);
+        // Fallback to browser TTS if backend fails!
+        this.fallbackToBrowserTTS(cleanedText, language, speed, onStartPlaying, onCompleted);
+      }
+    });
+
+    return true;
+  }
+
+  private fallbackToBrowserTTS(text: string, language: string | undefined, speed: number, onStartPlaying: () => void, onCompleted: (result: TtsSessionResult) => void) {
+    console.warn('[TtsLifecycle] Falling back to browser SpeechSynthesis due to backend failure');
+    if (this.state === 'STOPPING') return;
+    this.state = 'PLAYING';
+    
+    const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = language === 'hi' ? 'hi-IN' : 'en-IN';
     utterance.rate = speed;
 
-    utterance.onstart = () => {
-      onStartPlaying();
-    };
+    const voices = window.speechSynthesis.getVoices();
+    if (voices.length > 0) {
+      let selectedVoice = voices.find(v => v.lang.startsWith(utterance.lang) && v.name.toLowerCase().includes('female'));
+      if (!selectedVoice) selectedVoice = voices.find(v => v.lang.startsWith(utterance.lang));
+      if (selectedVoice) utterance.voice = selectedVoice;
+    }
 
+    utterance.onstart = () => { onStartPlaying(); };
     utterance.onend = () => {
       this.clearSafetyTimer();
       this.cleanup();
-      onCompleted({ completed: true });
+      const cb = this.pendingOnCompleted;
+      this.pendingOnCompleted = null;
+      if (cb) cb({ completed: true });
     };
-
     utterance.onerror = (e) => {
-      if (this.state === 'STOPPING') return; // expected when canceled
-      console.warn('[TtsLifecycle] SpeechSynthesis failed:', e);
+      if (this.state === 'STOPPING') return;
       this.clearSafetyTimer();
       this.cleanup();
-      onCompleted({ completed: false, error: e });
+      const cb = this.pendingOnCompleted;
+      this.pendingOnCompleted = null;
+      if (cb) cb({ completed: false, error: e });
     };
 
-    this.currentUtterance = utterance;
     window.speechSynthesis.speak(utterance);
-
-    // 30s hard failsafe — if onended never fires (browser bug), recover the mic loop
-    this.safetyTimerId = setTimeout(() => {
-      if (this.state === 'PLAYING') {
-        console.warn('[TtsLifecycle] Safety timeout hit — forcing recovery.');
-        this.cleanup();
-        onCompleted({ completed: false });
-      }
-    }, 30000);
-
-    return true;
   }
 
   public stop(): void {
     this.clearSafetyTimer();
     this.state = 'STOPPING';
 
-    if (window.speechSynthesis) {
-      window.speechSynthesis.cancel();
+    if (this.httpSubscription) {
+      this.httpSubscription.unsubscribe();
+      this.httpSubscription = null;
+    }
+
+    if (this.currentAudioElement) {
+      this.currentAudioElement.onended = null;
+      this.currentAudioElement.pause();
+      this.currentAudioElement.src = '';
+      this.currentAudioElement = null;
     }
     
-    this.currentUtterance = null;
+    if (window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+    }
+
     this.state = 'IDLE';
+    const cb = this.pendingOnCompleted;
+    this.pendingOnCompleted = null;
+    if (cb) cb({ completed: false });
   }
 
   private clearSafetyTimer(): void {
@@ -89,7 +174,12 @@ export class TtsLifecycleManager {
 
   private cleanup(): void {
     this.clearSafetyTimer();
-    this.currentUtterance = null;
+    if (this.currentAudioElement) {
+      this.currentAudioElement.onended = null;
+      this.currentAudioElement.src = '';
+      this.currentAudioElement = null;
+    }
+    this.httpSubscription = null;
     this.state = 'IDLE';
   }
 }
